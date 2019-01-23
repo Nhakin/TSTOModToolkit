@@ -85,7 +85,7 @@ uses
   TSTOSbtpIntf in 'SbtpFile\TSTOSbtpIntf.pas',
   TSTOSbtpIntfReg in 'SbtpFile\TSTOSbtpIntfReg.pas',
   TSTOSbtpTypes in 'SbtpFile\TSTOSbtpTypes.pas',
-  TSTOScriptTemplate.Bin in 'ScriptTemplates\IO\DataPlugins\TSTOScriptTemplate.Bin.pas',
+  TSTOScriptTemplate.Bin in 'ScriptTemplates\IO\DataPlugins\TSTOScriptTemplate.Bin.pas' {$R *.res},
   TSTOScriptTemplate.IO in 'ScriptTemplates\IO\TSTOScriptTemplate.IO.pas',
   TSTOScriptTemplate.Xml in 'ScriptTemplates\IO\DataPlugins\TSTOScriptTemplate.Xml.pas',
   TSTOScriptTemplateImpl in 'ScriptTemplates\TSTOScriptTemplateImpl.pas',
@@ -100,9 +100,7 @@ uses
   TSTOZeroImpl in 'ZeroFile\TSTOZeroImpl.pas',
   TSTOZeroIntf in 'ZeroFile\TSTOZeroIntf.pas',
   VTCombos in 'VirtualTree\VTCombos.pas',
-  VTEditors in 'VirtualTree\VTEditors.pas',
-  SpTBXExControls in 'ThirdParty\TBXToolBar\Source\SpTBX\SpTBXExControls.pas',
-  SpTBXSkins in 'ThirdParty\TBXToolBar\Source\SpTBX\SpTBXSkins.pas';
+  VTEditors in 'VirtualTree\VTEditors.pas';
 
 {$R *.res}
 {$R Images.res}
