@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{892ad55a-19cf-4115-b472-3d5a350da8ab}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+    <DCC_DependencyCheckOutputName>..\Bin\TSTOToolKitV1.exe</DCC_DependencyCheckOutputName>
+    <MainSource>TSTOToolKitV1.dpr</MainSource>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_DebugInformation>False</DCC_DebugInformation>
+    <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+    <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    <DCC_Define>RELEASE;VT60;DONT_LINK_TARGA;DONT_LINK_DDS;DONT_LINK_GIF;DONT_LINK_MNG;DONT_LINK_JNG;DONT_LINK_PNM;DONT_LINK_RADHDR;DONT_LINK_EXTRAS</DCC_Define>
+    <DCC_ExeOutput>..\Bin</DCC_ExeOutput>
+    <DCC_DcuOutput>..\Dcu</DCC_DcuOutput>
+    <DCC_ObjOutput>..\Dcu</DCC_ObjOutput>
+    <DCC_HppOutput>..\Dcu</DCC_HppOutput>
+    <DCC_UnitSearchPath>C:\Projects\ReportGenerator\Indy10\Sources\Core;C:\Projects\ReportGenerator\Indy10\Sources\System;C:\Projects\ReportGenerator\Indy10\Sources\Protocols;C:\Projects\DelphiCodeGenerator\Sources\VirtualTree;.\Oxml 1.9;.\AviWriter 2.1</DCC_UnitSearchPath>
+    <DCC_ResourcePath>C:\Projects\ReportGenerator\Indy10\Sources\Core;C:\Projects\ReportGenerator\Indy10\Sources\System;C:\Projects\ReportGenerator\Indy10\Sources\Protocols;C:\Projects\DelphiCodeGenerator\Sources\VirtualTree;.\Oxml 1.9;.\AviWriter 2.1</DCC_ResourcePath>
+    <DCC_ObjPath>C:\Projects\ReportGenerator\Indy10\Sources\Core;C:\Projects\ReportGenerator\Indy10\Sources\System;C:\Projects\ReportGenerator\Indy10\Sources\Protocols;C:\Projects\DelphiCodeGenerator\Sources\VirtualTree;.\Oxml 1.9;.\AviWriter 2.1</DCC_ObjPath>
+    <DCC_IncludePath>C:\Projects\ReportGenerator\Indy10\Sources\Core;C:\Projects\ReportGenerator\Indy10\Sources\System;C:\Projects\ReportGenerator\Indy10\Sources\Protocols;C:\Projects\DelphiCodeGenerator\Sources\VirtualTree;.\Oxml 1.9;.\AviWriter 2.1</DCC_IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_Define>DEBUG;VT60;DONT_LINK_TARGA;DONT_LINK_DDS;DONT_LINK_GIF;DONT_LINK_MNG;DONT_LINK_JNG;DONT_LINK_PNM;DONT_LINK_RADHDR;DONT_LINK_EXTRAS</DCC_Define>
+    <DCC_ExeOutput>..\Bin</DCC_ExeOutput>
+    <DCC_DcuOutput>..\dcu</DCC_DcuOutput>
+    <DCC_ObjOutput>..\dcu</DCC_ObjOutput>
+    <DCC_HppOutput>..\dcu</DCC_HppOutput>
+    <DCC_SYMBOL_LIBRARY>False</DCC_SYMBOL_LIBRARY>
+    <DCC_UNIT_LIBRARY>False</DCC_UNIT_LIBRARY>
+    <DCC_UNIT_PLATFORM>False</DCC_UNIT_PLATFORM>
+    <DCC_SYMBOL_PLATFORM>False</DCC_SYMBOL_PLATFORM>
+    <DCC_UnitSearchPath>C:\Projects\ReportGenerator\Indy10\Sources\Core;C:\Projects\ReportGenerator\Indy10\Sources\System;C:\Projects\ReportGenerator\Indy10\Sources\Protocols;C:\Projects\DelphiCodeGenerator\Sources\VirtualTree;.\Oxml 1.9;.\AviWriter 2.1</DCC_UnitSearchPath>
+    <DCC_ResourcePath>C:\Projects\ReportGenerator\Indy10\Sources\Core;C:\Projects\ReportGenerator\Indy10\Sources\System;C:\Projects\ReportGenerator\Indy10\Sources\Protocols;C:\Projects\DelphiCodeGenerator\Sources\VirtualTree;.\Oxml 1.9;.\AviWriter 2.1</DCC_ResourcePath>
+    <DCC_ObjPath>C:\Projects\ReportGenerator\Indy10\Sources\Core;C:\Projects\ReportGenerator\Indy10\Sources\System;C:\Projects\ReportGenerator\Indy10\Sources\Protocols;C:\Projects\DelphiCodeGenerator\Sources\VirtualTree;.\Oxml 1.9;.\AviWriter 2.1</DCC_ObjPath>
+    <DCC_IncludePath>C:\Projects\ReportGenerator\Indy10\Sources\Core;C:\Projects\ReportGenerator\Indy10\Sources\System;C:\Projects\ReportGenerator\Indy10\Sources\Protocols;C:\Projects\DelphiCodeGenerator\Sources\VirtualTree;.\Oxml 1.9;.\AviWriter 2.1</DCC_IncludePath>
+  </PropertyGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Delphi.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">False</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">3084</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
+      
+      
+      
+      
+      
+      
+      
+      <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\5.0\Bpl\rvrb15D2007.bpl">TRichView wrapper for ReportBuilder 15 for Delphi 2007</Excluded_Packages>
+    </Excluded_Packages><Source><Source Name="MainSource">TSTOToolKitV1.dpr</Source></Source></Delphi.Personality><ModelSupport>False</ModelSupport></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
+  <ItemGroup>
+    <DelphiCompile Include="TSTOToolKitV1.dpr">
+      <MainSource>MainSource</MainSource>
+    </DelphiCompile>
+    <DCCReference Include="BCellFile\IO\DataPlugin\TSTOBCell.Bin.pas" />
+    <DCCReference Include="BCellFile\IO\DataPlugin\TSTOBCell.Xml.pas" />
+    <DCCReference Include="BCellFile\IO\TSTOBCell.IO.pas" />
+    <DCCReference Include="BCellFile\TSTOBCellImpl.pas" />
+    <DCCReference Include="BCellFile\TSTOBCellIntf.pas" />
+    <DCCReference Include="BsvFile\IO\DataPlugin\TSTOBsv.Bin.pas" />
+    <DCCReference Include="BsvFile\IO\DataPlugin\TSTOBsv.Xml.pas" />
+    <DCCReference Include="BsvFile\IO\TSTOBsv.IO.pas" />
+    <DCCReference Include="BsvFile\TSTOBsvImpl.pas" />
+    <DCCReference Include="BsvFile\TSTOBsvIntf.pas" />
+    <DCCReference Include="BsvFile\TSTOBsvIntfReg.pas" />
+    <DCCReference Include="CustomPatchFrm.pas">
+      <Form>FrmCustomPatches</Form>
+    </DCCReference>
+    <DCCReference Include="DlcDownloadFrm.pas">
+      <Form>DlcDownload</Form>
+    </DCCReference>
+    <DCCReference Include="dmImage.pas">
+      <Form>DataModuleImage</Form>
+      <DesignClass>TDataModule</DesignClass>
+    </DCCReference>
+    <DCCReference Include="HackMasterList\IO\DataPlugin\TSTOHackMasterList.Xml.pas" />
+    <DCCReference Include="HackMasterList\IO\TSTOHackMasterList.IO.pas" />
+    <DCCReference Include="HackMasterList\TSTOHackMasterListImpl.pas" />
+    <DCCReference Include="HackMasterList\TSTOHackMasterListIntf.pas" />
+    <DCCReference Include="HsUnits\HsBaseConvEx.pas" />
+    <DCCReference Include="HsUnits\HsCheckSumEx.pas" />
+    <DCCReference Include="HsUnits\HsClipBoardEx.pas" />
+    <DCCReference Include="HsUnits\HsEncodingEx.pas" />
+    <DCCReference Include="HsUnits\HsFunctionsEx.pas" />
+    <DCCReference Include="HsUnits\HsHttpEx.pas" />
+    <DCCReference Include="HsUnits\HsInterfaceEx.pas" />
+    <DCCReference Include="HsUnits\HsJSonEx.pas" />
+    <DCCReference Include="HsUnits\HsJSonFormatterEx.pas" />
+    <DCCReference Include="HsUnits\HsStreamEx.pas" />
+    <DCCReference Include="HsUnits\HsStringListEx.pas" />
+    <DCCReference Include="HsUnits\HsSuperObjectEx.pas" />
+    <DCCReference Include="HsUnits\HsXmlDocEx.pas" />
+    <DCCReference Include="HsUnits\HsZipUtils.pas" />
+    <DCCReference Include="IntfReg.pas" />
+    <DCCReference Include="RgbExtractProgress.pas" />
+    <DCCReference Include="SbtpFile\IO\DataPlugin\TSTOSbtp.Bin.pas" />
+    <DCCReference Include="SbtpFile\IO\DataPlugin\TSTOSbtp.JSon.pas" />
+    <DCCReference Include="SbtpFile\IO\DataPlugin\TSTOSbtp.Xml.pas" />
+    <DCCReference Include="SbtpFile\IO\DataPlugin\TSTOSbtpEx.JSon.pas" />
+    <DCCReference Include="SbtpFile\IO\TSTOSbtp.IO.pas" />
+    <DCCReference Include="SbtpFile\TSTOSbtpImpl.pas" />
+    <DCCReference Include="SbtpFile\TSTOSbtpIntf.pas" />
+    <DCCReference Include="SbtpFile\TSTOSbtpIntfReg.pas" />
+    <DCCReference Include="SbtpFile\TSTOSbtpTypes.pas" />
+    <DCCReference Include="SettingsFrm.pas">
+      <Form>FrmSettings</Form>
+    </DCCReference>
+    <DCCReference Include="SptbFrm.pas">
+      <Form>FrmSbtp</Form>
+    </DCCReference>
+    <DCCReference Include="SuperObject.pas" />
+    <DCCReference Include="TSTOBCell.pas" />
+    <DCCReference Include="TSTODownloader.pas" />
+    <DCCReference Include="TSTOFunctions.pas" />
+    <DCCReference Include="TSTOModToolKit.pas" />
+    <DCCReference Include="TSTOPackageList.pas" />
+    <DCCReference Include="TSTOPatches.pas" />
+    <DCCReference Include="TSTORgb.pas" />
+    <DCCReference Include="TSTORgbTrans.pas" />
+    <DCCReference Include="Vampyre\ImagingRgb.pas" />
+    <DCCReference Include="VirtualTree\TSTOTreeviews.pas" />
+    <DCCReference Include="VirtualTree\VTCombos.pas" />
+    <DCCReference Include="VirtualTree\VTEditors.pas" />
+    <DCCReference Include="WorkSpace\IO\DataPlugin\TSTOProjectWorkSpace.Bin.pas" />
+    <DCCReference Include="WorkSpace\IO\DataPlugin\TSTOProjectWorkSpace.Xml.pas" />
+    <DCCReference Include="WorkSpace\IO\TSTOProjectWorkSpace.IO.pas" />
+    <DCCReference Include="WorkSpace\TSTOProjectWorkSpace.Types.pas" />
+    <DCCReference Include="WorkSpace\TSTOProjectWorkSpaceImpl.pas" />
+    <DCCReference Include="WorkSpace\TSTOProjectWorkSpaceIntf.pas" />
+    <DCCReference Include="WorkSpace\TSTOProjectWorkSpaceIntfReg.pas" />
+    <DCCReference Include="Xml\msxmldom.pas" />
+    <DCCReference Include="Xml\TSTOCustomPatches.pas" />
+    <DCCReference Include="Xml\TSTODlcIndex.pas" />
+    <DCCReference Include="Xml\TSTOProject.pas" />
+    <DCCReference Include="Xml\TSTOStoreMenu.pas" />
+    <DCCReference Include="Xml\TSTOStoreMenuMaster.pas" />
+    <DCCReference Include="Xml\TSTOXmlBaseType.pas" />
+    <DCCReference Include="ZeroFile\DataPlugin\TSTOZero.Bin.pas" />
+    <DCCReference Include="ZeroFile\TSTOZeroImpl.pas" />
+    <DCCReference Include="ZeroFile\TSTOZeroIntf.pas" />
+  </ItemGroup>
+</Project>

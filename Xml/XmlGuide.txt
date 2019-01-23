@@ -1,0 +1,372 @@
+Buildings.xml -> Buildings
+Characters.xml -> Characters
+Consumables.xml -> Consumables
+Decorations.xml -> Buildings
+
+<!-- Settings Format Data
+ StartingResources: The resources the player starts with. One only.
+ Attributes:
+ - money: starting money
+ - donuts: starting donuts
+ 
+ Levels: The level progression and rewards for levels
+ Attributes:
+ - maxLevel: The max level obtainable. Number of level entries must correctly reflect this value.
+ 
+ Tags:
+ - Level: Describes going from one level to the next. Which level it represents is based on order, where the first Level tag is from level 1 to level 2, second from 2 to 3, etc.
+ Attributes:
+ - toNext: exp required to obtain the level.
+ 
+ Tags:
+ - Reward: The reward given for gaining the level.
+ Attributes:
+ - money: money gained
+ - donuts: donuts gained
+ 
+ Rushing: Settings for rushing things. One only.
+ Attributes:
+ - time: time in seconds for a rush to finish
+ Tags:
+ - <rush type name>: The type of rush this setting is for (Construction or Job). Multiple allowed, no duplicates.
+ Attributes:
+ - cost: amount of donuts to rush one time interval.
+ - interval: the length of a time interval for calculating donut cost (seconds or DaysHoursMinutesSeconds).
+ 
+ DialogueDefaultSpeeds: Set the default text reveal speeds for the dialogue events. Speeds are the time in seconds for a single character to be revealed.
+ Attributes:
+ - slow:
+ - medium:
+ - fast:
+ 
+ WalkDefaultSpeeds: Sets the default walk speeds. Normal is used for ordinary walking. Fast is used for jobs, and is the default settings for scripts.
+ Attributes:
+ - normal:
+ - fast:
+ 
+ Vandalism:
+ CleanVandalism:
+ SocialShopReward:
+ SocialFarmReward:
+ Sets the rewards for social events
+ Tags: Reward tag (money, xp)
+ 
+ BuildingGroupNames:
+ List of valid group  names
+ Tags: Group (Attribute: name)
+ 
+ Ratings:
+ RatingDescription:
+ codeName: the name to set up as a attribute for other rating ssystems
+ default: a figure this rating should start at for a new user
+ RatingLevels:
+ level: the level at which these figure become relevant
+ values : the codeNames from above with int values for achieving 5 stars
+ 
+ RoadRequirements:
+ RiverRequirements:
+ PavementRequirements:
+ same as requirements
+ 
+ DefaultFriends
+ list of DefaultFriend, in order of selection
+ 
+ DefaultFriend
+ file: land xml of fake friend
+ rating: rating of this land, displayed in HUD when visiting and in friend map
+ level: level of this land, displayed in HUD when visiting and in friend map
+ levelmax: level of USER, used to pick which land is used when visiting fake friend
+ 
+ DefaultCharacterJobRewards: rewards used on character jobs that don't define their own rewards. The list must be sorted by time in ascending order.
+ Tags:
+ - <DefaultJobReward>: one unique entry (based on its time) for a job reward. The choice between premium and not premium is defined by the <character> entry of the job itself (it may be marked as premiumJob="true").
+ 
+ Attributes:
+ - time:			the time that the job takes
+ - money:		money awarded when the character is not a premium character
+ - xp:			xp awarded when the character is not a premium character
+ - premiumMoney: money awarded when for characters marked as premium in the job
+ - premiumXp:	xp awarded when for characters marked as premium in the job
+ 
+ 
+ DefaultBuildingJobRewards: the same as DefaultCharacterJobRewards, but for building jobs instead of character jobs.
+-->
+ 
+<!-- Buildings Format Guide
+    BuildingDefaults:
+        - This section contains default values which are applied if the Building (see below) does not override it. One only.
+        - Attributes: None
+        - Tags: Tags which can be defaulted are marked as such in the Building section below.
+        
+    Building:
+        - Describes an in-game Building entity. Multiple can be present.
+        
+        - Attributes:
+                    - id: A unique, integer id for the building. Should not be used to reference the building in the xmls.
+                    - name: A unique name for the building. Use this to reference the building in the xmls.
+                    - type: A building type which controls how it behaves. Allowed values: Building, Decoration
+                    - xpValue: The amount of xp granted upon completion of the building.
+                    - flatBuilding: Defines that this needs to be drawn in a preliminary render pass 
+
+        - Tags:
+                    - LoadBuilding: Controls whether the building is loaded into game or not - has default.
+                            Attributes:
+                                    - value: Either "true" or "false"
+                    
+                    - Cost: The price of the building - has default
+                            Attributes:
+                                    - money: the money cost (if not included, uses default)
+                                    - donuts: the donut cost (if not included, uses default)
+					
+					- UnlockCost: The price of unlocking the building prematurely. If not included, cannot be unlocked in this way.
+                            Attributes:
+                                    - money: the money cost
+                                    - donuts: the donut cost                  
+ 
+                    - Sell: The sell value of the building as a function of the cost - has default
+                            Attributes:
+                                    - money: the multiplier applied to the money cost to determine resources returned when sold (if not included, uses default)
+                                    - donuts: the multiplier applied to the donuts cost to determine resources returned when sold (if not included, uses default)
+                                    - allowed: true / false
+ 
+                    - Unique: Whether multiple instances of the building can be created in game - has default
+                            Attributes:
+                                    - value: Either "true" or "false"
+                    
+                    - Income: Controls the resource gain over time provided by the building
+                            Attributes:
+                                    - interval: The time (in seconds) between resource gains (if not included, uses default)
+                                    - money: The amount of money gained each interval (if not included, uses default)
+                    
+                    - BuildTime: The amount of time to construct the building
+                            Attributes:
+                                    - time: The time (in seconds) to build the building.
+                    
+                    - Requirements: A subgroup which contains a set of Requirement tags (see below). Required if there are multiple Requirement tags present, optional if there is only one.
+                    
+                    - Requirement: Describes a requirement which must be met to build the building. If multiple are present, must be nested inside a Requirements tag.
+                            Attributes:
+                                    - type: The type of requirement. Allowed values are: level, building, quest, active quest, sessions
+                                    - level: Used for level type requirement only. The minimum level needed to meet the requirement.
+                                    - building: Used for building requirement only. The name of the building which you must own an instance of to meet the requirement.
+									- rewardsCollected: additional argument for building requirement. Optional. If present and 'yes', will wait until rewards collected to proceed.
+                                    - quest: Used for quest and active quest requirements. The name of the quest which you must complete/be in to meet the requirement.
+                                    - count: used for sessions type requirement. The number of play sessions needed (>= comparison)
+                    
+                    - Characters: A subgroup which contains a set of Character tags (see below). Required if there are multiple Character tags present, optional if there is only one.
+                    
+                    - Character: The character which is unlocked when this building is created. If multiple are present, must be nested inside a Characters tag.
+                            Attributes:
+                                    - name: the name of the character unlocked
+					
+					- Script: A script to play when the building is selected. Specific quest scripts will override this script if set. If not set, will instead open the building menu.
+							Attributes:
+									- package: the script package is the name of the file (without extension) which contains the script (ie. SExample.xml would be the SExample package)
+									- name: the name of the script within the package
+							Example: <Script package="TutorialScripts" name="TestScript1"/>
+
+                    - Tile: Types of tile this building can be placed on
+                            Attributes:
+                                    - type: list of tile types this object can be placed on, example for manholes: "road|pavement"
+ 
+					- Vandalism: Can the building be vandalized.
+							Attributes:
+									- value: "true" if can be vandalized.
+                    - RatingElem : these effect the players ratings each time this building is created or destroyed on creation the valus are added on destruction they are removed.
+                            Attributes::
+                                    - The values are all ints, but the values are specified in the rating descriptions in the settings.xml
+					- Bonus : used to apply a global modifier on the exp and mony gain
+							Attributes::
+									money: value to mod money amount by
+									exp: value to mod exp amount by
+-->
+
+<!-- 
+	Consumable - a consumable item
+	
+	type Box:
+		Reward - an item which can be obtained from the box
+                Attributes: money, donuts, xp, chance
+				Tags: (optional)
+					Item: An inventory item which is given as a reward
+						Attributes:
+								type: one of "building", "character", "consumable", or "memorabilia"
+								name: the name of the building/character/consumable to gain
+								
+				chance: the chance of the item being obtained 
+					The chances of the items in a box are related to each other. When determining which item is picked within a box, a number between 0 and 1 is generated.
+					This number is compared to the chances of the items in order, and takes the first one with a chance greater or equal to the number generated.
+					If no items have a greater value, no item is obtained.
+					Example:
+						Items with chances: 0.2, 0.4, 0.5, 0.6, 0.65
+						Value rolled: 0.46
+						Compare with first: 0.2 < 0.46, fails.
+						Compare with second: 0.4 < 0.46, fails
+						Compare with third: 0.5 >= 0.46, passes <- this item is awarded, stop here.
+						
+						If a number greater than 0.65 was rolled, no item would be awarded.
+-->
+
+<!--
+ Controllers can contain any other controller, unless noted below.
+ 
+ <Animation>
+ Child Controllers:
+ 0
+ Attributes:
+ name: animation name from Characters.xml
+ 
+ <PriorityList>
+ Child Controllers:
+ N (must be Animation controllers)
+ Description:
+ Chooses animation starting from the top. If that doesn't exist goes onto next animation.
+ 
+ <Random>
+ Child Controllers:
+ 2
+ Attributes:
+ chance: chance out of 1 that first child controller is chosen, otherwise picks 2nd controller
+ 
+ <Loop>
+ Child Controllers:
+ 1
+ Attributes:
+ loops (optional): # of times to loop, loops forever if not specified
+ Description:
+ Loops child controller forever (unless loop attribute is used)
+ 
+ <Sequence>
+ Child Controllers:
+ N
+ Description:
+ Plays child controllers in sequence.
+ 
+ <MoveGroup>
+ Child Controllers:
+ N (must be MovePick controllers)
+ Description:
+ Chooses between a number of MovePick controllers based on character movement direction and speed
+ This chooses the closest matching MovePick, and will always pick one even if poorly matched.
+ 
+ <MovePick>
+ Child Controllers:
+ 1 (parent must be MoveGroup)
+ Attributes:
+ x: (range -1,1) prefer this anim if character movement is in this direction
+ y: (range -1,1)prefer this anim if character movement is in this direction
+ speed: (range 0,1) prefer this anim if character speed this (1 is full speed)
+ 
+ Description:
+ See MoveGroup description.
+-->
+
+<!-- Job Format Data
+    JobDefaults: The default settings for jobs, used if not overriden in the Job tag.
+            Tags:
+                    - Reward: The reward gained on completion of the job
+                            Attributes:
+                                    - money: the default money awarded
+                                    - xp: the default xp awarded
+    
+    Job: Describes a job done by a character
+            Attributes:Î
+                    - name: The name of the job
+                    - time: The time in seconds the job takes (DHMS is also accepted, such as 1d4m for 1 day 4 minutes)
+            
+            Tags:
+                    - Reward: The reward gained on completion of the job - has default
+                            Attributes:
+                                    - money: the money gained
+                                    - xp: the xp gained
+ 
+                    - Character: A character who can do this job. Multiple allowed.
+                            Attributes:
+                                    - name: The name of the character
+
+                    - Location: A location where there job is performed.
+						OR
+					  Group: a group of locations where the job is performed
+                            Attributes:
+                                    - name: The name of the location
+									- fade: whether to fade out when doing the job
+									
+									
+					- Requirement: see Buildings.xml for full description. 
+								Special case:
+									<Requirement type="active quest" quest="(quest name)"/>
+									A job with this requirement will only appear when the named quest is active and will appear at the top of the list.
+									This is accomplished by adding it to the front of the job list instead of the back, so if multiple active quest req jobs are active,
+									the one closest to the BOTTOM of this xml will appear at the top of the list.
+-->
+
+<!--
+ Set: a set of memorabilia items (max 5 - should always be 5)
+ Attributes:
+ id: a unique identifier for the set
+ name: the name of the set
+ 
+ Tags:
+ Reward: The reward for turning in the set
+ Attributes: money, donuts, xp
+ Tags: (optional)
+ Item: An inventory item which is given as a reward
+ Attributes:
+ type: one of "building", "character", or "consumable"
+ name: the name of the building/character/consumable to gain
+ 
+ Item: a memorabilia item
+ Attributes:
+ id: a unique identifier for the memorabilia item. Must be unique with respect to all memorabilia items. Unconnected to set id.
+ name: the name of the item
+ icon: the icon used - TODO: NOT YET IMPLEMENTED
+ buyCost: the donut cost of the item
+ chance: the chance of the item dropping when a job is done at a building that uses this set. 
+ The chances of the items in a set are related to each other. When determining which item is picked within a set, a number between 0 and 1 is generated.
+ This number is compared to the chances of the items in order, and takes the first one with a chance greater or equal to the number generated.
+ If no items have a greater value, no item is obtained.
+ Example:
+ Items with chances: 0.2, 0.4, 0.5, 0.6, 0.65.
+ Value rolled: 0.46
+ Compare with first: 0.2 < 0.46, fails.
+ Compare with second: 0.4 < 0.46, fails
+ Compare with third: 0.5 >= 0.46, passes <- this item is awarded, stop here.
+ 
+ If a number greater than 0.65 was rolled, no item would be awarded.
+ 
+ Building: a building which this set can be obtained from. A set can be obtained from multiple buildings, and a building can have multiple sets.
+ If a building has multiple sets, one is randomly picked, then the above formula used to determine if anything drops.
+ Attributes:
+ name: name of the building
+ 
+ 
+ <Set id="1" name="Test Set">
+ <Item id="1" name="Test Item 1" icon="" buyCost="10" chance="0.2"/>
+ <Item id="2" name="Test Item 2" icon="" buyCost="11" chance="0.75"/>
+ <Item id="3" name="Test Item 3" icon="" buyCost="12" chance="0.85"/>
+ <Item id="4" name="Test Item 4" icon="" buyCost="13" chance="0.95"/>
+ <Item id="5" name="Test Item 5" icon="" buyCost="14" chance="1.00"/>
+ 
+ <Reward money="250" donuts="0" xp="20">
+ <Item type="building" name="PowerPlant"/>
+ </Reward>
+ 
+ <Building name="SimpsonHome"/>
+ <Building name="PowerPlant"/>
+ </Set>
+ 
+ <Set id="2" name="Test Set 2">
+ <Item id="6" name="Test Item 6" icon="" buyCost="10" chance="0.1"/>
+ <Item id="7" name="Test Item 7" icon="" buyCost="11" chance="0.3"/>
+ <Item id="8" name="Test Item 8" icon="" buyCost="12" chance="0.4"/>
+ <Item id="9" name="Test Item 9" icon="" buyCost="13" chance="0.2"/>
+ <Item id="10" name="Test Item 10" icon="" buyCost="14" chance="0.55"/>
+ 
+ <Building name="SimpsonHome"/>
+ </Set>
+ -->
+ 
+ <!--
+   Kahn_SpecialEvents -> Damar1stCraftScript -> Damar1stMenu -> Kahn_Consumables -> Damar1stScript
+   
+ -->

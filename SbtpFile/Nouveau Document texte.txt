@@ -1,0 +1,185 @@
+Function ValidateZeroFile(Const APath : String) : Boolean;
+Var lZero : IBinZeroFile;
+    lMem  : IMemoryStreamEx;
+    lZip  : IHsMemoryZipper;
+    X, Y  : Integer;
+    lIdx  : Integer;
+    lLog  : IHsStringListEx;
+    lCrc32 : DWord;
+    lOriCrc : DWord;
+Begin
+  lZero := TBinZeroFile.CreateBinZeroFile();
+  lMem  := TMemoryStreamEx.Create();
+  lZip  := THsMemoryZipper.Create();
+  lLog  := THsStringListEx.CreateList();
+  Try
+    lMem.LoadFromFile(APath + '0');
+    lZero.LoadFromStream(lMem);
+
+    If lZero.FileHeader.ZeroFileSize <> lMem.Size Then
+      lLog.Add('Wrong Zero FileSize : ' + IntToStr(lZero.FileHeader.ZeroFileSize) + ' - ' + IntToStr(lMem.Size));
+
+    lMem.Position := lMem.Size - SizeOf(DWord);
+    lOriCrc := lMem.ReadDWord(True);
+    lMem.Size := lMem.Size - SizeOf(DWord);
+    lCrc32 := GetCrc32Value(TStream(lMem.InterfaceObject));
+    If lCrc32 <> lOriCrc Then
+      lLog.Add('Wrong Zero Crc32 : ' + IntToHex(lOriCrc, 8) + ' - ' + IntToHex(lCrc32, 8));
+
+    For X := 0 To lZero.FileDatas.Count - 1 Do
+    Begin
+      With lZero.FileDatas[X] Do
+      Begin
+        lZip.LoadFromFile(APath + FileName);
+        lCrc32 := GetCrc32Value(TStream(lZip.InterfaceObject));
+        If lCrc32 <> Crc32 Then
+          lLog.Add('Wrong Crc32 File ' + FileName + ' : ' + IntToHex(Crc32, 8) + ' - ' + IntToHex(lCrc32, 8));
+
+        For Y := 0 To ArchivedFiles.Count - 1 Do
+        Begin
+          With ArchivedFiles[Y] Do
+          Begin
+            lIdx := lZip.FindFile(FileName1);
+            If lIdx = -1 Then
+            Begin
+              lLog.Add('File doesn''t exist : ' + FileName1 + ' in - ' + FileName);
+              lLog.Add(ArchivedFiles[Y].GetDataAsString(2));
+            End
+            Else If FileSize <> lZip[lIdx].UncompressedSize Then
+            Begin
+              lLog.Add('Invalid File Size : ' + IntToStr(FileSize) + ' - ' + IntToStr(lZip[lIdx].UncompressedSize));
+              lLog.Add(ArchivedFiles[Y].GetDataAsString(2));
+            End
+            Else If FileName1 <> FileName2 Then
+              lLog.Add(ArchivedFiles[Y].GetDataAsString(2))
+            Else If Word1 <> 1 Then
+              lLog.Add(ArchivedFiles[Y].GetDataAsString(2));
+          End;
+        End;
+      End;
+    End;
+
+    ShowMessage(lLog.Text);
+
+    Finally
+      lLog  := Nil;
+      lZip  := Nil;
+      lMem  := Nil;
+      lZero := Nil;
+  End;
+End;
+
+Procedure CreateSbtpMod();//AProject : ITSTOXMLProject);
+Var lZip : IHsMemoryZipper;
+    lMem : IMemoryStreamEx;
+    lPatch : ISbtpFilesIO;
+    lStrs : TStringList;
+    lSr   : TSearchRec;
+    X, Y, Z : Integer;
+    lSbtp : ISbtpFileIO;
+    lSbtpFName : String;
+    lIdx  : Integer;
+    lStrIdx : String;
+
+    lVariable : ISbtpVariable;
+    lSubVariable : ISbtpSubVariable;
+    
+    lPath : String;
+    lInSbtpPath : String;
+    lOutSbtpPath : String;
+Begin
+  lPath := 'V:\TSTOModToolKit\4_18_Maggie_Patch1_PostLaunch_WRQ15IVQ3UTD\';
+  lInSbtpPath := lPath + 'textpools-en-r278343-R4UZI17C\0\';
+  lOutSbtpPath := lPath + 'textpools-en-r278343-R4UZI17C\1.src\';
+
+//  If FileExists(AProject.Settings.HackFileName) Then
+  If FileExists(lPath + 'KahnHack.zip') Then
+  Begin
+    lZip := THsMemoryZipper.Create();
+    lMem := TMemoryStreamEx.Create();
+    Try
+      lZip.ShowProgress := False;
+      lZip.LoadFromFile(lPath + 'KahnHack.zip');
+      lZip.ExtractToStream('TextPools', lMem);
+
+      If lMem.Size > 0 Then
+      Begin
+        lMem.Position := 0;
+        lPatch := TSbtpFilesIO.LoadBinSbtpFiles(lMem);
+        lStrs := TStringList.Create();
+        Try
+
+          If lPatch.Count > 0 Then
+          Begin
+//            If FindFirst(AProject.Settings.SourcePath + '*.sbtp', faAnyFile, lSr) = 0 Then
+            If FindFirst(lInSbtpPath + '*.sbtp', faAnyFile, lSr) = 0 Then
+            Try
+              Repeat
+                lStrs.Add(lSr.Name);
+              Until FindNext(lSr) <> 0;
+
+              Finally
+                FindClose(lSr);
+            End;
+          End;
+
+          For X := 0 To lPatch.Count - 1 Do
+          Begin
+            lSbtp := Nil;
+            lSbtpFName := '';
+
+            For Y := 0 To lStrs.Count - 1 Do
+            Begin
+              lStrIdx := '';
+              For Z := 1 To Length(lStrs[Y]) Do
+                If lStrs[Y][Z] In [#$30..#$39] Then
+                  lStrIdx := lStrIdx + lStrs[Y][Z];
+
+              If lPatch[X].Header.HeaderPadding = StrToIntDef(lStrIdx, -1) Then
+              Begin
+//                lSbtp := TSbtpFileIO.LoadBinSbtpFile(AProject.Settings.SourcePath + lStrs[Y]);
+                lSbtp := TSbtpFileIO.LoadBinSbtpFile(lInSbtpPath + lStrs[Y]);
+                lSbtpFName := lStrs[Y];
+                Break;
+              End;
+            End;
+
+            If Assigned(lSbtp) Then
+            Begin
+              For Y := 0 To lPatch[X].Item.Count - 1 Do
+              Begin
+                lIdx := lSbtp.Item.IndexOf(lPatch[X].Item[Y].VariableType);
+                If lIdx = -1 Then
+                  lSbtp.Item.Add().Assign(lPatch[X].Item[Y])
+                Else
+                Begin
+                  lVariable := lSbtp.Item[lIdx];
+
+                  For Z := 0 To lPatch[X].Item[Y].SubItem.Count - 1 Do
+                  Begin
+                    lIdx := lVariable.SubItem.IndexOf(lPatch[X].Item[Y].SubItem[Z].VariableName);
+                    If lIdx = -1 Then
+                      lVariable.SubItem.Add().Assign(lPatch[X].Item[Y].SubItem[Z])
+                    Else
+                      lVariable.SubItem[lIdx].VariableData := lPatch[X].Item[Y].SubItem[Z].VariableData;
+                  End;
+                End;
+              End;
+
+//              lSbtp.SaveToFile(AProject.Settings.TargetPath + lSbtpFName);
+              lSbtp.SaveToFile(lOutSbtpPath + lSbtpFName);
+            End;
+          End;
+
+          Finally
+            lStrs.Free();
+            lPatch := Nil;
+        End;
+      End;
+
+      Finally
+        lMem := Nil;
+        lZip := Nil;
+    End;
+  End;
+End;

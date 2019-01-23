@@ -1,0 +1,92 @@
+program TSTOToolKitV1;
+
+uses
+  Forms,
+  TSTOModToolKit in 'TSTOModToolKit.pas',
+  dmImage in 'dmImage.pas' {DataModuleImage: TDataModule},
+  TSTOXmlBaseType in 'Xml\TSTOXmlBaseType.pas',
+  TSTOStoreMenu in 'Xml\TSTOStoreMenu.pas',
+  TSTOStoreMenuMaster in 'Xml\TSTOStoreMenuMaster.pas',
+  TSTOProject in 'Xml\TSTOProject.pas',
+  HsClipBoardEx in 'HsUnits\HsClipBoardEx.pas',
+  HsEncodingEx in 'HsUnits\HsEncodingEx.pas',
+  HsInterfaceEx in 'HsUnits\HsInterfaceEx.pas',
+  HsStreamEx in 'HsUnits\HsStreamEx.pas',
+  HsSuperObjectEx in 'HsUnits\HsSuperObjectEx.pas',
+  HsXmlDocEx in 'HsUnits\HsXmlDocEx.pas',
+  HsZipUtils in 'HsUnits\HsZipUtils.pas',
+  HsCheckSumEx in 'HsUnits\HsCheckSumEx.pas',
+  SuperObject in 'SuperObject.pas',
+  TSTODlcIndex in 'Xml\TSTODlcIndex.pas',
+  TSTOZeroImpl in 'ZeroFile\TSTOZeroImpl.pas',
+  TSTOZeroIntf in 'ZeroFile\TSTOZeroIntf.pas',
+  TSTOZero.Bin in 'ZeroFile\DataPlugin\TSTOZero.Bin.pas',
+  msxmldom in 'Xml\msxmldom.pas',
+  HsHttpEx in 'HsUnits\HsHttpEx.pas',
+  HsStringListEx in 'HsUnits\HsStringListEx.pas',
+  TSTODownloader in 'TSTODownloader.pas',
+  TSTOPackageList in 'TSTOPackageList.pas',
+  DlcDownloadFrm in 'DlcDownloadFrm.pas' {DlcDownload},
+  TSTORgb in 'TSTORgb.pas',
+  RgbExtractProgress in 'RgbExtractProgress.pas',
+  SettingsFrm in 'SettingsFrm.pas' {FrmSettings},
+  TSTOPatches in 'TSTOPatches.pas',
+  SptbFrm in 'SptbFrm.pas' {FrmSbtp},
+  TSTOCustomPatches in 'Xml\TSTOCustomPatches.pas',
+  CustomPatchFrm in 'CustomPatchFrm.pas' {FrmCustomPatches},
+  TSTOBCell.Bin in 'BCellFile\IO\DataPlugin\TSTOBCell.Bin.pas',
+  TSTOBCell.IO in 'BCellFile\IO\TSTOBCell.IO.pas',
+  TSTOBCell.Xml in 'BCellFile\IO\DataPlugin\TSTOBCell.Xml.pas',
+  TSTOBCellImpl in 'BCellFile\TSTOBCellImpl.pas',
+  TSTOBCellIntf in 'BCellFile\TSTOBCellIntf.pas',
+  HsBaseConvEx in 'HsUnits\HsBaseConvEx.pas',
+  TSTOSbtp.Bin in 'SbtpFile\IO\DataPlugin\TSTOSbtp.Bin.pas',
+  TSTOSbtp.IO in 'SbtpFile\IO\TSTOSbtp.IO.pas',
+  TSTOSbtp.Xml in 'SbtpFile\IO\DataPlugin\TSTOSbtp.Xml.pas',
+  TSTOSbtpImpl in 'SbtpFile\TSTOSbtpImpl.pas',
+  TSTOSbtpIntf in 'SbtpFile\TSTOSbtpIntf.pas',
+  TSTOSbtpIntfReg in 'SbtpFile\TSTOSbtpIntfReg.pas',
+  TSTOSbtpTypes in 'SbtpFile\TSTOSbtpTypes.pas',
+  TSTOSbtp.JSon in 'SbtpFile\IO\DataPlugin\TSTOSbtp.JSon.pas',
+  HsFunctionsEx in 'HsUnits\HsFunctionsEx.pas',
+  HsJSonEx in 'HsUnits\HsJSonEx.pas',
+  HsJSonFormatterEx in 'HsUnits\HsJSonFormatterEx.pas',
+  TSTOSbtpEx.JSon in 'SbtpFile\IO\DataPlugin\TSTOSbtpEx.JSon.pas',
+  IntfReg in 'IntfReg.pas',
+  TSTOBsvImpl in 'BsvFile\TSTOBsvImpl.pas',
+  TSTOBsvIntf in 'BsvFile\TSTOBsvIntf.pas',
+  TSTOBsv.Bin in 'BsvFile\IO\DataPlugin\TSTOBsv.Bin.pas',
+  TSTOBsv.IO in 'BsvFile\IO\TSTOBsv.IO.pas',
+  TSTOBsv.Xml in 'BsvFile\IO\DataPlugin\TSTOBsv.Xml.pas',
+  TSTOBCell in 'TSTOBCell.pas',
+  TSTOBsvIntfReg in 'BsvFile\TSTOBsvIntfReg.pas',
+  TSTORgbTrans in 'TSTORgbTrans.pas',
+  ImagingRgb in 'Vampyre\ImagingRgb.pas',
+  VTEditors in 'VirtualTree\VTEditors.pas',
+  VTCombos in 'VirtualTree\VTCombos.pas',
+  TSTOTreeviews in 'VirtualTree\TSTOTreeviews.pas',
+  TSTOProjectWorkSpace.IO in 'WorkSpace\IO\TSTOProjectWorkSpace.IO.pas',
+  TSTOProjectWorkSpace.Bin in 'WorkSpace\IO\DataPlugin\TSTOProjectWorkSpace.Bin.pas',
+  TSTOProjectWorkSpace.Xml in 'WorkSpace\IO\DataPlugin\TSTOProjectWorkSpace.Xml.pas',
+  TSTOProjectWorkSpaceImpl in 'WorkSpace\TSTOProjectWorkSpaceImpl.pas',
+  TSTOProjectWorkSpaceIntf in 'WorkSpace\TSTOProjectWorkSpaceIntf.pas',
+  TSTOProjectWorkSpaceIntfReg in 'WorkSpace\TSTOProjectWorkSpaceIntfReg.pas',
+  TSTOProjectWorkSpace.Types in 'WorkSpace\TSTOProjectWorkSpace.Types.pas',
+  TSTOHackMasterList.IO in 'HackMasterList\IO\TSTOHackMasterList.IO.pas',
+  TSTOHackMasterList.Xml in 'HackMasterList\IO\DataPlugin\TSTOHackMasterList.Xml.pas',
+  TSTOHackMasterListImpl in 'HackMasterList\TSTOHackMasterListImpl.pas',
+  TSTOHackMasterListIntf in 'HackMasterList\TSTOHackMasterListIntf.pas',
+  TSTOFunctions in 'TSTOFunctions.pas';
+
+{$R *.res}
+
+begin
+  ReportMemoryLeaksOnShutdown := True;
+
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.Title := 'TSTOModToolKit';
+  Application.CreateForm(TDataModuleImage, DataModuleImage);
+  Application.CreateForm(TDlcDownload, DlcDownload);
+  Application.Run;
+end.
