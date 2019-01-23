@@ -87,6 +87,7 @@ Service/
 ThirdParty/
 Misc/
 _*.*
+RgbViewer/
 
 # Castalia statistics file (since XE7 Castalia is distributed with Delphi)
 *.stat
