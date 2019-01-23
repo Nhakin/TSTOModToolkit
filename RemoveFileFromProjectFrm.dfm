@@ -11,9 +11,11 @@ object FrmRemoveFileFromProject: TFrmRemoveFileFromProject
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 13
   object SpTBXGroupBox1: TSpTBXGroupBox
@@ -24,7 +26,6 @@ object FrmRemoveFileFromProject: TFrmRemoveFileFromProject
     Color = 2499877
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 288
     object SBOk: TSpTBXButton
       Left = 384
       Top = 3
@@ -52,9 +53,5 @@ object FrmRemoveFileFromProject: TFrmRemoveFileFromProject
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitLeft = 288
-    ExplicitTop = 64
-    ExplicitWidth = 185
-    ExplicitHeight = 41
   end
 end

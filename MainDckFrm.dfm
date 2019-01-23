@@ -1773,12 +1773,6 @@ object FrmDckMain: TFrmDckMain
       object popRenameProjectGroup: TSpTBXItem
         Caption = 'Rename'
       end
-      object SpTBXSeparatorItem12: TSpTBXSeparatorItem
-      end
-      object popTvWSProjectGroupConfiguration: TSpTBXItem
-        Caption = 'Configuration Manager...'
-        OnClick = popTvWSProjectGroupConfigurationClick
-      end
       object SpTBXSeparatorItem13: TSpTBXSeparatorItem
       end
       object popExportHackConfig: TSpTBXItem
@@ -1788,6 +1782,12 @@ object FrmDckMain: TFrmDckMain
       object popBuildHackConfig: TSpTBXItem
         Caption = 'Build Hack Config'
         OnClick = popBuildHackConfigClick
+      end
+      object SpTBXSeparatorItem12: TSpTBXSeparatorItem
+      end
+      object popTvWSProjectGroupConfiguration: TSpTBXItem
+        Caption = 'Configuration Manager...'
+        OnClick = popTvWSProjectGroupConfigurationClick
       end
     end
     object popTvWSProjectItems: TSpTBXSubmenuItem
