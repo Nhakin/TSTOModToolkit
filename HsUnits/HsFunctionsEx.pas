@@ -12,6 +12,7 @@ Function PushZero(Const AString : String; Const ALen : Integer) : String;
 Function PushZeroR(Const AString : String; Const ALen : Integer) : String;
 Function UnPushZeroR(Const AString : String) : String;
 Function MessageConfirm(Const AMessage : String) : Boolean;
+Procedure AppLogFile(Const AMessage : String; AFileName : String = ''; AWriteDate : Boolean = True);
 
 Var
   MoveFast : Procedure(Const Source; Var Dest; Count: PtrInt);
@@ -21,7 +22,7 @@ Var
 implementation
 
 Uses
-  Controls, Dialogs;
+  Classes, SysUtils, Controls, Dialogs;
 
 Var
   /// the available CPU features, as recognized at program startup
@@ -618,6 +619,31 @@ End;
 Function MessageConfirm(Const AMessage : String) : Boolean;
 Begin
   Result := MessageDlg(AMessage, mtInformation, [mbYes, mbNo], 0) = mrYes;
+End;
+
+Procedure AppLogFile(Const AMessage : String; AFileName : String = ''; AWriteDate : Boolean = True);
+Var FName : String;
+Begin
+  With TStringList.Create() Do
+  Try
+    If AFileName = '' Then
+      FName := ChangeFileExt(ParamStr(0), '.log')
+    Else
+      FName := AFileName;
+
+    If FileExists(FName) Then
+      LoadFromFile(FName);
+
+    If AWriteDate Then
+      Add(FormatDateTime('ddmmyy:hhmmss.zzz - ', Now) + AMessage)
+    Else
+      Add(AMessage);
+
+    SaveToFile(FName);
+
+    Finally
+      Free();
+  End;
 End;
 
 Initialization

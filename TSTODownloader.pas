@@ -53,7 +53,7 @@ Type
 implementation
 
 Uses Classes, Forms, StdCtrls, ComCtrls, ExtCtrls, SysUtils, Controls, Dialogs,
-  HsHttpEx, HsStreamEx, HsStringListEx, HsZipUtils, HsXmlDocEx;
+  HsHttpEx, HsStreamEx, HsStringListEx, HsZipUtils, HsXmlDocEx, HsFunctionsEx;
 
 Type
   THttpDownloadProgress = Class(TInterfacedObjectEx, IHttpProgress)
@@ -350,16 +350,7 @@ Begin
           End;
 
           Except
-            With TStringList.Create() Do
-            Try
-              If FileExists('00-DebugWeb.txt') Then
-                LoadFromFile('00-DebugWeb.txt');
-              Add(FServerName + FFileList[X]);
-              SaveToFile('00-DebugWeb.txt');
-
-              Finally
-                Free();
-            End;
+            AppLogFile('Failed to download : ' + FFileList[X]);
         End;
 
         Application.ProcessMessages();

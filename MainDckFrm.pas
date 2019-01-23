@@ -275,18 +275,16 @@ Type
 
     FWorkSpace    : ITSTOWorkSpaceProjectGroupIO;
     FResources    : ITSTOResourcePaths;
-//    FHackSettings : ITSTOHackSettings;
-//    FHackMasterList : ITSTOHackMasterListIO;
-//    FHackTemplate   : ITSTOScriptTemplateHacksIO;
 
     FPrevSTHack : ITSTOScriptTemplateHackIO;
 
     FPrj        : ITSTOXMLProject;
     FBCell      : ITSTOBCellAnimation;
 
-    FLoaded     : Boolean;
-    FDefLayout  : IMemoryStreamEx;
-    FCurData    : ITSTOCurrentData;
+    FLoaded      : Boolean;
+    FDefLayout   : IMemoryStreamEx;
+    FCurData     : ITSTOCurrentData;
+    FCurDlcIndex : String;
 
     Procedure ShowPanelClick(Sender : TObject);
     Procedure DoWorkSpaceOnChanged(Sender : TObject);
@@ -566,22 +564,6 @@ begin
       FWorkSpace.LoadFromFile(WorkSpaceFile);
     FWorkSpace.OnChange := DoWorkSpaceOnChanged;
 
-//    FHackSettings := TTSTOHackSettings.CreateHackSettings();
-//    If FileExists(HackFileName) Then
-//      FHackSettings.LoadFromFile(HackFileName);
-//    FHackSettings.ScriptTemplates.OnChanged := DoHackOnChanged;
-(*
-    FHackMasterList := TTSTOHackMasterListIO.CreateHackMasterList();
-    If FileExists(HackMasterList) Then
-      FHackMasterList.LoadFromFile(HackMasterList);
-
-    If FileExists(HackFileTemplate) Then
-      FHackTemplate := TTSTOScriptTemplateHacksIO.CreateScriptTemplateHacks(HackFileTemplate)
-    Else
-      FHackTemplate := TTSTOScriptTemplateHacksIO.CreateScriptTemplateHacks();
-
-    FHackTemplate.OnChanged := DoHackOnChanged;
-*)
     If FileExists(IncludeTrailingBackslash(ResourcePath) + 'ResourceIndex.bin') Then
       FResources := TTSTOResourcePaths.CreateResourcePaths(IncludeTrailingBackslash(ResourcePath) + 'ResourceIndex.bin')
     Else
@@ -638,14 +620,12 @@ begin
   FTvCustomPatches.Align      := alClient;
   FTvCustomPatches.Font.Color := clBlack;
   FTvCustomPatches.TvData     := FWorkSpace.HackSettings.CustomPatches.Patches;
-  //FHackSettings.CustomPatches.Patches; //FPrj.CustomPatches.Patches;
 
   FTvScriptTemplate := TTSTOScriptTemplateTreeView.Create(Self);
   FTvScriptTemplate.Parent     := PanTvHackTemplate;
   FTvScriptTemplate.Align      := alClient;
   FTvScriptTemplate.Font.Color := clBlack;
   FTvScriptTemplate.TvData     := FWorkSpace.HackSettings.ScriptTemplates;
-  //FHackSettings.ScriptTemplates;//FHackTemplate;
   FTvScriptTemplate.PopupMenu  := popTvSTTemplate;
   FTvScriptTemplate.OnFocusChanged := DoTvScriptTemplateOnFocusChanged;
 
@@ -744,291 +724,8 @@ End;
 (******************************************************************************)
 
 procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
-Const
-  cBuildCustomStore = 1;
-  cInstantBuild = 2;
-  cAllFreeItems = 4;
-  cNonUnique = 8;
-  cFreeLand = 16;
-  cUnlimitedTime = 32;
-
-Const
-  cCategoryEnabled = 1;
-  cBuildStore = 2;
-  cAddInStore = 1;
-  cOverRide = 2;
-
-Var lZip : IHsMemoryZipper;
-    lMem : IMemoryStreamEx;
-    W, X, Y, Z : Integer;
-    lHackFlags : Byte;
-    lHackML : ITSTOHackMasterListIO;
-    lFileName : String;
-    lBmp : TBitMap;
-    lRes : TResourceStream;
-
-//    lPatchIO : ITSTOCustomPatchesIO;
-    lNodes : IXmlNodeListEx;
-    lXml   : IXmlDocumentEx;
-    lLst   : IHsStringListEx;
-    lCData : IXmlNode;
-
-    lXmlWS : IXmlTSTOWorkSpaceProjectGroup;
-
-    lWS : ITSTOWorkSpaceProjectGroupIO;
-    lStrStrm : IStringStreamEx;
-    lHexStr  : AnsiString;
-    lCrc32   : DWord;
-    lCurString : AnsiString;
-    lBase64Str : AnsiString;
-
-    lPatchIO : ITSTOCustomPatchesIO;
 begin
-Exit;
-{  FWorkSpace.SaveToFile( ChangeFileExt(FWorkSpace.FileName, '.xml') );
-  ShowMessage('Done');
-Exit;}
-//  FWorkSpace.SaveToFile(FWorkSpace.FileName);
-//  ShowMessage('Done');
-//Exit;
-//  FHackTemplate.GenerateScripts(FHackMasterList);
-//  ShowMessage('Done');
-//Exit;
-(*
-//Decrypt
-  lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_35_XMAS2018Teaser_L8N4LCSZA757\4_35_XMAS2018Teaser_L8N4LCSZA757.bin';
-  lMem := TMemoryStreamEx.Create();
-  Try
-    lMem.LoadFromFile(lFileName);
-    lMem.Position := lMem.Size - 8;
-    lHexStr := lMem.ReadAnsiString(8);
-
-    lMem.Size := lMem.Size - 8;
-    If GetCrc32Value(TStream(lMem.InterfaceObject)) = StrToInt('$' + lHexStr) Then
-    Begin
-      lMem.Position := 0;
-      lLst := THsStringListEx.CreateList();
-      Try
-        lLst.Text := lMem.ReadAnsiString(lMem.Size - lMem.Position);
-        lBase64Str := '';
-
-        For X := 0 To lLst.Count - 1 Do
-        Begin
-          lCurString := lLst[X];
-
-          While Length(lCurString) > 0 Do
-          Begin
-            lBase64Str := lBase64Str + AnsiChar(StrToInt('$' + Copy(lCurString, 1, 2)));
-            lCurString := Copy(lCurString, 3, Length(lCurString));
-          End;
-        End;
-
-        lMem.Clear();
-        Base64DecodeToStream(lBase64Str, TStream(lMem.InterfaceObject));
-        lMem.SaveToFile(ExtractFilePath(lFileName) + 'DecryptTest.zip');
-
-        Finally
-          lLst := Nil;
-      End;
-    End
-    Else
-      ShowMessage('Shit');
-
-    Finally
-      lMem := Nil;
-  End;
-*)
-//(*
-//Encrypt
-  lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_35_XMAS2018Teaser_L8N4LCSZA757\4_35_XMAS2018Teaser_L8N4LCSZA757.wspg';
-  lWS := TTSTOWorkSpaceProjectGroupIO.CreateProjectGroup();
-  Try
-    lWS.LoadFromFile(lFileName);
-
-    lStrStrm := TStringStreamEx.Create();
-    lZip := THsMemoryZipper.Create();
-    Try
-      lWS.SaveToStream(lStrStrm);
-      //lStrStrm.Position := 0;
-
-      lZip.Password := 'ThaNhak';
-      lZip.ShowProgress := False;
-      lZip.AddFromStream('WorkGroup', lStrStrm);
-lZip.SaveToFile(ExtractFilePath(lFileName) + 'Calisse.zip');
-      lStrStrm.Clear();
-      With (lZip As IMemoryStreamEx) Do
-        Base64EncodeToStream(Memory, TStream(lStrStrm.InterfaceObject), Size);
-
-//      ShowMessage(lStrStrm.DataString);
-
-      lStrStrm.Position := 0;
-      lHexStr := '';
-
-      (lZip As IMemoryStreamEx).Clear();
-
-      While Not lStrStrm.EoS Do
-      Begin
-        lHexStr := lHexStr + IntToHex(lStrStrm.ReadByte(), 2);
-        If Length(lHexStr) Mod 32 = 0 Then
-        Begin
-          lHexStr := lHexStr + #$D#$A;
-          (lZip As IMemoryStreamEx).WriteAnsiString(lHexStr, False);
-          lHexStr := '';
-        End;
-      End;
-
-      With (lZip As IMemoryStreamEx) Do
-      Begin
-        If lHexStr <> '' Then
-          WriteAnsiString(lHexStr, False);
-
-        lCrc32 := GetCrc32Value(TStream(InterfaceObject));
-        WriteAnsiString(IntToHex(lCrc32, 8), False);
-        SaveToFile(ChangeFileExt(lFileName, '.bin'));
-      End;
-
-      Finally
-        lStrStrm := Nil;
-        lZip := Nil;
-    End;
-
-    Finally
-      lWS := Nil;
-  End;
-//*)
-Exit;
-  If Supports(FWorkSpace, IXmlTSTOWorkSpaceProjectGroup, lXmlWS) Then
-  Begin
-    FWorkSpace.Assign(lXmlWS);
-    ShowMessage(FWorkSpace.AsXml);
-//    ShowMessage(FormatXmlData(lXmlWS.Xml));
-  End;
-//  FWorkSpace.SaveToFile(ChangeFileExt(FPrj.Settings.WorkSpaceFile, '.xml'));
-Exit;
-(*
-  lPatchIO := TTSTOCustomPatchesIO.CreateCustomPatchIO();
-  Try
-    lPatchIO.AsXml := FPrj.CustomPatches.XML;
-
-//    ShowMessage( lPatchIO.Patches[0].PatchData[0].PatchPath + #$D#$A +
-//                 lPatchIO.Patches[0].PatchData[0].Code );
-//    ShowMessage(IntToStr(lPatchIO.Patches[0].PatchData.Count));
-    ShowMessage(lPatchIO.AsXml);
-//    ShowMessage(IntToStr(lPatchIO.Patches.Count) + ' - ' + IntToStr(lPatchIO.ActivePatchCount));
-//    ShowMessage('Done');
-//    ShowMessage(lPatchIO.AsXml);
-    Finally
-      lPatchIO := Nil;
-  End;
-//  ShowMessage(FPrj.CustomPatches.XML);
-Exit;
-*)
-  ShowMessage(IntToHex(ColorToRGB(clFuchsia), 8));
-Exit;
-
-  lHackML := TTSTOHackMasterListIO.CreateHackMasterList();
-  Try
-    lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_35_THOH2018_Patch4_X98YAKUL9PRG\gamescripts-r438293-HEZ7LWQU\HackMasterList.xml';
-    lHackML.LoadFromFile(lFileName);
-
-    lMem := TMemoryStreamEx.Create();
-    Try
-      lMem.WriteByte(1);
-      lMem.WriteWord(lHackML.Count);
-
-      For X := 0 To lHackML.Count - 1 Do
-      Begin
-        lMem.WriteAnsiString(lHackML[X].Name);
-
-        lHackFlags := 0;
-        If lHackML[X].Enabled Then
-          lHackFlags := lHackFlags Or cCategoryEnabled;
-        If lHackML[X].BuildStore Then
-          lHackFlags := lHackFlags Or cBuildStore;
-        lMem.WriteByte(lHackFlags);
-
-        lMem.WriteByte(lHackML.Category[X].Count);
-        For Y := 0 To lHackML.Category[X].Count - 1 Do
-        Begin
-          lMem.WriteAnsiString(lHackML[X][Y].PackageType);
-          lMem.WriteAnsiString(lHackML[X][Y].XmlFile);
-          lMem.WriteBoolean(lHackML[X][Y].Enabled);
-
-          lMem.WriteByte(lHackML[X][Y].Count);
-          For Z := 0 To lHackML[X][Y].Count - 1 Do
-          Begin
-            lMem.WriteDWord(lHackML[X][Y][Z].Id);
-            lMem.WriteAnsiString(lHackML[X][Y][Z].Name);
-
-            lHackFlags := 0;
-            If lHackML[X][Y][Z].AddInStore Then
-              lHackFlags := lHackFlags Or cAddInStore;
-            If lHackML.Category[X][Y][Z].OverRide Then
-              lHackFlags := lHackFlags Or cOverRide;
-            lMem.WriteByte(lHackFlags);
-
-            lMem.WriteByte(lHackML[X][Y][Z].MiscData.Count - 2);
-            For W := 1 To lHackML[X][Y][Z].MiscData.Count - 2 Do
-              lMem.WriteAnsiString(lHackML[X][Y][Z].MiscData[W]);
-          End;
-        End;
-      End;
-
-      lMem.SaveToFile(ChangeFileExt(lFileName, '.hml'));
-
-      Finally
-        lMem := Nil;
-    End;
-
-    Finally
-      lHackML := Nil;
-  End;
-  ShowMessage('Done');
-//  lHackML.LoadFromFile(ExtractFilePath(ExcludeTrailingBackslash(lSelDir)) + 'HackMasterList - ' + lDateStr + '.xml', lPrj);
-Exit;
-  lMem := TMemoryStreamEx.Create();
-  Try
-    lMem.WriteByte(1);
-    lMem.WriteAnsiString(FPrj.Settings.DLCServer);
-    lMem.WriteAnsiString(FPrj.Settings.DLCPath);
-    lMem.WriteAnsiString(FPrj.Settings.HackPath);
-    lMem.WriteAnsiString(FPrj.Settings.HackFileName);
-    lMem.WriteAnsiString(FPrj.Settings.CustomPatchFileName);
-    lMem.WriteAnsiString(FPrj.Settings.ResourcePath);
-    lMem.WriteAnsiString(FPrj.Settings.SourcePath);
-    lMem.WriteAnsiString(FPrj.Settings.TargetPath);
-    lMem.WriteAnsiString(FPrj.Settings.WorkSpaceFile);
-    lMem.WriteAnsiString(FPrj.Settings.SkinName);
-
-    lMem.WriteByte(FPrj.Settings.MasterFiles.Count);
-    For X := 0 To FPrj.Settings.MasterFiles.Count - 1 Do
-    Begin
-      lMem.WriteAnsiString(FPrj.Settings.MasterFiles[X].FileName);
-      lMem.WriteAnsiString(FPrj.Settings.MasterFiles[X].NodeName);
-      lMem.WriteAnsiString(FPrj.Settings.MasterFiles[X].NodeKind);
-    End;
-
-    lHackFlags := 0;
-
-    If FPrj.Settings.BuildCustomStore Then
-      lHackFlags := lHackFlags Or cBuildCustomStore;
-    If FPrj.Settings.InstantBuild Then
-      lHackFlags := lHackFlags Or cInstantBuild;
-    If FPrj.Settings.AllFreeItems Then
-      lHackFlags := lHackFlags Or cAllFreeItems;
-    If FPrj.Settings.NonUnique Then
-      lHackFlags := lHackFlags Or cNonUnique;
-    If FPrj.Settings.FreeLand Then
-      lHackFlags := lHackFlags Or cFreeLand;
-    If FPrj.Settings.UnlimitedTime Then
-      lHackFlags := lHackFlags Or cUnlimitedTime;
-
-    lMem.WriteByte(lHackFlags);
-    lMem.SaveToFile(ChangeFileExt(ParamStr(0), '.bin'));
-
-    Finally
-      lMem := Nil;
-  End;
+//
 end;
 
 procedure TFrmDckMain.sptbxMainMenuMouseDown(Sender: TObject;
@@ -1130,6 +827,7 @@ Begin
 
   FTvDlcServer.LoadData( FPrj.Settings.DLCPath + 'dlc\' +
                          StripHotkey(TSptbxItem(Sender).Caption) + '.zip');
+  FCurDlcIndex := ChangeFileExt(StripHotkey(TSptbxItem(Sender).Caption), '');
 End;
 
 Procedure TFrmDckMain.LoadDlcIndexes();
@@ -1159,7 +857,10 @@ begin
         End;
 
     If mnuIndexesItems.Count > 0 Then
+    Begin
       mnuIndexesItems[0].Checked := True;
+      FCurDlcIndex := StripHotkey(mnuIndexesItems[0].Caption);
+    End;
 
     Finally
       Free();
@@ -2403,6 +2104,7 @@ Var lPkgList : ITSTOPackageNodes;
 begin
   If MessageDlg('Do you want to extract RGB Files?', mtConfirmation, [mbYes, mbNo], 0) = mrYes Then
   Begin
+    AppLogFile('Extracting Rgb files from : ' + FCurDlcIndex);
     lPkgList := TTSTOPackageNodes.Create();
     Try
       FTvDlcServer.IterateSubtree(FTvDlcServer.GetFirstSelected(), GetRgbNodeList, @lPkgList);

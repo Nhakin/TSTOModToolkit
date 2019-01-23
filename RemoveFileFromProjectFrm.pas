@@ -14,6 +14,7 @@ type
     SbCancel: TSpTBXButton;
     PanTreeView: TPanel;
     procedure FormCreate(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
 
   Private
     FTvFiles : TTSTORemoveFileTreeView;
@@ -49,6 +50,16 @@ begin
     FTvFiles.Color := clNone;
 
   SkinManager.SetSkin(SkinManager.CurrentSkinName);
+end;
+
+procedure TFrmRemoveFileFromProject.FormKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  If Key = #27 Then
+  Begin
+    Key := #0;
+    Close;
+  End;
 end;
 
 Function TFrmRemoveFileFromProject.GetFileList() : ITSTOWorkSpaceProjectSrcFiles;
