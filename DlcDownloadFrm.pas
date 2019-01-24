@@ -763,7 +763,8 @@ Raise Exception.Create('Not working anymore in V1 Use V2');
     Begin
       With TTSTODlcGenerator.Create() Do
       Try
-        CreateSbtpMod(FPrj);
+Raise Exception.Create('Not working anymore in V1 Use V2');
+//        CreateSbtpMod(FPrj);
         MessageDlg('Done', mtCustom, [mbOk], 0);
 
         Finally

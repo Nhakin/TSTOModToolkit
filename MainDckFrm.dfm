@@ -140,7 +140,6 @@ object FrmDckMain: TFrmDckMain
         end
         object SpTBXItem3: TSpTBXItem
           ImageIndex = 35
-          Visible = False
           OnClick = SpTBXItem3Click
         end
       end
@@ -1805,6 +1804,7 @@ object FrmDckMain: TFrmDckMain
       end
       object popTvWSApplyMod: TSpTBXItem
         Caption = 'Apply Mod'
+        OnClick = popTvWSApplyModClick
       end
       object popTvWSPackMod: TSpTBXItem
         Caption = 'Pack Mod'

@@ -3,14 +3,14 @@ unit TSTOModToolKit;
 interface
 
 Uses Windows, Classes, SysUtils, HsStringListEx,
-  TSTOProject.Xml, TSTODlcIndex, TSTOPatches, TSTOHackSettings;
+  TSTOProject.Xml, TSTODlcIndex, TSTOPatches, TSTOProjectWorkSpace.IO;
 
 Type
   TTSTODlcGenerator = Class(TObject)
   Public
     Procedure ValidateXmlFiles(AProject : ITSTOXMLProject);
-    Procedure CreateMod(AProject : ITSTOXMLProject; AHackSettings : ITSTOHackSettings);
-    Procedure CreateSbtpMod(AProject : ITSTOXMLProject);
+    Procedure CreateMod(AProject : ITSTOXMLProject; AWorkSpace : ITSTOWorkSpaceProjectIO; AMasterFiles : ITSTOXmlMasterFiles);
+    Procedure CreateSbtpMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
     Procedure CreateDLCEx(AProject : ITSTOXMLProject);
     Procedure CreateRootDLC(AProject : ITSTOXMLProject; ACrcValue : DWord);
 
@@ -69,12 +69,12 @@ Begin
   ShowMessage('Done no error found.');
 End;
 
-Procedure TTSTODlcGenerator.CreateMod(AProject : ITSTOXMLProject; AHackSettings : ITSTOHackSettings);
+Procedure TTSTODlcGenerator.CreateMod(AProject : ITSTOXMLProject; AWorkSpace : ITSTOWorkSpaceProjectIO; AMasterFiles : ITSTOXmlMasterFiles);
 Var lMod : ITSTOModder;
 Begin
   lMod := TTSTOModder.Create();
   Try
-    lMod.CreateMod(AProject, AHackSettings);
+    lMod.CreateMod(AProject, AWorkSpace, AMasterFiles);
 
     Finally
       lMod := Nil;
@@ -171,11 +171,11 @@ Begin
 End;
 }
 
-Procedure TTSTODlcGenerator.CreateSbtpMod(AProject : ITSTOXMLProject);
+Procedure TTSTODlcGenerator.CreateSbtpMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 Var lZip : IHsMemoryZipper;
     lMem : IMemoryStreamEx;
     lPatch : ISbtpFilesIO;
-    lStrs : TStringList;
+    lStrs : IHsStringListEx;
     lSr   : TSearchRec;
     X, Y, Z : Integer;
     lSbtp : ISbtpFileIO;
@@ -185,91 +185,75 @@ Var lZip : IHsMemoryZipper;
 
     lVariable : ISbtpVariable;
 Begin
-  If FileExists(AProject.Settings.HackFileName) Then
-  Begin
-    lZip := THsMemoryZipper.Create();
-    lMem := TMemoryStreamEx.Create();
-    Try
-      lZip.ShowProgress := False;
-      lZip.LoadFromFile(AProject.Settings.HackFileName);
-      lZip.ExtractToStream('TextPools', lMem);
-
-      If lMem.Size > 0 Then
-      Begin
-        lMem.Position := 0;
-        lPatch := TSbtpFilesIO.LoadBinSbtpFiles(lMem);
-        lStrs := TStringList.Create();
+  lPatch := AWorkSpaceProject.GlobalSettings.TextPools;
+  Try
+    If lPatch.Count > 0 Then
+    Begin
+      lStrs := THsStringListEx.CreateList();
+      Try
+        If FindFirst(AWorkSpaceProject.SrcPath + '*.sbtp', faAnyFile, lSr) = 0 Then
         Try
-
-          If lPatch.Count > 0 Then
-          Begin
-            If FindFirst(AProject.Settings.SourcePath + '*.sbtp', faAnyFile, lSr) = 0 Then
-            Try
-              Repeat
-                lStrs.Add(lSr.Name);
-              Until FindNext(lSr) <> 0;
-
-              Finally
-                FindClose(lSr);
-            End;
-          End;
-
-          For X := 0 To lPatch.Count - 1 Do
-          Begin
-            lSbtp := Nil;
-            lSbtpFName := '';
-
-            For Y := 0 To lStrs.Count - 1 Do
-            Begin
-              lStrIdx := '';
-              For Z := 1 To Length(lStrs[Y]) Do
-                If lStrs[Y][Z] In [#$30..#$39] Then
-                  lStrIdx := lStrIdx + lStrs[Y][Z];
-
-              If lPatch[X].Header.HeaderPadding = StrToIntDef(lStrIdx, -1) Then
-              Begin
-                lSbtp := TSbtpFileIO.LoadBinSbtpFile(AProject.Settings.SourcePath + lStrs[Y]);
-                lSbtpFName := lStrs[Y];
-                Break;
-              End;
-            End;
-
-            If Assigned(lSbtp) Then
-            Begin
-              For Y := 0 To lPatch[X].Item.Count - 1 Do
-              Begin
-                lIdx := lSbtp.Item.IndexOf(lPatch[X].Item[Y].VariableType);
-                If lIdx = -1 Then
-                  lSbtp.Item.Add().Assign(lPatch[X].Item[Y])
-                Else
-                Begin
-                  lVariable := lSbtp.Item[lIdx];
-
-                  For Z := 0 To lPatch[X].Item[Y].SubItem.Count - 1 Do
-                  Begin
-                    lIdx := lVariable.SubItem.IndexOf(lPatch[X].Item[Y].SubItem[Z].VariableName);
-                    If lIdx = -1 Then
-                      lVariable.SubItem.Add().Assign(lPatch[X].Item[Y].SubItem[Z])
-                    Else
-                      lVariable.SubItem[lIdx].VariableData := lPatch[X].Item[Y].SubItem[Z].VariableData;
-                  End;
-                End;
-              End;
-
-              lSbtp.SaveToFile(AProject.Settings.TargetPath + lSbtpFName);
-            End;
-          End;
+          Repeat
+            lStrs.Add(lSr.Name);
+          Until FindNext(lSr) <> 0;
 
           Finally
-            lStrs.Free();
-            lPatch := Nil;
+            FindClose(lSr);
         End;
-      End;
 
-      Finally
-        lMem := Nil;
-        lZip := Nil;
+        For X := 0 To lPatch.Count - 1 Do
+        Begin
+          lSbtp := Nil;
+          lSbtpFName := '';
+
+          For Y := 0 To lStrs.Count - 1 Do
+          Begin
+            lStrIdx := '';
+            For Z := 1 To Length(lStrs[Y]) Do
+              If lStrs[Y][Z] In [#$30..#$39] Then
+                lStrIdx := lStrIdx + lStrs[Y][Z];
+
+            If lPatch[X].Header.HeaderPadding = StrToIntDef(lStrIdx, -1) Then
+            Begin
+              lSbtp := TSbtpFileIO.LoadBinSbtpFile(AWorkSpaceProject.SrcPath + lStrs[Y]);
+              lSbtpFName := lStrs[Y];
+              Break;
+            End;
+          End;
+
+          If Assigned(lSbtp) Then
+          Begin
+            For Y := 0 To lPatch[X].Item.Count - 1 Do
+            Begin
+              lIdx := lSbtp.Item.IndexOf(lPatch[X].Item[Y].VariableType);
+              If lIdx = -1 Then
+                lSbtp.Item.Add().Assign(lPatch[X].Item[Y])
+              Else
+              Begin
+                lVariable := lSbtp.Item[lIdx];
+
+                For Z := 0 To lPatch[X].Item[Y].SubItem.Count - 1 Do
+                Begin
+                  lIdx := lVariable.SubItem.IndexOf(lPatch[X].Item[Y].SubItem[Z].VariableName);
+                  If lIdx = -1 Then
+                    lVariable.SubItem.Add().Assign(lPatch[X].Item[Y].SubItem[Z])
+                  Else
+                    lVariable.SubItem[lIdx].VariableData := lPatch[X].Item[Y].SubItem[Z].VariableData;
+                End;
+              End;
+            End;
+
+            lSbtp.SaveToFile(AWorkSpaceProject.CustomModPath + lSbtpFName);
+          End;
+        End;
+
+        Finally
+          lStrs := Nil;
+      End;
     End;
+
+    Finally
+      lPatch := Nil;
   End;
 End;
 

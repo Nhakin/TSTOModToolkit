@@ -3,7 +3,7 @@ object FrmProjectSettings: TFrmProjectSettings
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'FrmProjectSettings'
-  ClientHeight = 240
+  ClientHeight = 261
   ClientWidth = 364
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -22,15 +22,16 @@ object FrmProjectSettings: TFrmProjectSettings
     Left = 0
     Top = 26
     Width = 364
-    Height = 188
+    Height = 209
     Caption = 'SpTBXExPanel1'
     Align = alClient
     TabOrder = 1
     Borders = False
     TBXStyleBackground = True
+    ExplicitHeight = 188
     DesignSize = (
       364
-      188)
+      209)
     object SpTBXLabel1: TSpTBXLabel
       Left = 16
       Top = 17
@@ -59,7 +60,7 @@ object FrmProjectSettings: TFrmProjectSettings
       Height = 28
       BiDiMode = bdLeftToRight
       ParentBiDiMode = False
-      TabOrder = 2
+      TabOrder = 4
     end
     object EditOutputPath: TSpTBXButtonEdit
       Left = 117
@@ -67,7 +68,7 @@ object FrmProjectSettings: TFrmProjectSettings
       Width = 241
       Height = 21
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 5
+      TabOrder = 6
       EditButton.Left = 218
       EditButton.Top = 0
       EditButton.Width = 19
@@ -107,7 +108,7 @@ object FrmProjectSettings: TFrmProjectSettings
       Width = 121
       Height = 58
       Caption = ' Project Kind '
-      TabOrder = 6
+      TabOrder = 2
       Items.Strings = (
         'Root'
         'Dlc Server')
@@ -118,7 +119,7 @@ object FrmProjectSettings: TFrmProjectSettings
       Width = 121
       Height = 58
       Caption = ' Project Type '
-      TabOrder = 7
+      TabOrder = 3
       OnClick = rgProjectTypeClick
       Items.Strings = (
         'Scripts'
@@ -126,7 +127,7 @@ object FrmProjectSettings: TFrmProjectSettings
     end
     object LabelCustomScriptPath: TSpTBXLabel
       Left = 16
-      Top = 155
+      Top = 182
       Width = 103
       Height = 19
       Caption = 'Custom script path :'
@@ -139,6 +140,20 @@ object FrmProjectSettings: TFrmProjectSettings
     end
     object EditCustomScriptPath: TSpTBXButtonEdit
       Left = 117
+      Top = 181
+      Width = 241
+      Height = 21
+      Anchors = [akLeft, akTop, akRight]
+      TabOrder = 10
+      EditButton.Left = 218
+      EditButton.Top = 0
+      EditButton.Width = 19
+      EditButton.Height = 17
+      EditButton.Align = alRight
+      EditButton.OnClick = EditCustomScriptPathSubEditButton0Click
+    end
+    object EditCustomModPath: TSpTBXButtonEdit
+      Left = 117
       Top = 154
       Width = 241
       Height = 21
@@ -149,14 +164,28 @@ object FrmProjectSettings: TFrmProjectSettings
       EditButton.Width = 19
       EditButton.Height = 17
       EditButton.Align = alRight
-      EditButton.OnClick = EditCustomScriptPathSubEditButton0Click
+      EditButton.OnClick = EditCustomModPathSubEditButton0Click
+    end
+    object SpTBXLabel2: TSpTBXLabel
+      Left = 16
+      Top = 155
+      Width = 97
+      Height = 19
+      Caption = 'Custom mod path :'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
     end
   end
   object SpTBXStatusBar1: TSpTBXStatusBar
     Left = 0
-    Top = 214
+    Top = 235
     Width = 364
     Height = 26
+    ExplicitTop = 214
   end
   object SpTBXDock1: TSpTBXDock
     Left = 0

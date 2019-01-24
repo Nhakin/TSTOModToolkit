@@ -26,12 +26,15 @@ type
     rgProjectType: TSpTBXRadioGroup;
     LabelCustomScriptPath: TSpTBXLabel;
     EditCustomScriptPath: TSpTBXButtonEdit;
+    EditCustomModPath: TSpTBXButtonEdit;
+    SpTBXLabel2: TSpTBXLabel;
     procedure FormCreate(Sender: TObject);
     procedure EditOutputPathSubEditButton0Click(Sender: TObject);
     procedure SpTbxSaveClick(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure rgProjectTypeClick(Sender: TObject);
     procedure EditCustomScriptPathSubEditButton0Click(Sender: TObject);
+    procedure EditCustomModPathSubEditButton0Click(Sender: TObject);
 
   private
     FWorkSpaceProject : ITSTOWorkSpaceProject;
@@ -52,6 +55,14 @@ implementation
 Uses Vcl.ImgList, uSelectDirectoryEx, TSTOProjectWorkSpace.Types;
 
 {$R *.dfm}
+
+procedure TFrmProjectSettings.EditCustomModPathSubEditButton0Click(Sender: TObject);
+Var lSelDir : AnsiString;
+begin
+  If SelectDirectoryEx('Custom mod path', ExtractFilePath(ParamStr(0)),
+    lSelDir, True, False, False) Then
+    EditCustomModPath.Text := lSelDir;
+end;
 
 procedure TFrmProjectSettings.EditCustomScriptPathSubEditButton0Click(Sender: TObject);
 Var lSelDir : AnsiString;
@@ -92,6 +103,9 @@ begin
 
   EditCustomScriptPath.EditButton.Images     := lImgList;
   EditCustomScriptPath.EditButton.ImageIndex := 0;
+
+  EditCustomModPath.EditButton.Images     := lImgList;
+  EditCustomModPath.EditButton.ImageIndex := 0;
 end;
 
 procedure TFrmProjectSettings.FormKeyPress(Sender: TObject; var Key: Char);
@@ -130,6 +144,7 @@ Begin
   chkPackOutput.Checked     := FWorkSpaceProject.PackOutput;
   EditOutputPath.Text       := FWorkSpaceProject.OutputPath;
   EditCustomScriptPath.Text := FWorkSpaceProject.CustomScriptPath;
+  EditCustomModPath.Text    := FWorkSpaceProject.CustomModPath;
 End;
 
 procedure TFrmProjectSettings.SpTbxSaveClick(Sender: TObject);
@@ -140,6 +155,7 @@ begin
   FWorkSpaceProject.PackOutput       := chkPackOutput.Checked;
   FWorkSpaceProject.OutputPath       := EditOutputPath.Text;
   FWorkSpaceProject.CustomScriptPath := EditCustomScriptPath.Text;
+  FWorkSpaceProject.CustomModPath    := EditCustomModPath.Text;
 
   ModalResult := mrOk;
 end;

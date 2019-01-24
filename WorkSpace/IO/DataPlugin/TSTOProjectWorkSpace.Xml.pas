@@ -57,6 +57,9 @@ Type
     Function  GetCustomScriptPath() : AnsiString;
     Procedure SetCustomScriptPath(Const ACustomScriptPath : AnsiString);
 
+    Function  GetCustomModPath() : AnsiString;
+    Procedure SetCustomModPath(Const ACustomModPath : AnsiString);
+
     Function  GetSrcFolders() : IXmlTSTOWorkSpaceProjectSrcFolders;
 
     Procedure Assign(ASource : IInterface);
@@ -68,6 +71,7 @@ Type
     Property PackOutput       : Boolean                            Read GetPackOutput       Write SetPackOutput;
     Property OutputPath       : AnsiString                         Read GetOutputPath       Write SetOutputPath;
     Property CustomScriptPath : AnsiString                         Read GetCustomScriptPath Write SetCustomScriptPath;
+    Property CustomModPath    : AnsiString                         Read GetCustomModPath    Write SetCustomModPath;
     Property SrcFolders       : IXmlTSTOWorkSpaceProjectSrcFolders Read GetSrcFolders;
 
   End;
@@ -205,6 +209,9 @@ Type
     Function  GetCustomScriptPath() : AnsiString;
     Procedure SetCustomScriptPath(Const ACustomScriptPath : AnsiString);
 
+    Function  GetCustomModPath() : AnsiString;
+    Procedure SetCustomModPath(Const ACustomModPath : AnsiString);
+
     Function  GetSrcFolders() : IXmlTSTOWorkSpaceProjectSrcFolders;
     Function  GetISrcFolders() : ITSTOWorkSpaceProjectSrcFolders;
     Function  ITSTOWorkSpaceProject.GetSrcFolders = GetISrcFolders;
@@ -323,6 +330,7 @@ Begin
     ATarget.PackOutput       := ASource.PackOutput;
     ATarget.OutputPath       := ASource.OutputPath;
     ATarget.CustomScriptPath := ASource.CustomScriptPath;
+    ATarget.CustomModPath    := ASource.CustomModPath;
 //    ATarget.HackFileName     := ASource.HackFileName;
 
     If Supports(ATarget, IXmlNodeEx) And
@@ -453,6 +461,19 @@ Begin
 
   If Not IsImplementorOf(WSProjectImpl) Then
     WSProjectImpl.CustomScriptPath := ACustomScriptPath;
+End;
+
+Function TXmlTSTOWorkSpaceProject.GetCustomModPath() : AnsiString;
+Begin
+  Result := ChildNodes['CustomModPath'].AsString;
+End;
+
+Procedure TXmlTSTOWorkSpaceProject.SetCustomModPath(Const ACustomModPath : AnsiString);
+Begin
+  ChildNodes['CustomModPath'].AsString := ACustomModPath;
+
+  If Not IsImplementorOf(WSProjectImpl) Then
+    WSProjectImpl.CustomModPath := ACustomModPath;
 End;
 
 Function TXmlTSTOWorkSpaceProject.GetSrcFolders() : IXmlTSTOWorkSpaceProjectSrcFolders;
