@@ -76,6 +76,9 @@ Type
     Function  GetTvData() : ITSTOWorkSpaceProjectGroupIO;
     Procedure SetTvData(ATvData : ITSTOWorkSpaceProjectGroupIO);
 
+    Procedure DoCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode;
+      Column: TColumnIndex; var Result: Integer);
+
   Protected
     {$IfDef VT60}
     Function  DoGetImageIndex(Node : PVirtualNode; Kind : TVTImageKind; Column : TColumnIndex;
@@ -99,6 +102,8 @@ Type
     Procedure MoveNodeDown(ANode : PVirtualNode);
 
     Procedure LoadData();
+
+    Procedure AfterConstruction(); OverRide;
 
   End;
 
@@ -165,7 +170,7 @@ Type
     Procedure SetTvData(ATvData : ITSTOResourcePaths);
 
     Procedure DoSetNodeExpandState(Sender : TBaseVirtualTree; Node : PVirtualNode; Data : Pointer; Var Abort : Boolean);
-    Procedure DoCompare(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode;
+    Procedure DoCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode;
       Column: TColumnIndex; var Result: Integer);
 
   Protected
@@ -988,6 +993,27 @@ End;
 
 (******************************************************************************)
 
+Procedure TTSTOWorkSpaceTreeView.AfterConstruction();
+Begin
+  InHerited AfterConstruction();
+  InHerited OnCompareNodes := DoCompareNodes;
+End;
+
+Procedure TTSTOWorkSpaceTreeView.DoCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+Var lFolder1, lFolder2 : ITSTOWorkSpaceProjectSrcFolder;
+    lFile1, lFile2 : ITSTOWorkSpaceProjectSrcFile;
+Begin
+  Result := -1;
+
+  If GetNodeData(Node1, ITSTOWorkSpaceProjectSrcFolder, lFolder1) And
+     GetNodeData(Node2, ITSTOWorkSpaceProjectSrcFolder, lFolder2) Then
+    Result := CompareText(lFolder1.SrcPath, lFolder2.SrcPath)
+  Else If GetNodeData(Node1, ITSTOWorkSpaceProjectSrcFile, lFile1) And
+          GetNodeData(Node2, ITSTOWorkSpaceProjectSrcFile, lFile2) Then
+    Result := CompareText(lFile1.FileName, lFile2.FileName);
+
+End;
+
 Procedure TTSTOWorkSpaceTreeView.LoadData();
 Begin
   RootNodeCount := 1;
@@ -1493,7 +1519,7 @@ Procedure TTSTORessourcesTreeView.AfterConstruction();
 Begin
   InHerited AfterConstruction();
 
-  InHerited OnCompareNodes := DoCompare;
+  InHerited OnCompareNodes := DoCompareNodes;
 End;
 
 Procedure TTSTORessourcesTreeView.BeforeDestruction();
@@ -1577,7 +1603,7 @@ Begin
   Expanded[Node] := PBoolean(Data)^;
 End;
 
-Procedure TTSTORessourcesTreeView.DoCompare(Sender: TBaseVirtualTree;
+Procedure TTSTORessourcesTreeView.DoCompareNodes(Sender: TBaseVirtualTree;
   Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
 Var lRp1, lRp2 : ITSTOResourcePath;
     lFile1, lFile2 : ITSTOResourceFile;
