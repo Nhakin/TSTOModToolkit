@@ -2104,7 +2104,7 @@ Var lPkgList : ITSTOPackageNodes;
 begin
   If MessageDlg('Do you want to extract RGB Files?', mtConfirmation, [mbYes, mbNo], 0) = mrYes Then
   Begin
-    AppLogFile('Extracting Rgb files from : ' + FCurDlcIndex);
+    AppLogFile('Extracting Rgb files from (1) : ' + FCurDlcIndex);
     lPkgList := TTSTOPackageNodes.Create();
     Try
       FTvDlcServer.IterateSubtree(FTvDlcServer.GetFirstSelected(), GetRgbNodeList, @lPkgList);
@@ -2114,6 +2114,7 @@ begin
       Finally
         lPkgList := Nil;
     End;
+    AppLogFile('Extracting Rgb files from (2) : ' + FCurDlcIndex);
   End;
 end;
 

@@ -165,6 +165,8 @@ Type
     Procedure SetTvData(ATvData : ITSTOResourcePaths);
 
     Procedure DoSetNodeExpandState(Sender : TBaseVirtualTree; Node : PVirtualNode; Data : Pointer; Var Abort : Boolean);
+    Procedure DoCompare(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode;
+      Column: TColumnIndex; var Result: Integer);
 
   Protected
     Procedure DoGetText(Var pEventArgs : TVSTGetCellTextEventArgs); OverRide;
@@ -181,7 +183,8 @@ Type
     Procedure ExpandAllNodes();
     Procedure CollapseAllNodes();
 
-    Destructor  Destroy(); OverRide;
+    Procedure AfterConstruction(); OverRide;
+    Procedure BeforeDestruction(); OverRide;
 
   End;
 
@@ -1486,11 +1489,18 @@ Begin
     Node.CheckState := csCheckedNormal;
 End;
 
-Destructor TTSTORessourcesTreeView.Destroy();
+Procedure TTSTORessourcesTreeView.AfterConstruction();
+Begin
+  InHerited AfterConstruction();
+
+  InHerited OnCompareNodes := DoCompare;
+End;
+
+Procedure TTSTORessourcesTreeView.BeforeDestruction();
 Begin
   FTvData := Nil;
 
-  InHerited Destroy();
+  InHerited BeforeDestruction();
 End;
 
 Procedure TTSTORessourcesTreeView.DoGetText(Var pEventArgs : TVSTGetCellTextEventArgs);
@@ -1565,6 +1575,21 @@ End;
 Procedure TTSTORessourcesTreeView.DoSetNodeExpandState(Sender : TBaseVirtualTree; Node : PVirtualNode; Data : Pointer; Var Abort : Boolean);
 Begin
   Expanded[Node] := PBoolean(Data)^;
+End;
+
+Procedure TTSTORessourcesTreeView.DoCompare(Sender: TBaseVirtualTree;
+  Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+Var lRp1, lRp2 : ITSTOResourcePath;
+    lFile1, lFile2 : ITSTOResourceFile;
+Begin
+  Result := -1;
+
+  If GetNodeData(Node1, ITSTOResourcePath, lRp1) And
+     GetNodeData(Node2, ITSTOResourcePath, lRp2) Then
+    Result := CompareText(lRp1.ResourcePath, lRp2.ResourcePath)
+  Else If GetNodeData(Node1, ITSTOResourceFile, lFile1) And
+          GetNodeData(Node2, ITSTOResourceFile, lFile2) Then
+    Result := CompareText(lFile1.FileName, lFile2.FileName);
 End;
 
 Procedure TTSTORessourcesTreeView.ExpandAllNodes();

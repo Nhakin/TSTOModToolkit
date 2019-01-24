@@ -42,12 +42,6 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Cfg_2)'=='true') or '$(Cfg_2_iOSDevice64)'!=''">
-        <Cfg_2_iOSDevice64>true</Cfg_2_iOSDevice64>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
         <Cfg_2_Win32>true</Cfg_2_Win32>
         <CfgParent>Cfg_2</CfgParent>
@@ -112,9 +106,6 @@
         <DCC_ObjPath>C:\Projects\ReportGenerator\Indy10\Sources\Core;C:\Projects\ReportGenerator\Indy10\Sources\System;C:\Projects\ReportGenerator\Indy10\Sources\Protocols;C:\Projects\DelphiCodeGenerator\Sources\VirtualTree;xC:\Projet\Composant\VirtualTree 5.51\Source;.\Oxml 1.9;.\AviWriter 2.1;$(DCC_ObjPath)</DCC_ObjPath>
         <DCC_IncludePath>C:\Projects\ReportGenerator\Indy10\Sources\Core;C:\Projects\ReportGenerator\Indy10\Sources\System;C:\Projects\ReportGenerator\Indy10\Sources\Protocols;C:\Projects\DelphiCodeGenerator\Sources\VirtualTree;xC:\Projet\Composant\VirtualTree 5.51\Source;.\Oxml 1.9;.\AviWriter 2.1;$(DCC_IncludePath)</DCC_IncludePath>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_iOSDevice64)'!=''">
-        <BT_BuildType>Debug</BT_BuildType>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <DCC_DebugDCUs>false</DCC_DebugDCUs>
         <DCC_IMPLICIT_STRING_CAST>false</DCC_IMPLICIT_STRING_CAST>
@@ -175,7 +166,6 @@
             </Delphi.Personality>
             <ModelSupport>False</ModelSupport>
             <Platforms>
-                <Platform value="iOSDevice64">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>
@@ -733,8 +723,6 @@
         <DCCReference Include="VirtualTree\VTEditors.pas">
             <Form>$R *.res</Form>
         </DCCReference>
-        <DCCReference Include="ThirdParty\TBXToolBar\Source\SpTBX\SpTBXExControls.pas"/>
-        <DCCReference Include="ThirdParty\TBXToolBar\Source\SpTBX\SpTBXSkins.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
