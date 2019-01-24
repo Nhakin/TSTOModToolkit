@@ -745,6 +745,7 @@ begin
     FTvResources.IsDebugMode      := Not FTvResources.IsDebugMode;
     FTvScriptTemplate.IsDebugMode := Not FTvScriptTemplate.IsDebugMode;
     FTvSTVariables.IsDebugMode    := Not FTvSTVariables.IsDebugMode;
+    FTvCustomPatches.IsDebugMode  := Not FTvCustomPatches.IsDebugMode;
   End;
 end;
 

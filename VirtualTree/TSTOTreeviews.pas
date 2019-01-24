@@ -143,7 +143,13 @@ Type
     Function  GetTvData() : ITSTOCustomPatchListIO;
     Procedure SetTvData(ATvData : ITSTOCustomPatchListIO);
 
+    Procedure DoCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode;
+      Column: TColumnIndex; var Result: Integer);
+
   Protected
+    Function  GetIsDebugMode() : Boolean; OverRide;
+    Procedure SetIsDebugMode(Const AIsDebugMode : Boolean); OverRide;
+
     Procedure DoChecked(Node : PVirtualNode); OverRide;
     {$IfDef VT60}
     Procedure DoGetText(Var pEventArgs : TVSTGetCellTextEventArgs); OverRide;
@@ -1011,7 +1017,6 @@ Begin
   Else If GetNodeData(Node1, ITSTOWorkSpaceProjectSrcFile, lFile1) And
           GetNodeData(Node2, ITSTOWorkSpaceProjectSrcFile, lFile2) Then
     Result := CompareText(lFile1.FileName, lFile2.FileName);
-
 End;
 
 Procedure TTSTOWorkSpaceTreeView.LoadData();
@@ -1428,6 +1433,8 @@ Begin
 
     Columns.Add().Text := 'Name';
     Columns.Add().Text := 'Description';
+    With Columns.Add() Do
+      Options := Options - [coVisible];
 
     AutoSizeIndex := 1;
 
@@ -1442,6 +1449,38 @@ Begin
                          toFullVertGridLines,} toHotTrack];
     SelectionOptions := SelectionOptions + [toFullRowSelect, toExtendedFocus];
   End;
+
+  InHerited OnCompareNodes := DoCompareNodes;
+End;
+
+Procedure TTSTOCustomPatchesTreeView.DoCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+Var lPatch1, lPatch2 : ITSTOCustomPatchIO;
+Begin
+  Result := -1;
+
+  If GetNodeData(Node1, ITSTOCustomPatchIO, lPatch1) And
+     GetNodeData(Node2, ITSTOCustomPatchIO, lPatch2) Then
+    Result := CompareText(lPatch1.PatchName, lPatch2.PatchName);
+End;
+
+Function TTSTOCustomPatchesTreeView.GetIsDebugMode() : Boolean;
+Begin
+  Result := Header.Columns[Header.Columns.Count - 1].Options * [coVisible] = [coVisible];
+End;
+
+Procedure TTSTOCustomPatchesTreeView.SetIsDebugMode(Const AIsDebugMode : Boolean);
+Begin
+  With Header, Columns[Header.Columns.Count - 1] Do
+    If AIsDebugMode Then
+    Begin
+      Options := Options + [coVisible];
+      AutoSizeIndex := Columns.Count - 1;
+    End
+    Else
+    Begin
+      Options := Options - [coVisible];
+      AutoSizeIndex := Columns.Count - 2;
+    End;
 End;
 
 Function TTSTOCustomPatchesTreeView.GetTvData() : ITSTOCustomPatchListIO;
@@ -1487,6 +1526,7 @@ Procedure TTSTOCustomPatchesTreeView.DoGetText(Node: PVirtualNode; Column: TColu
 {$EndIf}
 Var lNodeData : ITSTOCustomPatchIO;
     lCellText : String;
+    lNodeIntf : PInterface;
 Begin
 {$IfDef VT60}
   With pEventArgs Do
@@ -1496,6 +1536,11 @@ Begin
       Case Column Of
         0 : lCellText := lNodeData.PatchName;
         1 : lCellText := lNodeData.PatchDesc;
+        2 :
+        Begin
+          lNodeIntf := GetNodeData(Node);
+          lCellText := GetInterfaceName(lNodeIntf^);
+        End;
         Else
           lCellText := '';
       End;
