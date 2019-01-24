@@ -1806,6 +1806,10 @@ object FrmDckMain: TFrmDckMain
         Caption = 'Apply Mod'
         OnClick = popTvWSApplyModClick
       end
+      object popTvWSBuildMod: TSpTBXItem
+        Caption = 'Build Mod'
+        OnClick = popTvWSBuildModClick
+      end
       object popTvWSPackMod: TSpTBXItem
         Caption = 'Pack Mod'
       end
@@ -1826,7 +1830,7 @@ object FrmDckMain: TFrmDckMain
       object popTvWSApplyAllModFromHere: TSpTBXItem
         Caption = 'Apply All Mod From Here'
       end
-      object popTvWSPackAllModFromHere: TSpTBXItem
+      object popTvWSBuildAllModFromHere: TSpTBXItem
         Caption = 'Pack All Mod From Here'
       end
       object SpTBXSeparatorItem4: TSpTBXSeparatorItem

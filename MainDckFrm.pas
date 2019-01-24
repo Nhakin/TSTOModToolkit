@@ -142,7 +142,7 @@ Type
     popTvWSApplyMod: TSpTBXItem;
     popTvWSApplyAllModFromHere: TSpTBXItem;
     popTvWSPackMod: TSpTBXItem;
-    popTvWSPackAllModFromHere: TSpTBXItem;
+    popTvWSBuildAllModFromHere: TSpTBXItem;
     popTvWS: TSpTBXPopupMenu;
     popTV: TSpTBXPopupMenu;
     popTvWSItems: TSpTBXSubmenuItem;
@@ -203,6 +203,7 @@ Type
     SpTBXSeparatorItem13: TSpTBXSeparatorItem;
     popExportHackConfig: TSpTBXItem;
     popBuildHackConfig: TSpTBXItem;
+    popTvWSBuildMod: TSpTBXItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -260,6 +261,7 @@ Type
     procedure popExportHackConfigClick(Sender: TObject);
     procedure popBuildHackConfigClick(Sender: TObject);
     procedure popTvWSApplyModClick(Sender: TObject);
+    procedure popTvWSBuildModClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -968,7 +970,7 @@ end;
 
 procedure TFrmDckMain.popAddExistingProjectClick(Sender: TObject);
 Var lSelDir : AnsiString;
-    lProject : ITSTOWorkSpaceProject;
+    lProject : ITSTOWorkSpaceProjectIO;
 begin
   If SelectDirectoryEx('Package Directory', FPrj.Settings.HackPath,
     lSelDir,True, False, False) Then
@@ -1278,16 +1280,23 @@ begin
   End;
 end;
 
+procedure TFrmDckMain.popTvWSBuildModClick(Sender: TObject);
+Var lWorkSpace : ITSTOWorkspaceProjectIO;
+begin
+  With FTvWorkSpace Do
+    If GetNodeData(GetFirstSelected(), ITSTOWorkspaceProjectIO, lWorkSpace) Then
+      FWorkSpace.CompileMod(lWorkSpace);
+end;
+
 procedure TFrmDckMain.popTvWSGenerateScriptsClick(Sender: TObject);
-Var lWorkSpace : ITSTOWorkspaceProject;
+Var lWorkSpace : ITSTOWorkspaceProjectIO;
     lNode      : PVirtualNode;
 begin
-
   With FTvWorkSpace Do
   Begin
     lNode := GetFirstSelected();
 
-    If GetNodeData(lNode, ITSTOWorkspaceProject, lWorkSpace) Then
+    If GetNodeData(lNode, ITSTOWorkspaceProjectIO, lWorkSpace) Then
     Begin
       FWorkSpace.GenerateScripts(lWorkSpace);
       ReinitNode(lNode, True);
@@ -1306,7 +1315,7 @@ procedure TFrmDckMain.popTvWSPopup(Sender: TObject);
   End;
 
 Var lNode : PVirtualNode;
-    lProject : ITSTOWorkSpaceProject;
+    lProject : ITSTOWorkspaceProjectIO;
 begin
   SetVisibility(popTvWSProjectGroupItems, False);
   SetVisibility(popTvWSProjectItems, False);
@@ -1319,7 +1328,7 @@ begin
     Begin
       If GetNodeData(lNode, ITSTOWorkSpaceProjectGroupIO) Then
         SetVisibility(popTvWSProjectGroupItems, True)
-      Else If GetNodeData(lNode, ITSTOWorkSpaceProject, lProject) Then
+      Else If GetNodeData(lNode, ITSTOWorkspaceProjectIO, lProject) Then
       Begin
         SetVisibility(popTvWSProjectItems, True);
         popTvWSProcessSooner.Enabled   := Assigned(lNode.PrevSibling);
@@ -2314,7 +2323,7 @@ begin
       lPath := IncludeTrailingBackSlash(FPrj.Settings.HackPath + ExtractFilePath(lPkgList[0].FileName));
       lWSProject := TTSTOWorkSpaceProjectGroupIO.CreateProjectGroup();
       Try
-        lWSProject.CreateWsGroupProject(lPath);
+        lWSProject.CreateWsGroupProject(lPath, FPrj.Settings.HackFileName);
         //lWSProject.SaveToFile(lPath + ExtractFileName(ExcludeTrailingBackslash(lPath)) + '.xml');
         lWSProject.SaveToFile(lPath + ExtractFileName(ExcludeTrailingBackslash(lPath)) + '.wspg');
 

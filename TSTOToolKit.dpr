@@ -3,29 +3,9 @@ program TSTOToolKit;
 uses
   Forms,
   CustomPatchFrm in 'CustomPatchFrm.pas' {FrmCustomPatches},
-  DlcDownloadFrm in 'DlcDownloadFrm.pas' {DlcDownload},
   dmImage in 'dmImage.pas' {DataModuleImage: TDataModule},
   HsAlarmEx in 'HsUnits\HsAlarmEx.pas',
-  HsBase64Ex in 'HsUnits\HsBase64Ex.pas' {,
-  HsBaseConvEx in 'HsUnits\HsBaseConvEx.pas',
-  HsCheckSumEx in 'HsUnits\HsCheckSumEx.pas',
-  HsClipBoardEx in 'HsUnits\HsClipBoardEx.pas',
-  HsEncodingEx in 'HsUnits\HsEncodingEx.pas',
-  HsEventListEx in 'HsUnits\HsEventListEx.pas',
-  HsFunctionsEx in 'HsUnits\HsFunctionsEx.pas',
-  HsHttpEx in 'HsUnits\HsHttpEx.pas',
-  HsInterfaceEx in 'HsUnits\HsInterfaceEx.pas',
-  HsJSonEx in 'HsUnits\HsJSonEx.pas',
-  HsJSonFormatterEx in 'HsUnits\HsJSonFormatterEx.pas',
-  HsListEx in 'HsUnits\HsListEx.pas',
-  HsStreamEx in 'HsUnits\HsStreamEx.pas',
-  HsStringListEx in 'HsUnits\HsStringListEx.pas',
-  HsSuperObjectEx in 'HsUnits\HsSuperObjectEx.pas',
-  HsXmlDocEx in 'HsUnits\HsXmlDocEx.pas',
-  HsZipUtils in 'HsUnits\HsZipUtils.pas',
-  ImagingRgb in 'Vampyre\ImagingRgb.pas',
-  IntfReg in 'IntfReg.pas',
-  MainDckFrm in 'MainDckFrm.pas' {FrmDckMain},
+  HsBase64Ex in 'HsUnits\HsBase64Ex.pas',
   HsBaseConvEx in 'HsUnits\HsBaseConvEx.pas',
   HsCheckSumEx in 'HsUnits\HsCheckSumEx.pas',
   HsClipBoardEx in 'HsUnits\HsClipBoardEx.pas',
@@ -104,7 +84,7 @@ uses
   TSTOSbtpIntf in 'SbtpFile\TSTOSbtpIntf.pas',
   TSTOSbtpIntfReg in 'SbtpFile\TSTOSbtpIntfReg.pas',
   TSTOSbtpTypes in 'SbtpFile\TSTOSbtpTypes.pas',
-  TSTOScriptTemplate.Bin in 'ScriptTemplates\IO\DataPlugins\TSTOScriptTemplate.Bin.pas' {$R *.res},
+  TSTOScriptTemplate.Bin in 'ScriptTemplates\IO\DataPlugins\TSTOScriptTemplate.Bin.pas',
   TSTOScriptTemplate.IO in 'ScriptTemplates\IO\TSTOScriptTemplate.IO.pas',
   TSTOScriptTemplate.Xml in 'ScriptTemplates\IO\DataPlugins\TSTOScriptTemplate.Xml.pas',
   TSTOScriptTemplateImpl in 'ScriptTemplates\TSTOScriptTemplateImpl.pas',
@@ -119,7 +99,7 @@ uses
   TSTOZeroImpl in 'ZeroFile\TSTOZeroImpl.pas',
   TSTOZeroIntf in 'ZeroFile\TSTOZeroIntf.pas',
   VTCombos in 'VirtualTree\VTCombos.pas',
-  VTEditors in 'VirtualTree\VTEditors.pas' {$R *.res};
+  VTEditors in 'VirtualTree\VTEditors.pas';
 
 {$R *.res}
 {$R Images.res}
@@ -131,9 +111,6 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.Title := 'TSTOModToolKit';
   Application.CreateForm(TDataModuleImage, DataModuleImage);
-  If DataModuleImage.IsV1 Then
-    Application.CreateForm(TDlcDownload, DlcDownload)
-  Else
-    Application.CreateForm(TFrmDckMain, FrmDckMain);
+  Application.CreateForm(TFrmDckMain, FrmDckMain);
   Application.Run;
 end.
