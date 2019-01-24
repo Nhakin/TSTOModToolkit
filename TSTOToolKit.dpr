@@ -119,7 +119,7 @@ uses
   TSTOZeroImpl in 'ZeroFile\TSTOZeroImpl.pas',
   TSTOZeroIntf in 'ZeroFile\TSTOZeroIntf.pas',
   VTCombos in 'VirtualTree\VTCombos.pas',
-  VTEditors in 'VirtualTree\VTEditors.pas' {$R *.res};
+  VTEditors in 'VirtualTree\VTEditors.pas';
 
 {$R *.res}
 {$R Images.res}
