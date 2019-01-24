@@ -88,6 +88,7 @@ Type
   TBinTSTOWorkSpaceProject = Class(TTSTOWorkSpaceProject, IBinTSTOWorkSpaceProject)
   Private
     Procedure LoadFromStreamV001(ASource : IStreamEx);
+    Procedure LoadFromStreamV002(ASource : IStreamEx);
 
   Protected
     Function GetWorkSpaceProjectSrcFoldersClass() : TTSTOWorkSpaceProjectSrcFoldersClass; OverRide;
@@ -217,10 +218,36 @@ Begin
   End;
 End;
 
+Procedure TBinTSTOWorkSpaceProject.LoadFromStreamV002(ASource : IStreamEx);
+Var lNbPath : Byte;
+    lSrcFolders : IBinTSTOWorkSpaceProjectSrcFolders;
+Begin
+  ProjectName := ASource.ReadAnsiString();
+  ProjectKind := TWorkSpaceProjectKind(ASource.ReadByte());
+  ProjectType := TWorkSpaceProjectType(ASource.ReadByte());
+  ZeroCrc32   := ASource.ReadDWord();
+  PackOutput  := ASource.ReadByte() <> 0;
+
+  OutputPath  := ASource.ReadAnsiString();
+  If ProjectType = sptScript Then
+    CustomScriptPath := ASource.ReadAnsiString();
+  CustomModPath := ASource.ReadAnsiString();
+
+  lNbPath := ASource.ReadByte();
+  lSrcFolders := GetSrcFolders();
+  While lNbPath > 0 Do
+  Begin
+    lSrcFolders.Add().LoadFromStream(ASource);
+    Dec(lNbPath);
+  End;
+End;
+
 Procedure TBinTSTOWorkSpaceProject.LoadFromStream(ASource : IStreamEx);
 Begin
   Case ASource.ReadByte() Of
     1 : LoadFromStreamV001(ASource);
+    2 : LoadFromStreamV002(ASource);
+
     Else
       Raise Exception.Create('Invalid workspace file');
   End;
@@ -228,7 +255,7 @@ End;
 
 Procedure TBinTSTOWorkSpaceProject.SaveToStream(ATarget : IStreamEx);
 Const
-  cStreamVersion = 1;
+  cStreamVersion = 2;
 
 Var X : Integer;
     lSrcFolders : IBinTSTOWorkSpaceProjectSrcFolders;
@@ -238,14 +265,16 @@ Begin
   ATarget.WriteByte(Ord(ProjectKind));
   ATarget.WriteByte(Ord(ProjectType));
   ATarget.WriteDWord(ZeroCrc32);
+
   If PackOutput Then
     ATarget.WriteByte(1)
   Else
     ATarget.WriteByte(0);
-  ATarget.WriteAnsiString(OutputPath);
 
+  ATarget.WriteAnsiString(OutputPath);
   If ProjectType = sptScript Then
     ATarget.WriteAnsiString(CustomScriptPath);
+  ATarget.WriteAnsiString(CustomModPath);
 
   lSrcFolders := GetSrcFolders();
   ATarget.WriteByte(lSrcFolders.Count);

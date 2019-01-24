@@ -76,6 +76,9 @@ Type
     Function  GetTvData() : ITSTOWorkSpaceProjectGroupIO;
     Procedure SetTvData(ATvData : ITSTOWorkSpaceProjectGroupIO);
 
+    Procedure DoCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode;
+      Column: TColumnIndex; var Result: Integer);
+
   Protected
     {$IfDef VT60}
     Function  DoGetImageIndex(Node : PVirtualNode; Kind : TVTImageKind; Column : TColumnIndex;
@@ -99,6 +102,8 @@ Type
     Procedure MoveNodeDown(ANode : PVirtualNode);
 
     Procedure LoadData();
+
+    Procedure AfterConstruction(); OverRide;
 
   End;
 
@@ -138,7 +143,13 @@ Type
     Function  GetTvData() : ITSTOCustomPatchListIO;
     Procedure SetTvData(ATvData : ITSTOCustomPatchListIO);
 
+    Procedure DoCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode;
+      Column: TColumnIndex; var Result: Integer);
+
   Protected
+    Function  GetIsDebugMode() : Boolean; OverRide;
+    Procedure SetIsDebugMode(Const AIsDebugMode : Boolean); OverRide;
+
     Procedure DoChecked(Node : PVirtualNode); OverRide;
     {$IfDef VT60}
     Procedure DoGetText(Var pEventArgs : TVSTGetCellTextEventArgs); OverRide;
@@ -165,6 +176,8 @@ Type
     Procedure SetTvData(ATvData : ITSTOResourcePaths);
 
     Procedure DoSetNodeExpandState(Sender : TBaseVirtualTree; Node : PVirtualNode; Data : Pointer; Var Abort : Boolean);
+    Procedure DoCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode;
+      Column: TColumnIndex; var Result: Integer);
 
   Protected
     Procedure DoGetText(Var pEventArgs : TVSTGetCellTextEventArgs); OverRide;
@@ -181,7 +194,8 @@ Type
     Procedure ExpandAllNodes();
     Procedure CollapseAllNodes();
 
-    Destructor  Destroy(); OverRide;
+    Procedure AfterConstruction(); OverRide;
+    Procedure BeforeDestruction(); OverRide;
 
   End;
 
@@ -985,6 +999,26 @@ End;
 
 (******************************************************************************)
 
+Procedure TTSTOWorkSpaceTreeView.AfterConstruction();
+Begin
+  InHerited AfterConstruction();
+  InHerited OnCompareNodes := DoCompareNodes;
+End;
+
+Procedure TTSTOWorkSpaceTreeView.DoCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+Var lFolder1, lFolder2 : ITSTOWorkSpaceProjectSrcFolder;
+    lFile1, lFile2 : ITSTOWorkSpaceProjectSrcFile;
+Begin
+  Result := -1;
+
+  If GetNodeData(Node1, ITSTOWorkSpaceProjectSrcFolder, lFolder1) And
+     GetNodeData(Node2, ITSTOWorkSpaceProjectSrcFolder, lFolder2) Then
+    Result := CompareText(lFolder1.SrcPath, lFolder2.SrcPath)
+  Else If GetNodeData(Node1, ITSTOWorkSpaceProjectSrcFile, lFile1) And
+          GetNodeData(Node2, ITSTOWorkSpaceProjectSrcFile, lFile2) Then
+    Result := CompareText(lFile1.FileName, lFile2.FileName);
+End;
+
 Procedure TTSTOWorkSpaceTreeView.LoadData();
 Begin
   RootNodeCount := 1;
@@ -1399,6 +1433,8 @@ Begin
 
     Columns.Add().Text := 'Name';
     Columns.Add().Text := 'Description';
+    With Columns.Add() Do
+      Options := Options - [coVisible];
 
     AutoSizeIndex := 1;
 
@@ -1413,6 +1449,38 @@ Begin
                          toFullVertGridLines,} toHotTrack];
     SelectionOptions := SelectionOptions + [toFullRowSelect, toExtendedFocus];
   End;
+
+  InHerited OnCompareNodes := DoCompareNodes;
+End;
+
+Procedure TTSTOCustomPatchesTreeView.DoCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+Var lPatch1, lPatch2 : ITSTOCustomPatchIO;
+Begin
+  Result := -1;
+
+  If GetNodeData(Node1, ITSTOCustomPatchIO, lPatch1) And
+     GetNodeData(Node2, ITSTOCustomPatchIO, lPatch2) Then
+    Result := CompareText(lPatch1.PatchName, lPatch2.PatchName);
+End;
+
+Function TTSTOCustomPatchesTreeView.GetIsDebugMode() : Boolean;
+Begin
+  Result := Header.Columns[Header.Columns.Count - 1].Options * [coVisible] = [coVisible];
+End;
+
+Procedure TTSTOCustomPatchesTreeView.SetIsDebugMode(Const AIsDebugMode : Boolean);
+Begin
+  With Header, Columns[Header.Columns.Count - 1] Do
+    If AIsDebugMode Then
+    Begin
+      Options := Options + [coVisible];
+      AutoSizeIndex := Columns.Count - 1;
+    End
+    Else
+    Begin
+      Options := Options - [coVisible];
+      AutoSizeIndex := Columns.Count - 2;
+    End;
 End;
 
 Function TTSTOCustomPatchesTreeView.GetTvData() : ITSTOCustomPatchListIO;
@@ -1458,6 +1526,7 @@ Procedure TTSTOCustomPatchesTreeView.DoGetText(Node: PVirtualNode; Column: TColu
 {$EndIf}
 Var lNodeData : ITSTOCustomPatchIO;
     lCellText : String;
+    lNodeIntf : PInterface;
 Begin
 {$IfDef VT60}
   With pEventArgs Do
@@ -1467,6 +1536,11 @@ Begin
       Case Column Of
         0 : lCellText := lNodeData.PatchName;
         1 : lCellText := lNodeData.PatchDesc;
+        2 :
+        Begin
+          lNodeIntf := GetNodeData(Node);
+          lCellText := GetInterfaceName(lNodeIntf^);
+        End;
         Else
           lCellText := '';
       End;
@@ -1486,11 +1560,18 @@ Begin
     Node.CheckState := csCheckedNormal;
 End;
 
-Destructor TTSTORessourcesTreeView.Destroy();
+Procedure TTSTORessourcesTreeView.AfterConstruction();
+Begin
+  InHerited AfterConstruction();
+
+  InHerited OnCompareNodes := DoCompareNodes;
+End;
+
+Procedure TTSTORessourcesTreeView.BeforeDestruction();
 Begin
   FTvData := Nil;
 
-  InHerited Destroy();
+  InHerited BeforeDestruction();
 End;
 
 Procedure TTSTORessourcesTreeView.DoGetText(Var pEventArgs : TVSTGetCellTextEventArgs);
@@ -1565,6 +1646,21 @@ End;
 Procedure TTSTORessourcesTreeView.DoSetNodeExpandState(Sender : TBaseVirtualTree; Node : PVirtualNode; Data : Pointer; Var Abort : Boolean);
 Begin
   Expanded[Node] := PBoolean(Data)^;
+End;
+
+Procedure TTSTORessourcesTreeView.DoCompareNodes(Sender: TBaseVirtualTree;
+  Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+Var lRp1, lRp2 : ITSTOResourcePath;
+    lFile1, lFile2 : ITSTOResourceFile;
+Begin
+  Result := -1;
+
+  If GetNodeData(Node1, ITSTOResourcePath, lRp1) And
+     GetNodeData(Node2, ITSTOResourcePath, lRp2) Then
+    Result := CompareText(lRp1.ResourcePath, lRp2.ResourcePath)
+  Else If GetNodeData(Node1, ITSTOResourceFile, lFile1) And
+          GetNodeData(Node2, ITSTOResourceFile, lFile2) Then
+    Result := CompareText(lFile1.FileName, lFile2.FileName);
 End;
 
 Procedure TTSTORessourcesTreeView.ExpandAllNodes();

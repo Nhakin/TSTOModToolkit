@@ -4,7 +4,7 @@ interface
 
 Uses Classes, HsInterfaceEx, HsXmlDocEx,
   TSTOProject.Xml, TSTOStoreMenuMaster, TSTOStoreMenu,
-  TSTOSbtp.IO, TSTOCustomPatches.IO, TSTOHackSettings, RgbExtractProgress;
+  TSTOSbtp.IO, TSTOCustomPatches.IO, TSTOProjectWorkSpace.IO, RgbExtractProgress;
 
 Type
   TPatchType = ( tptCost, tptDynamicBuyInfo, tptDynamicSellInfo,
@@ -49,7 +49,7 @@ Type
     Function  GetProject() : ITSTOXMLProject;
     Procedure SetProject(AProject : ITSTOXMLProject);
 
-    Procedure CreateMod(AProject : ITSTOXMLProject; AHackSettings : ITSTOHackSettings);
+    Procedure CreateMod(AProject : ITSTOXMLProject; AWorkSpaceProject : ITSTOWorkSpaceProjectIO; AMasterFiles : ITSTOXmlMasterFiles);
     Procedure PreviewCustomPatches(AXml : IXmlDocumentEx; APatches : ITSTOPatchDatasIO);
 
     Property Project : ITSTOXMLProject Read GetProject Write SetProject;
@@ -130,8 +130,8 @@ Type
     FProject  : ITSTOXMLProject;
 
     Procedure BuildCustomStore(AXml : IXmlDocumentEx; AMasterFile : ITSTOXMLMasterFile; AStoreList : ITSTOXmlStoreCategories);
-    Procedure BuildCustomStoreEx(AProject : ITSTOXMLProject; ATextPools : ISbtpFileIO);
-    Procedure FreeLandUpgrades(AProject : ITSTOXMLProject);
+    Procedure BuildCustomStoreEx(AWorkSpaceProject : ITSTOWorkSpaceProjectIO; ATextPools : ISbtpFileIO; AMasterFiles : ITSTOXmlMasterFiles);
+    Procedure FreeLandUpgrades(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
     Function  GetSbtpPatch(Const AIndex : Integer; APatches : ISbtpFilesIO) : ISbtpFileIO;
 
     Function GetCodeNode(Const ACode : WideString) : IXmlNodeEx;
@@ -139,7 +139,7 @@ Type
     Procedure ReplaceAttributes(APatch : WideString; ATarget : IXmlNodeEx);
     Procedure RemoveAttributes(APatch : WideString; ATarget : IXmlNodeEx);
     Procedure AddNode(APatch : WideString; ATarget : IXmlNodeEx);
-    Procedure ApplyCustomPatches(AProject : ITSTOXMLProject; AHackSettings : ITSTOHackSettings; AXmlList : IXmlDocumentExList);
+    Procedure ApplyCustomPatches(AWorkSpaceProject : ITSTOWorkSpaceProjectIO; AXmlList : IXmlDocumentExList);
 
   Protected
     Procedure PreviewCustomPatches(AXml : IXmlDocumentEx; APatches : ITSTOPatchDatasIO);
@@ -147,7 +147,7 @@ Type
     Function  GetProject() : ITSTOXMLProject;
     Procedure SetProject(AProject : ITSTOXMLProject);
 
-    Procedure CreateMod(AProject : ITSTOXMLProject; AHackSettings : ITSTOHackSettings);
+    Procedure CreateMod(AProject : ITSTOXMLProject; AWorkSpaceProject : ITSTOWorkSpaceProjectIO; AMasterFiles : ITSTOXmlMasterFiles);
 
   End;
 
@@ -290,7 +290,7 @@ Begin
     End;
 End;
 
-Procedure TTSTOModder.ApplyCustomPatches(AProject : ITSTOXMLProject; AHackSettings : ITSTOHackSettings; AXmlList : IXmlDocumentExList);
+Procedure TTSTOModder.ApplyCustomPatches(AWorkSpaceProject : ITSTOWorkSpaceProjectIO; AXmlList : IXmlDocumentExList);
 Var X, Y : Integer;
     lNbPatches,
     lPatchIdx : Integer;
@@ -300,23 +300,23 @@ Var X, Y : Integer;
     lIdx : Integer;
 Begin
   lPatchIdx  := 0;
-  lNbPatches := AHackSettings.CustomPatches.ActivePatchCount;
+  lNbPatches := AWorkSpaceProject.GlobalSettings.CustomPatches.ActivePatchCount;
 
   If Assigned(FProgress) Then
     FProgress.CurArchiveName := 'Applying Custom Patches';
 
-  With AHackSettings.CustomPatches Do
+  With AWorkSpaceProject.GlobalSettings.CustomPatches Do
   Begin
     For X := 0 To Patches.Count - 1 Do
       With Patches[X] Do
         If PatchActive And
-           FileExists(AProject.Settings.SourcePath + FileName) Then
+           FileExists(AWorkSpaceProject.SrcPath + FileName) Then
         Begin
           lIdx := AXmlList.IndexOf(FileName);
 
           If lIdx = -1 Then
           Begin
-            lXml := LoadXMLDocument(AProject.Settings.SourcePath + FileName);
+            lXml := LoadXMLDocument(AWorkSpaceProject.SrcPath + FileName);
             AXmlList.Add(lXml);
           End
           Else
@@ -353,7 +353,7 @@ Begin
     Begin
       lStrStream := TStringStreamEx.Create(FormatXmlData(AXmlList[X].Xml.Text));
       Try
-        lStrStream.SaveToFile(AProject.Settings.TargetPath + ExtractFileName(AXmlList[X].FileName));
+        lStrStream.SaveToFile(IncludeTrailingBackSlash(AWorkSpaceProject.CustomModPath) + ExtractFileName(AXmlList[X].FileName));
 
         Finally
           lStrStream := Nil;
@@ -380,179 +380,109 @@ Begin
   End;
 End;
 
-Procedure TTSTOModder.CreateMod(AProject : ITSTOXMLProject; AHackSettings : ITSTOHackSettings);
+Procedure TTSTOModder.CreateMod(AProject : ITSTOXMLProject; AWorkSpaceProject : ITSTOWorkSpaceProjectIO; AMasterFiles : ITSTOXmlMasterFiles);
 Var X, Y : Integer;
-    lCurFileName     : String;
-    lXmlMaster       : IXmlDocumentEx;
-    lMasterList      : IXmlNodeListEx;
-    lXml             : IXmlDocumentEx;
-    lPatchs          : ITSTOXmlPatches;
+    lCurFileName : String;
+    lXmlMaster   : IXmlDocumentEx;
+    lMasterList  : IXmlNodeListEx;
+    lXml         : IXmlDocumentEx;
+    lPatchs      : ITSTOXmlPatches;
 
     lZip : IHsMemoryZipper;
     lMem : IMemoryStreamEx;
-    lSbtpPatchFile : ISbtpFilesIO;
-    lSbtpPatches   : ISbtpFileIO;
+    lSbtpPatches : ISbtpFileIO;
 
     lXmls : IXmlDocumentExList;
     lIdx  : Integer;
 Begin
   FProject := AProject;
 
-  If AProject.Settings.BuildCustomStore Then
-  Begin
-    lSbtpPatchFile := TSbtpFilesIO.CreateSbtpFiles();
-    If FileExists(AProject.Settings.HackFileName) Then
-    Begin
-      lZip := THsMemoryZipper.Create();
-      lMem := TMemoryStreamEx.Create();
-      Try
-        lZip.LoadFromFile(AProject.Settings.HackFileName);
-        If lZip.FindFile('TextPools') > -1 Then
-        Begin
-          lZip.ExtractToStream('TextPools', lMem);
-          If lMem.Size > 0 Then
-            lSbtpPatchFile.LoadFromStream(lMem);
-        End;
-
-        Finally
-          lMem := Nil;
-          lZip := Nil;
-      End;
-    End;
-  End;
-
   FProgress := TRgbProgress.CreateRgbProgress();
   FProgress.Show();
   Try
-    With AProject.Settings Do
-    Begin
-      lXmls := TXmlDocumentExList.Create();
+    lXmls := TXmlDocumentExList.Create();
 
-//      If FileExists(CustomPatchFileName) Then
-      Begin
-//        lMasterList := LoadXmlDocument(CustomPatchFileName).SelectNodes('//Patch[@Active="true"]/FileName/text()');
-        lMasterList := LoadXmlData(AHackSettings.CustomPatches.AsXml).SelectNodes('//Patch[@Active="true"]/FileName/text()');
-        If Assigned(lMasterList) Then
-        Try
-          For X := 0 To lMasterList.Count - 1 Do
-            If FileExists(SourcePath + lMasterList[X].Text) Then
-            Begin
-              If lXmls.IndexOf(lMasterList[X].Text) = -1 Then
-              Begin
-                lXml := LoadXmlDocument(SourcePath + lMasterList[X].Text);
-                lXmls.Add(lXml);
-              End;
-            End;
-
-          Finally
-            lMasterList := Nil;
-        End;
-      End;
-
-(*
-      If FileExists(CustomPatchFileName) Then
-      Begin
-        lMasterList := LoadXmlDocument(CustomPatchFileName).SelectNodes('//Patch[@Active="true"]/FileName/text()');
-        Try
-          For X := 0 To lMasterList.Count - 1 Do
-            If FileExists(SourcePath + lMasterList[X].Text) Then
-            Begin
-              If lXmls.IndexOf(lMasterList[X].Text) = -1 Then
-              Begin
-                lXml := LoadXmlDocument(SourcePath + lMasterList[X].Text);
-                lXmls.Add(lXml);
-              End;
-            End;
-
-          Finally
-            lMasterList := Nil;
-        End;
-      End;
-*)
-      For X := 0 To MasterFiles.Count - 1 Do
-        If FileExists(SourcePath + MasterFiles[X].FileName) Then
+    lMasterList := LoadXmlData(AWorkSpaceProject.GlobalSettings.CustomPatches.AsXml).SelectNodes('//Patch[@Active="true"]/FileName/text()');
+    If Assigned(lMasterList) Then
+    Try
+      For X := 0 To lMasterList.Count - 1 Do
+        If FileExists(AWorkSpaceProject.SrcPath + lMasterList[X].Text) Then
         Begin
-          lXmlMaster := LoadXMLDocument(SourcePath + MasterFiles[X].FileName);
-          Try
-            lMasterList := lXmlMaster.SelectNodes('Package');
-            If Assigned(lMasterList) Then
-            Try
-              For Y := 0 To lMasterList.Count - 1 Do
-              Begin
-                lCurFileName := lMasterList[Y].Attributes['name'] + '.xml';
-
-                If FileExists(SourcePath + lCurFileName) Then
-                Begin
-                  lIdx := lXmls.IndexOf(lCurFileName);
-                  If lIdx = -1 Then
-                    lXml := LoadXMLDocument(SourcePath + lCurFileName)
-                  Else
-                    lXml := lXmls[lIdx];
-
-                  Try
-                    lPatchs := TTSTOXmlPatches.Create(Self);
-                    Try
-                      lPatchs.Progress := FProgress;
-                      lPatchs.LoadPatches(lXml, MasterFiles[X]);
-
-                      If lPatchs.TotalPatches > 0 Then
-                      Begin
-                        lPatchs.ApplyPatches(lXml);
-                        lXml.SaveToFile(TargetPath + lCurFileName);
-                      End;
-
-                      FProgress.ItemProgress := System.Round((Y + 1) / lMasterList.Count * 100);
-
-//                      If AProject.Settings.BuildCustomStore Then
-//                        Self.BuildCustomStore(lXml, MasterFiles[X], lStoreList);
-
-                      Finally
-                        lPatchs := Nil;
-                    End;
-
-                    Finally
-                      lXml := Nil;
-                  End;
-                End;
-              End;
-
-              Finally
-                lMasterList := Nil;
-            End;
-
-            Finally
-              lXmlMaster := Nil;
+          If lXmls.IndexOf(lMasterList[X].Text) = -1 Then
+          Begin
+            lXml := LoadXmlDocument(AWorkSpaceProject.SrcPath + lMasterList[X].Text);
+            lXmls.Add(lXml);
           End;
         End;
 
-      If AProject.Settings.BuildCustomStore Then
-      Begin
-        lSbtpPatches := GetSbtpPatch(14, lSbtpPatchFile);
-        BuildCustomStoreEx(FProject, lSbtpPatches);
+      Finally
+        lMasterList := Nil;
+    End;
 
-        lZip := THsMemoryZipper.Create();
-        lMem := TMemoryStreamEx.Create();
+    For X := 0 To AMasterFiles.Count - 1 Do
+      If FileExists(AWorkSpaceProject.SrcPath + AMasterFiles[X].FileName) Then
+      Begin
+        lXmlMaster := LoadXMLDocument(AWorkSpaceProject.SrcPath + AMasterFiles[X].FileName);
         Try
-          lZip.ShowProgress := False;
-          If FileExists(AProject.Settings.HackFileName) Then
-            lZip.LoadFromFile(AProject.Settings.HackFileName);
-          lSbtpPatchFile.SaveToStream(lMem);
-          lMem.Position := 0;
-          lZip.AddFromStream('TextPools', lMem);
-          lZip.SaveToFile(AProject.Settings.HackFileName);
+          lMasterList := lXmlMaster.SelectNodes('Package');
+          If Assigned(lMasterList) Then
+          Try
+            For Y := 0 To lMasterList.Count - 1 Do
+            Begin
+              lCurFileName := lMasterList[Y].Attributes['name'] + '.xml';
+
+              If FileExists(AWorkSpaceProject.SrcPath + lCurFileName) Then
+              Begin
+                lIdx := lXmls.IndexOf(lCurFileName);
+                If lIdx = -1 Then
+                  lXml := LoadXMLDocument(AWorkSpaceProject.SrcPath + lCurFileName)
+                Else
+                  lXml := lXmls[lIdx];
+
+                Try
+                  lPatchs := TTSTOXmlPatches.Create(Self);
+                  Try
+                    lPatchs.Progress := FProgress;
+                    lPatchs.LoadPatches(lXml, AMasterFiles[X]);
+
+                    If lPatchs.TotalPatches > 0 Then
+                    Begin
+                      lPatchs.ApplyPatches(lXml);
+                      lXml.SaveToFile(AWorkSpaceProject.CustomModPath + lCurFileName);
+                    End;
+
+                    FProgress.ItemProgress := System.Round((Y + 1) / lMasterList.Count * 100);
+
+                    Finally
+                      lPatchs := Nil;
+                  End;
+
+                  Finally
+                    lXml := Nil;
+                End;
+              End;
+            End;
+
+            Finally
+              lMasterList := Nil;
+          End;
 
           Finally
-            lZip := Nil;
-            lMem := Nil;
+            lXmlMaster := Nil;
         End;
       End;
 
-      If AProject.Settings.FreeLand Then
-        FreeLandUpgrades(AProject);
-
-      If AHackSettings.CustomPatches.ActivePatchCount > 0 Then
-        ApplyCustomPatches(AProject, AHackSettings, lXmls);
+    If AProject.Settings.BuildCustomStore Then
+    Begin
+      lSbtpPatches := GetSbtpPatch(14, AWorkSpaceProject.GlobalSettings.TextPools);
+      BuildCustomStoreEx(AWorkSpaceProject, lSbtpPatches, AMasterFiles);
     End;
+
+    If AProject.Settings.FreeLand Then
+      FreeLandUpgrades(AWorkSpaceProject);
+
+    If AWorkSpaceProject.GlobalSettings.CustomPatches.ActivePatchCount > 0 Then
+      ApplyCustomPatches(AWorkSpaceProject, lXmls);
 
     Finally
       FProgress := Nil;
@@ -777,7 +707,7 @@ Begin
             For X := 0 To Patches.Count - 1 Do
             Begin
               Patches[X].DOMNode.parentNode.removeChild(Patches[X].DOMNode);
-              
+
               If Assigned(FProgress) Then
                 FProgress.ArchiveProgress := Round((X + 1) / Patches.Count * 100);
             End;
@@ -1044,7 +974,7 @@ Begin
   InHerited Sort(InternalSort);
 End;
 
-Procedure TTSTOModder.BuildCustomStoreEx(AProject : ITSTOXMLProject; ATextPools : ISbtpFileIO);
+Procedure TTSTOModder.BuildCustomStoreEx(AWorkSpaceProject : ITSTOWorkSpaceProjectIO; ATextPools : ISbtpFileIO; AMasterFiles : ITSTOXmlMasterFiles);
   Function GetPackageName(Const APackage : String) : String;
   Var lIdx : Integer;
   Begin
@@ -1068,15 +998,15 @@ Var X, Y, Z    : Integer;
     lIdx       : Integer;
     lPath      : String;
 Begin
-  lPath   := AProject.Settings.SourcePath;
+  lPath   := AWorkSpaceProject.SrcPath;
   lStores := TCustomStores.Create();
   Try
     If Assigned(FProgress) Then
       FProgress.CurArchiveName := 'Making Custom Store';
 
-    For Z := 0 To AProject.Settings.MasterFiles.Count - 1 Do
+    For Z := 0 To AMasterFiles.Count - 1 Do
     Begin
-      lMaster := LoadXMLDocument(lPath + AProject.Settings.MasterFiles[Z].FileName);
+      lMaster := LoadXMLDocument(lPath + AMasterFiles[Z].FileName);
       lInclNodes := lMaster.SelectNodes('//Include');
 
       //Build full master list
@@ -1135,7 +1065,7 @@ Begin
             Begin
               With lCurStore.Add() Do
               Begin
-                ItemType := AProject.Settings.MasterFiles[Z].NodeKind;//NodeName;
+                ItemType := AMasterFiles[Z].NodeKind;//NodeName;
                 ItemId   := lNodes[X].ChildNodes[Y].Attributes['id'];
                 ItemName := lNodes[X].ChildNodes[Y].Attributes['name'];
               End
@@ -1196,10 +1126,10 @@ Begin
       With TStringList.Create() Do
       Try
         Text := FormatXmlData(lTrgStore.Xml.Text);
-        SaveToFile(AProject.Settings.TargetPath + 'newstores.xml');
+        SaveToFile(AWorkSpaceProject.CustomModPath + 'newstores.xml');
 
         Text := FormatXmlData(lTrgStores.Xml.Text);
-        SaveToFile(AProject.Settings.TargetPath + 'newstoremenu.xml');
+        SaveToFile(AWorkSpaceProject.CustomModPath + 'newstoremenu.xml');
 
         Finally
           Free();
@@ -1295,14 +1225,14 @@ Begin
   End;
 End;
 
-Procedure TTSTOModder.FreeLandUpgrades(AProject : ITSTOXMLProject);
+Procedure TTSTOModder.FreeLandUpgrades(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 Var lXml   : IXmlDocumentEx;
     lNodes : IXmlNodeListEx;
     X, Y   : Integer;
     lLst   : TStringList;
     lStr   : String;
 Begin
-  lXml := TXmlDocumentEx.Create(AProject.Settings.SourcePath + 'LandInfo.xml');
+  lXml := TXmlDocumentEx.Create(AWorkSpaceProject.SrcPath + 'LandInfo.xml');
   Try
     lNodes := lXml.SelectNodes('//LandCost');
     If Assigned(lNodes) And (lNodes.Count > 0) Then
@@ -1326,7 +1256,7 @@ Begin
           lNodes[X].Attributes['value'] := lStr;
         End;
 
-        lXml.SaveToFile(AProject.Settings.TargetPath + 'LandInfo.xml');
+        lXml.SaveToFile(AWorkSpaceProject.CustomModPath + 'LandInfo.xml');
 
         Finally
           lLst.Free();

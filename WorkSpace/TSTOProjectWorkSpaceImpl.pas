@@ -93,6 +93,7 @@ Type
     FPackOutput       : Boolean;
     FOutputPath       : AnsiString;
     FCustomScriptPath : AnsiString;
+    FCustomModPath    : AnsiString;
     FSrcFolders       : ITSTOWorkSpaceProjectSrcFolders;
 
   Protected
@@ -119,9 +120,14 @@ Type
     Function  GetCustomScriptPath() : AnsiString; Virtual;
     Procedure SetCustomScriptPath(Const ACustomScriptPath : AnsiString); Virtual;
 
+    Function  GetCustomModPath() : AnsiString; Virtual;
+    Procedure SetCustomModPath(Const ACustomModPath : AnsiString); Virtual;
+
     Function  GetSrcFolders() : ITSTOWorkSpaceProjectSrcFolders;
 
     Procedure Clear();
+
+    Procedure Assign(ASource : IInterface);
 
     Property ProjectName      : AnsiString                      Read GetProjectName      Write SetProjectName;
     Property ProjectKind      : TWorkSpaceProjectKind           Read GetProjectKind      Write SetProjectKind;
@@ -130,9 +136,8 @@ Type
     Property PackOutput       : Boolean                         Read GetPackOutput       Write SetPackOutput;
     Property OutputPath       : AnsiString                      Read GetOutputPath       Write SetOutputPath;
     Property CustomScriptPath : AnsiString                      Read GetCustomScriptPath Write SetCustomScriptPath;
+    Property CustomModPath    : AnsiString                      Read GetCustomModPath    Write SetCustomModPath;
     Property SrcFolders       : ITSTOWorkSpaceProjectSrcFolders Read GetSrcFolders;
-
-    Procedure Assign(ASource : IInterface);
 
   Public
     Procedure AfterConstruction(); OverRide;
@@ -406,7 +411,7 @@ Begin
     FPackOutput       := lSrc.PackOutput;
     FOutputPath       := lSrc.OutputPath;
     FCustomScriptPath := lSrc.CustomScriptPath;
-//    FHackFileName     := lSrc.HackFileName;
+    FCustomModPath    := lSrc.CustomModPath;
 
     FSrcFolders.Assign(lSrc.SrcFolders);
   End
@@ -476,12 +481,34 @@ End;
 
 Function TTSTOWorkSpaceProject.GetCustomScriptPath() : AnsiString;
 Begin
-  Result := FCustomScriptPath;
+  If FCustomScriptPath <> '' Then
+    Result := IncludeTrailingBackSlash(FCustomScriptPath)
+  Else
+    Result := '';
 End;
 
 Procedure TTSTOWorkSpaceProject.SetCustomScriptPath(Const ACustomScriptPath : AnsiString);
 Begin
-  FCustomScriptPath := ACustomScriptPath;
+  If ACustomScriptPath <> '' Then
+    FCustomScriptPath := IncludeTrailingBackSlash(ACustomScriptPath)
+  Else
+    FCustomScriptPath := '';
+End;
+
+Function TTSTOWorkSpaceProject.GetCustomModPath() : AnsiString;
+Begin
+  If FCustomModPath <> '' Then
+    Result := IncludeTrailingBackSlash(FCustomModPath)
+  Else
+    Result := '';
+End;
+
+Procedure TTSTOWorkSpaceProject.SetCustomModPath(Const ACustomModPath : AnsiString);
+Begin
+  If ACustomModPath <> '' Then
+    FCustomModPath := IncludeTrailingBackSlash(ACustomModPath)
+  Else
+    FCustomModPath := '';
 End;
 
 Function TTSTOWorkSpaceProject.GetSrcFolders() : ITSTOWorkSpaceProjectSrcFolders;

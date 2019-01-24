@@ -259,6 +259,7 @@ Type
     procedure popTvWSGenerateScriptsClick(Sender: TObject);
     procedure popExportHackConfigClick(Sender: TObject);
     procedure popBuildHackConfigClick(Sender: TObject);
+    procedure popTvWSApplyModClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -724,8 +725,16 @@ End;
 (******************************************************************************)
 
 procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
+Var lStrStrm : IStringStreamEx;
 begin
-//
+  lStrStrm := TStringStreamEx.Create(FWorkSpace.AsXml);
+  Try
+    lStrStrm.SaveToFile(ChangeFileExt(FWorkSpace.FileName, '.xml'));
+    ShowMessage('Done');
+
+    Finally
+      lStrStrm := Nil;
+  End;
 end;
 
 procedure TFrmDckMain.sptbxMainMenuMouseDown(Sender: TObject;
@@ -745,6 +754,7 @@ begin
     FTvResources.IsDebugMode      := Not FTvResources.IsDebugMode;
     FTvScriptTemplate.IsDebugMode := Not FTvScriptTemplate.IsDebugMode;
     FTvSTVariables.IsDebugMode    := Not FTvSTVariables.IsDebugMode;
+    FTvCustomPatches.IsDebugMode  := Not FTvCustomPatches.IsDebugMode;
   End;
 end;
 
@@ -1223,6 +1233,51 @@ begin
   popTvSTTemplateDelete.Enabled := Assigned(FTvSTVariables.GetFirstSelected());
 end;
 
+procedure TFrmDckMain.popTvWSApplyModClick(Sender: TObject);
+Var lPkg  : ITSTOPackageNode;
+    lPath : AnsiString;
+    lProject : ITSTOWorkSpaceProjectIO;
+begin
+  If FTvWorkSpace.GetNodeData(FTvWorkSpace.GetFirstSelected(), ITSTOWorkSpaceProjectIO, lProject) Then
+  Try
+    Case lProject.ProjectType Of
+      sptScript :
+      Begin
+        FPrj.Settings.AllFreeItems     := chkAllFree.Checked;
+        FPrj.Settings.NonUnique        := chkNonUnique.Checked;
+        FPrj.Settings.BuildCustomStore := chkBuildStore.Checked;
+        FPrj.Settings.InstantBuild     := chkInstantBuild.Checked;
+        FPrj.Settings.FreeLand         := chkFreeLandUpgade.Checked;
+        FPrj.Settings.UnlimitedTime    := chkUnlimitedTime.Checked;
+
+        With TTSTODlcGenerator.Create() Do
+        Try
+          CreateMod(FPrj, lProject, FPrj.Settings.MasterFiles);
+          MessageDlg('Done', mtCustom, [mbOk], 0);
+
+          Finally
+            Free();
+        End;
+      End;
+
+      sptTextPools :
+      Begin
+        With TTSTODlcGenerator.Create() Do
+        Try
+          CreateSbtpMod(lProject);
+          MessageDlg('Done', mtCustom, [mbOk], 0);
+
+          Finally
+            Free();
+        End;
+      End;
+    End;
+
+    Finally
+      lProject := Nil;
+  End;
+end;
+
 procedure TFrmDckMain.popTvWSGenerateScriptsClick(Sender: TObject);
 Var lWorkSpace : ITSTOWorkspaceProject;
     lNode      : PVirtualNode;
@@ -1511,27 +1566,7 @@ Begin
         tbUnpackMod.Enabled   := lPkg.FileExist;
         tbPackMod.Enabled     := DirectoryExists(lPath);
         tbValidateXml.Enabled := DirectoryExists(lPath);
-        If Pos(UpperCase('GAMESCRIPT'), UpperCase(lPkg.FileName)) > 0 Then
-          tbCreateMod.Enabled := DirectoryExists(lPath + '0') And
-                                 DirectoryExists(lPath + '1.src')
-        Else If Pos(UpperCase('TEXTPOOLS'), UpperCase(lPkg.FileName)) > 0 Then
-        Begin
-          If FileExists(FPrj.Settings.HackFileName) Then
-          Begin
-            lZip := THsMemoryZipper.Create();
-            lMem := TMemoryStreamEx.Create();
-            Try
-              lZip.LoadFromFile(FPrj.Settings.HackFileName);
-              lZip.ExtractToStream('TextPools', lMem);
-              tbCreateMod.Enabled := DirectoryExists(lPath + '0') And
-                                     DirectoryExists(lPath + '1.src') And
-                                     (lMem.Size > 0);
-              Finally
-                lMem := Nil;
-                lZip := Nil;
-            End;
-          End;
-        End;
+        tbCreateMod.Enabled   := FTvWorkSpace.GetNodeData(FTvWorkSpace.GetFirstSelected(), ITSTOWorkSpaceProjectIO)
       End
       Else If GetNodeData(ANode, IBinArchivedFileData, lFile) And
               GetNodeData(ANode.Parent, IBinZeroFileData, lArchive) And
@@ -2027,6 +2062,7 @@ end;
 procedure TFrmDckMain.tbCreateModOldClick(Sender: TObject);
 Var lPkg  : ITSTOPackageNode;
     lPath : AnsiString;
+    lProject : ITSTOWorkSpaceProjectIO;
 begin
   If FTvDlcServer.GetNodeData(FTvDlcServer.GetFirstSelected(), ITSTOPackageNode, lPkg) Then
   Try
@@ -2043,25 +2079,29 @@ begin
       FPrj.Settings.FreeLand         := chkFreeLandUpgade.Checked;
       FPrj.Settings.UnlimitedTime    := chkUnlimitedTime.Checked;
 
-      With TTSTODlcGenerator.Create() Do
-      Try
-        CreateMod(FPrj, FWorkSpace.HackSettings);
-        MessageDlg('Done', mtCustom, [mbOk], 0);
+      With FTvWorkSpace Do
+        If GetNodeData(GetFirstSelected(), ITSTOWorkSpaceProjectIO, lProject) Then
+          With TTSTODlcGenerator.Create() Do
+          Try
+            CreateMod(FPrj, lProject, FPrj.Settings.MasterFiles);
+            MessageDlg('Done', mtCustom, [mbOk], 0);
 
-        Finally
-          Free();
-      End;
+            Finally
+              Free();
+          End;
     End
     Else If Pos('TEXTPOOL', UpperCase(lPkg.FileName)) > 0 Then
     Begin
-      With TTSTODlcGenerator.Create() Do
-      Try
-        CreateSbtpMod(FPrj);
-        MessageDlg('Done', mtCustom, [mbOk], 0);
+      With FTvWorkSpace Do
+        If GetNodeData(GetFirstSelected(), ITSTOWorkSpaceProjectIO, lProject) Then
+          With TTSTODlcGenerator.Create() Do
+          Try
+            CreateSbtpMod(lProject);
+            MessageDlg('Done', mtCustom, [mbOk], 0);
 
-        Finally
-          Free();
-      End;
+            Finally
+              Free();
+          End;
     End;
 
     Finally
@@ -2104,7 +2144,7 @@ Var lPkgList : ITSTOPackageNodes;
 begin
   If MessageDlg('Do you want to extract RGB Files?', mtConfirmation, [mbYes, mbNo], 0) = mrYes Then
   Begin
-    AppLogFile('Extracting Rgb files from : ' + FCurDlcIndex);
+    AppLogFile('Extracting Rgb files from (1) : ' + FCurDlcIndex);
     lPkgList := TTSTOPackageNodes.Create();
     Try
       FTvDlcServer.IterateSubtree(FTvDlcServer.GetFirstSelected(), GetRgbNodeList, @lPkgList);
@@ -2114,6 +2154,7 @@ begin
       Finally
         lPkgList := Nil;
     End;
+    AppLogFile('Extracting Rgb files from (2) : ' + FCurDlcIndex);
   End;
 end;
 

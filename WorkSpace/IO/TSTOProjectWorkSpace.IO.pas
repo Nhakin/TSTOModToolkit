@@ -41,10 +41,19 @@ Type
 
   End;
 
+  ITSTOWorkSpaceProjectGroupIO = Interface;
   ITSTOWorkSpaceProjectIO = Interface(ITSTOWorkSpaceProject)
     ['{4B61686E-29A0-2112-84E7-E72095D7D3D9}']
+    Function  GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function  GetGlobalSettings() : ITSTOHackSettings;
+    Function  GetSrcPath() : String;
+
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
+
+    Property WorkSpace      : ITSTOWorkSpaceProjectGroupIO Read GetWorkSpace;
+    Property GlobalSettings : ITSTOHackSettings            Read GetGlobalSettings;
+    Property SrcPath        : String                       Read GetSrcPath;
 
     Property OnChange : TNotifyEvent Read GetOnChange Write SetOnChange;
 
@@ -102,6 +111,14 @@ Uses
   TSTOProjectWorkSpace.Bin, TSTOProjectWorkSpace.Xml;
 
 Type
+  ITSTOWorkSpaceProjectIOEx = Interface(ITSTOWorkSpaceProjectIO)
+    ['{4B61686E-29A0-2112-84E7-E72095D7D3D9}']
+    Procedure SetWorkSpace(AWorkSpace : ITSTOWorkSpaceProjectGroupIO);
+
+    Property WorkSpace : ITSTOWorkSpaceProjectGroupIO Read GetWorkSpace Write SetWorkSpace;
+
+  End;
+
   TTSTOWorkSpaceProjectSrcFilesIO = Class(TTSTOWorkSpaceProjectSrcFiles, ITSTOWorkSpaceProjectSrcFilesIO)
   Protected
     Function  GetOnChange() : TNotifyEvent; Virtual; Abstract;
@@ -135,12 +152,20 @@ Type
 
   End;
 
-  TTSTOWorkSpaceProjectIO = Class(TTSTOWorkSpaceProject, ITSTOWorkSpaceProjectIO)
+  TTSTOWorkSpaceProjectIO = Class(TTSTOWorkSpaceProject, ITSTOWorkSpaceProjectIO, ITSTOWorkSpaceProjectIOEx)
   Private
-    FOnChange : TNotifyEvent;
+    FOnChange  : TNotifyEvent;
+    FWorkSpace : Pointer;
 
   Protected
     Function  GetWorkSpaceProjectSrcFoldersClass() : TTSTOWorkSpaceProjectSrcFoldersClass; OverRide;
+
+    Function  GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Procedure SetWorkSpace(AWorkSpace : ITSTOWorkSpaceProjectGroupIO);
+
+    Function  GetSrcPath() : String;
+
+    Function  GetGlobalSettings() : ITSTOHackSettings;
 
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
@@ -152,6 +177,10 @@ Type
     Procedure SetPackOutput(Const APackOutput : Boolean); OverRide;
     Procedure SetOutputPath(Const AOutputPath : AnsiString); OverRide;
     Procedure SetCustomScriptPath(Const ACustomScriptPath : AnsiString); OverRide;
+    Procedure SetCustomModPath(Const ACustomModPath : AnsiString); OverRide;
+
+  Public
+    Constructor Create(AWorkSpace : ITSTOWorkSpaceProjectGroupIO); ReIntroduce;
 
   End;
 
@@ -261,6 +290,35 @@ Begin
   FOnChange := AOnChange;
 End;
 
+Constructor TTSTOWorkSpaceProjectIO.Create(AWorkSpace : ITSTOWorkSpaceProjectGroupIO);
+Begin
+  InHerited Create(True);
+
+  FWorkSpace := Pointer(AWorkSpace);
+End;
+
+Function TTSTOWorkSpaceProjectIO.GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+Begin
+  Result := ITSTOWorkSpaceProjectGroupIO(FWorkSpace);
+End;
+
+Procedure TTSTOWorkSpaceProjectIO.SetWorkSpace(AWorkSpace : ITSTOWorkSpaceProjectGroupIO);
+Begin
+  FWorkSpace := Pointer(AWorkSpace);
+End;
+
+Function TTSTOWorkSpaceProjectIO.GetSrcPath() : String;
+Begin
+  If CustomModPath = '' Then
+    Raise Exception.Create('You must configure Custom mod path in project settings');
+  Result := ExtractFilePath(ExcludeTrailingBackslash(CustomModPath)) + '0\';
+End;
+
+Function TTSTOWorkSpaceProjectIO.GetGlobalSettings() : ITSTOHackSettings;
+Begin
+  Result := GetWorkSpace().HackSettings;
+End;
+
 Function TTSTOWorkSpaceProjectIO.GetWorkSpaceProjectSrcFoldersClass() : TTSTOWorkSpaceProjectSrcFoldersClass;
 Begin
   Result := TTSTOWorkSpaceProjectSrcFoldersIO;
@@ -353,6 +411,17 @@ Begin
   End;
 End;
 
+Procedure TTSTOWorkSpaceProjectIO.SetCustomModPath(Const ACustomModPath : AnsiString);
+Begin
+  If GetCustomModPath() <> ACustomModPath Then
+  Begin
+    InHerited SetCustomModPath(ACustomModPath);
+
+    If Assigned(FOnChange) Then
+      FOnChange(Self);
+  End;
+End;
+
 Destructor TTSTOWorkSpaceProjectGroupIOImpl.Destroy();
 Begin
   FBinImpl := Nil;
@@ -398,12 +467,14 @@ End;
 Function TTSTOWorkSpaceProjectGroupIOImpl.Add() : ITSTOWorkSpaceProjectIO;
 Begin
   Result := InHerited Add() As ITSTOWorkSpaceProjectIO;
+  (Result As ITSTOWorkSpaceProjectIOEx).WorkSpace := Self;
   Result.OnChange := DoOnChange;
 End;
 
 Function TTSTOWorkSpaceProjectGroupIOImpl.Add(Const AItem : ITSTOWorkSpaceProjectIO) : Integer;
 Begin
   Result := InHerited Add(AItem);
+  (AItem As ITSTOWorkSpaceProjectIOEx).WorkSpace := Self;
   AItem.OnChange := DoOnChange;
 End;
 
@@ -426,7 +497,11 @@ Begin
   FXmlImpl := Nil;
 
   For X := 0 To Count - 1 Do
-    Get(X).OnChange := DoOnChange;
+    With Get(X) As ITSTOWorkSpaceProjectIOEx Do
+    Begin
+      WorkSpace := Self;
+      OnChange  := DoOnChange;
+    End;
 End;
 
 Procedure TTSTOWorkSpaceProjectGroupIOImpl.SetProjectGroupName(Const AProjectGroupName : AnsiString);
@@ -502,7 +577,11 @@ Begin
   Assign(FBinImpl);
 
   For X := 0 To Count - 1 Do
-    Get(X).OnChange := DoOnChange;
+    With Get(X) As ITSTOWorkSpaceProjectIOEx Do
+    Begin
+      WorkSpace := Self;
+      OnChange  := DoOnChange;
+    End;
 
   FBinImpl := Nil;
 End;
@@ -657,7 +736,7 @@ Begin
         lOutPath := ExtractFilePath(lTemplate[X].Settings.OutputFileName);
         If (lOutPath = '') Or Not DirectoryExists(lOutPath) Then
           lTemplate[X].Settings.OutputFileName :=
-            IncludeTrailingBackSlash(AProject.CustomScriptPath) +
+            AProject.CustomScriptPath +
             ExtractFileName(lTemplate[X].Settings.OutputFileName);
 
         If Not DirectoryExists(ExtractFilePath(lTemplate[X].Settings.OutputFileName)) Then

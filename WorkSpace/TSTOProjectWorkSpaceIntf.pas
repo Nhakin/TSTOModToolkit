@@ -91,6 +91,9 @@ Type
     Function  GetCustomScriptPath() : AnsiString;
     Procedure SetCustomScriptPath(Const ACustomScriptPath : AnsiString);
 
+    Function  GetCustomModPath() : AnsiString;
+    Procedure SetCustomModPath(Const ACustomModPath : AnsiString);
+
     Function  GetSrcFolders() : ITSTOWorkSpaceProjectSrcFolders;
 
     Procedure Assign(ASource : IInterface);
@@ -102,6 +105,7 @@ Type
     Property PackOutput       : Boolean                         Read GetPackOutput       Write SetPackOutput;
     Property OutputPath       : AnsiString                      Read GetOutputPath       Write SetOutputPath;
     Property CustomScriptPath : AnsiString                      Read GetCustomScriptPath Write SetCustomScriptPath;
+    Property CustomModPath    : AnsiString                      Read GetCustomModPath    Write SetCustomModPath;
     Property SrcFolders       : ITSTOWorkSpaceProjectSrcFolders Read GetSrcFolders;
 
   End;
