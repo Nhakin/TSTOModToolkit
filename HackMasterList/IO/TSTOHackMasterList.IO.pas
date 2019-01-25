@@ -3,7 +3,7 @@ unit TSTOHackMasterList.IO;
 interface
 
 Uses
-  HsStreamEx,
+  HsStreamEx, RgbExtractProgress,
   TSTOHackMasterListIntf, TSTOProject.Xml, TSTOScriptTemplateIntf;
 
 Type
@@ -76,34 +76,34 @@ Type
     Procedure BuildMasterList(AProject : ITSTOXMLProject);
     Function ListStoreRequirements(Const ACategoryName : String) : String;
 
-    Function  BuildStoreMenu(ASettings : ITSTOScriptTemplateSettings) : String; OverLoad;
+    Function  BuildStoreMenu(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String; OverLoad;
     Function  BuildStoreMenu() : String; OverLoad;
     Procedure BuildStoreMenu(Const AFileName : String); OverLoad;
 
-    Function  BuildInventoryMenu(ASettings : ITSTOScriptTemplateSettings) : String; OverLoad;
+    Function  BuildInventoryMenu(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String; OverLoad;
     Function  BuildInventoryMenu() : String; OverLoad;
     Procedure BuildInventoryMenu(Const AFileName : String); OverLoad;
 
-    Function  BuildStoreItems(ASettings : ITSTOScriptTemplateSettings) : String; OverLoad;
+    Function  BuildStoreItems(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String; OverLoad;
     Function  BuildStoreItems() : String; OverLoad;
     Procedure BuildStoreItems(Const AFileName : String); OverLoad;
 
+    Function  BuildFreeItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildFreeItems(Const AFileName : String); OverLoad;
-    Function  BuildFreeItems() : String; OverLoad;
 
+    Function  BuildUniqueItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildUniqueItems(Const AFileName : String); OverLoad;
-    Function  BuildUniqueItems() : String; OverLoad;
 
-    Function  BuildNonSellableItems() : String; OverLoad;
+    Function  BuildNonSellableItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildNonSellableItems(Const AFileName : String); OverLoad;
 
-    Function  BuildReqsItems() : String; OverLoad;
+    Function  BuildReqsItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildReqsItems(Const AFileName : String); OverLoad;
 
-    Function  BuildDeleteBadItems() : String; OverLoad;
+    Function  BuildDeleteBadItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildDeleteBadItems(Const AFileName : String); OverLoad;
 
-    Function  BuildStoreRequirements() : String; OverLoad;
+    Function  BuildStoreRequirements(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildStoreRequirements(Const AFileName : String); OverLoad;
 
     Procedure LoadFromStream(ASource : IStreamEx);
@@ -127,7 +127,7 @@ Type
 
 implementation
 
-Uses SysUtils, Classes, Dialogs, TypInfo, Math, XMLIntf,
+Uses SysUtils, Classes, Forms, Dialogs, TypInfo, Math, XMLIntf,
   HsInterfaceEx, HsXmlDocEx, HsStringListEx,
   TSTOHackMasterListImpl, TSTOHackMasterList.Xml, TSTOHackMasterList.Bin, TSTOScriptTemplateImpl;
 
@@ -217,34 +217,34 @@ Type
     Procedure EnhanceMasterList(AProject : ITSTOXMLProject);
     Function  ListStoreRequirements(Const ACategoryName : String) : String;
 
-    Function  BuildStoreMenu(ASettings : ITSTOScriptTemplateSettings) : String; OverLoad;
+    Function  BuildStoreMenu(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String; OverLoad;
     Function  BuildStoreMenu() : String; OverLoad;
     Procedure BuildStoreMenu(Const AFileName : String); OverLoad;
 
-    Function  BuildInventoryMenu(ASettings : ITSTOScriptTemplateSettings) : String; OverLoad;
+    Function  BuildInventoryMenu(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String; OverLoad;
     Function  BuildInventoryMenu() : String; OverLoad;
     Procedure BuildInventoryMenu(Const AFileName : String); OverLoad;
 
-    Function  BuildStoreItems(ASettings : ITSTOScriptTemplateSettings) : String; OverLoad;
+    Function  BuildStoreItems(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String; OverLoad;
     Function  BuildStoreItems() : String; OverLoad;
     Procedure BuildStoreItems(Const AFileName : String); OverLoad;
 
-    Function  BuildStoreRequirements() : String; OverLoad;
+    Function  BuildStoreRequirements(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildStoreRequirements(Const AFileName : String); OverLoad;
 
+    Function  BuildFreeItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildFreeItems(Const AFileName : String); OverLoad;
-    Function  BuildFreeItems() : String; OverLoad;
 
+    Function  BuildUniqueItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildUniqueItems(Const AFileName : String); OverLoad;
-    Function  BuildUniqueItems() : String; OverLoad;
 
+    Function  BuildNonSellableItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildNonSellableItems(Const AFileName : String); OverLoad;
-    Function  BuildNonSellableItems() : String; OverLoad;
 
+    Function  BuildReqsItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildReqsItems(Const AFileName : String); OverLoad;
-    Function  BuildReqsItems() : String; OverLoad;
 
-    Function  BuildDeleteBadItems() : String; OverLoad;
+    Function  BuildDeleteBadItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildDeleteBadItems(Const AFileName : String); OverLoad;
 
     Property Category[Index : Integer] : ITSTOHackMasterCategoryIO Read Get; Default;
@@ -1372,9 +1372,10 @@ Begin
   End;
 End;
 
-Function TTSTOHackMasterListIOImpl.BuildStoreMenu(ASettings : ITSTOScriptTemplateSettings) : String;
+Function TTSTOHackMasterListIOImpl.BuildStoreMenu(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String;
 Var X, Y, Z : Integer;
     lLst : IHsStringListEx;
+    lNbItem : Integer;
 Begin
   With ASettings Do
   Begin
@@ -1387,6 +1388,12 @@ Begin
 
     lLst := THsStringListEx.CreateList();
     Try
+      lNbItem := 0;
+      If Assigned(AProgress) Then
+        For X := 0 To Count - 1 Do
+          If Category[X].BuildStore Then
+            Inc(lNbItem);
+
       lLst.Add('<Categories>');
 
       For X := 0 To Count - 1 Do
@@ -1402,11 +1409,23 @@ Begin
           lLst.Add('<Include path="' + StoreItemsPath + Category[X].Name + '"/>');
           lLst.Add('<Requirement type="reqList" location="' + RequirementPath + Category[X].Name + '"/>');
           lLst.Add('</Category>');
+
+          If Assigned(AProgress) Then
+          Begin
+            AProgress.CurArchiveName  := Category[X].Name;
+            AProgress.ArchiveProgress := Round(X / lNbItem * 100);
+            Application.ProcessMessages();
+          End;
         End;
 
       lLst.Add('</Categories>');
 
       Result := FormatXMLData(lLst.Text);
+      If Assigned(AProgress) Then
+      Begin
+        AProgress.ArchiveProgress := 100;
+        Application.ProcessMessages();
+      End;
 
       Finally
         lLst := Nil;
@@ -1432,9 +1451,11 @@ Begin
   End;
 End;
 
-Function TTSTOHackMasterListIOImpl.BuildInventoryMenu(ASettings : ITSTOScriptTemplateSettings) : String;
+Function TTSTOHackMasterListIOImpl.BuildInventoryMenu(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String;
 Var X, Y, Z : Integer;
     lLst : IHsStringListEx;
+    lNbItem : Integer;
+    lCurItem : Integer;
 Begin
   With ASettings Do
   Begin
@@ -1445,6 +1466,17 @@ Begin
 
     lLst := THsStringListEx.CreateList();
     Try
+      lNbItem := 0;
+      lCurItem := 0;
+      If Assigned(AProgress) Then
+        For X := 0 To Count - 1 Do
+          If Category[X].BuildStore Then
+            For Y := 0 To Category[X].Count - 1 Do
+              If Category[X].Package[Y].Enabled Then
+                For Z := 0 To Category[X].Package[Y].Count - 1 Do
+                  If Category[X].Package[Y].DataID[Z].AddInStore Then
+                    Inc(lNbItem);
+
       lLst.Add('<InventoryMenus>');
       lLst.Add('<Categories>');
 
@@ -1468,9 +1500,21 @@ Begin
             If Category[X].Package[Y].Enabled Then
               For Z := 0 To Category[X].Package[Y].Count - 1 Do
                 If Category[X].Package[Y].DataID[Z].AddInStore Then
+                Begin
                   lLst.Add( '<Requirement type="item" item="' +
                             Category[X].Package[Y].DataID[Z].Name +
                             '" checkInventoryOnly="true"/>');
+
+                  If Assigned(AProgress) Then
+                  Begin
+                    Inc(lCurItem);
+
+                    AProgress.CurArchiveName  := Category[X].Name + ' - ' + Category[X].Package[Y].DataID[Z].Name;
+                    AProgress.ArchiveProgress := Round(lCurItem / lNbItem * 100);
+                    Application.ProcessMessages();
+                  End;
+                End;
+
           lLst.Add('</Requirement>');
           lLst.Add('</Requirement>');
           lLst.Add('</Requirements>');
@@ -1481,6 +1525,11 @@ Begin
       lLst.Add('</InventoryMenus>');
 
       Result := FormatXMLData(lLst.Text);
+      If Assigned(AProgress) Then
+      Begin
+        AProgress.ArchiveProgress := 100;
+        Application.ProcessMessages();
+      End;
 
       Finally
         lLst := Nil;
@@ -1506,9 +1555,11 @@ Begin
   End;
 End;
 
-Function TTSTOHackMasterListIOImpl.BuildStoreItems(ASettings : ITSTOScriptTemplateSettings) : String;
+Function TTSTOHackMasterListIOImpl.BuildStoreItems(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String;
 Var X, Y, Z : Integer;
     lLst    : IHsStringListEx;
+    lNbItems : Integer;
+    lCurItem : Integer;
 Begin
   With ASettings Do
   Begin
@@ -1517,6 +1568,17 @@ Begin
 
     lLst := THsStringListEx.CreateList();
     Try
+      lNbItems := 0;
+      lCurItem := 0;
+      If Assigned(AProgress) Then
+        For X := 0 To Count - 1 Do
+          If Category[X].Enabled And Category[X].BuildStore Then
+            For Y := 0 To Category[X].Count - 1 Do
+              If Category[X][Y].Enabled Then
+                For Z := 0 To Category[X][Y].Count - 1 Do
+                  If Category[X][Y].DataID[Z].AddInStore Then
+                    Inc(lNbItems);
+
       lLst.Add('<Stores>');
 
       For X := 0 To Count - 1 Do
@@ -1527,9 +1589,20 @@ Begin
             If Category[X][Y].Enabled Then
               For Z := 0 To Category[X][Y].Count - 1 Do
                 If Category[X][Y].DataID[Z].AddInStore Then
+                Begin
                   lLst.Add( '<Object type = "' + LowerCase(Category[X][Y].PackageType) + '"' +
                             ' id="' + IntToStr(Category[X][Y][Z].Id) + '"' +
                             ' name="' + Category[X][Y][Z].Name + '"/>' );
+
+                  If Assigned(AProgress) Then
+                  Begin
+                    Inc(lCurItem);
+
+                    AProgress.CurArchiveName  := Category[X].Name + ' - ' + Category[X].Package[Y].DataID[Z].Name;
+                    AProgress.ArchiveProgress := Round(lCurItem / lNbItems * 100);
+                    Application.ProcessMessages();
+                  End;
+                End;
 
           lLst.Add('</' + StorePrefix + Category[X].Name + '>');
         End;
@@ -1538,6 +1611,11 @@ Begin
       lLst.Add('</Stores>');
 
       Result := FormatXMLData(lLst.Text);
+      If Assigned(AProgress) Then
+      Begin
+        AProgress.ArchiveProgress := 100;
+        Application.ProcessMessages();
+      End;
 
       Finally
         lLst := Nil;
@@ -1563,7 +1641,7 @@ Begin
   End;
 End;
 
-Function  TTSTOHackMasterListIOImpl.BuildFreeItems() : String;
+Function  TTSTOHackMasterListIOImpl.BuildFreeItems(AProgress : IRgbProgress = Nil) : String;
   Function CategoryHavePaidItem(ACategory : ITSTOHackMasterCategoryIO) : Boolean;
   Var X, Y : Integer;
   Begin
@@ -1599,6 +1677,8 @@ Var X, Y, Z : Integer;
     lCmtCharacterAdd  : Boolean;
     lCmtConsumableAdd : Boolean;
     lStrComment       : String;
+    lNbItems : Integer;
+    lCurItem : Integer;
 Begin
   lLst           := THsStringListEx.CreateList();
   lLstBuilding   := THsStringListEx.CreateList();
@@ -1606,6 +1686,18 @@ Begin
   lLstCharacter  := THsStringListEx.CreateList();
   lLstConsumable := THsStringListEx.CreateList();
   Try
+    lNbItems := 0;
+    lCurItem := 0;
+
+    If Assigned(AProgress) Then
+      For X := 0 To Count - 1 Do
+        If Category[X].Enabled And CategoryHavePaidItem(Category[X]) Then
+          For Y := 0 To Category[X].Count - 1 Do
+            If Category[X][Y].Enabled Then
+              For Z := 0 To Category[X][Y].Count - 1 Do
+                If Not Category[X][Y][Z].IsFree And Category[X][Y][Z].OverRide Then
+                  Inc(lNbItems);
+
     For X := 0 To Count - 1 Do
       If Category[X].Enabled Then
       Begin
@@ -1628,6 +1720,15 @@ Begin
               For Z := 0 To Category[X][Y].Count - 1 Do
                 If Not Category[X][Y][Z].IsFree And Category[X][Y][Z].OverRide Then
                 Begin
+                  If Assigned(AProgress) Then
+                  Begin
+                    Inc(lCurItem);
+
+                    AProgress.CurArchiveName  := Category[X].Name + ' - ' + Category[X][Y][Z].Name;
+                    AProgress.ArchiveProgress := Round(lCurItem / lNbItems * 100);
+                    Application.ProcessMessages();
+                  End;
+
                   lCurLst := Nil;
 
                   If SameText(Category[X][Y].PackageType, 'Building') Then
@@ -1672,6 +1773,7 @@ Begin
 
                   If Assigned(lCurLst) Then
                   Begin
+
                     If lCurLst = lLstConsumable Then
                     Begin
                       lCurLst.Add('<Consumable name="' + Category[X][Y][Z].Name + '">');
@@ -1699,8 +1801,6 @@ Begin
         End;
       End;
 
-//    lLst.Add('<FreeItemEvent>');
-
     lLst.Add('<List name="KhnBuilding">');
     lLst.Add(lLstBuilding.Text);
     lLst.Add('</List>');
@@ -1718,10 +1818,11 @@ Begin
     lLst.Add('</Consumables>');
     Result := lLst.Text;
 
-//    lLst.Add('</FreeItemEvent>');
-
-//    lLst.Text := FormatXmlData(lLst.Text);
-//    lLst.SaveToFile(AFileName);
+    If Assigned(AProgress) Then
+    Begin
+      AProgress.ArchiveProgress := 100;
+      Application.ProcessMessages();
+    End;
 
     Finally
       lLst := Nil;
@@ -1745,7 +1846,7 @@ Begin
   End;
 End;
 
-Function TTSTOHackMasterListIOImpl.BuildUniqueItems() : String;
+Function TTSTOHackMasterListIOImpl.BuildUniqueItems(AProgress : IRgbProgress = Nil) : String;
   Function CategoryHaveUniqueItem(ACategory : ITSTOHackMasterCategoryIO) : Boolean;
     Var X, Y : Integer;
   Begin
@@ -1788,6 +1889,9 @@ Var X, Y, Z : Integer;
     lCmtCharacterAdd  : Boolean;
     lCmtConsumableAdd : Boolean;
     lStrComment       : String;
+
+    lNbItems : Integer;
+    lCurItem : Integer;
 Begin
   lLst           := THsStringListEx.CreateList();
   lLstBuilding   := THsStringListEx.CreateList();
@@ -1795,6 +1899,18 @@ Begin
   lLstCharacter  := THsStringListEx.CreateList();
   lLstConsumable := THsStringListEx.CreateList();
   Try
+    lNbItems := 0;
+    lCurItem := 0;
+
+    If Assigned(AProgress) Then
+      For X := 0 To Count - 1 Do
+        If Category[X].Enabled And CategoryHaveUniqueItem(Category[X]) Then
+          For Y := 0 To Category[X].Count - 1 Do
+            If Category[X][Y].Enabled Then
+              For Z := 0 To Category[X][Y].Count - 1 Do
+                If Not Category[X][Y][Z].IsFree And Category[X][Y][Z].OverRide Then
+                  Inc(lNbItems);
+
     For X := 0 To Count - 1 Do
       If Category[X].Enabled Then
       Begin
@@ -1824,6 +1940,15 @@ Begin
                 If Category[X][Y][Z].Unique And Category[X][Y][Z].OverRide And (Category[X][Y][Z].ItemType <> tdtCharacter) Then
                 Begin
                   lCurLst := Nil;
+
+                  If Assigned(AProgress) Then
+                  Begin
+                    Inc(lCurItem);
+
+                    AProgress.CurArchiveName  := Category[X].Name + ' - ' + Category[X][Y][Z].Name;
+                    AProgress.ArchiveProgress := Round(lCurItem / lNbItems * 100);
+                    Application.ProcessMessages();
+                  End;
 
                   If SameText(Category[X][Y].PackageType, 'Building') Then
                   Begin
@@ -1895,8 +2020,6 @@ Begin
         End;
       End;
 
-//    lLst.Add('<UniqueItemEvent>');
-
     lLst.Add('<List name="KhnBuildingNU">');
     lLst.Add(lLstBuilding.Text);
     lLst.Add('</List>');
@@ -1914,7 +2037,11 @@ Begin
     lLst.Add('</Consumables>');
 
     Result := lLst.Text;
-//    lLst.Add('</UniqueItemEvent>');
+    If Assigned(AProgress) Then
+    Begin
+      AProgress.ArchiveProgress := 100;
+      Application.ProcessMessages();
+    End;
 
     Finally
       lLst := Nil;
@@ -1938,7 +2065,7 @@ Begin
   End;
 End;
 
-Function TTSTOHackMasterListIOImpl.BuildNonSellableItems() : String;
+Function TTSTOHackMasterListIOImpl.BuildNonSellableItems(AProgress : IRgbProgress = Nil) : String;
   Function CategoryHaveNonSellableItem(ACategory : ITSTOHackMasterCategoryIO) : Boolean;
     Var X, Y : Integer;
   Begin
@@ -1981,6 +2108,9 @@ Var X, Y, Z : Integer;
     lCmtCharacterAdd  : Boolean;
     lCmtConsumableAdd : Boolean;
     lStrComment       : String;
+
+    lNbItems : Integer;
+    lCurItem : Integer;
 Begin
   lLst           := THsStringListEx.CreateList();
   lLstBuilding   := THsStringListEx.CreateList();
@@ -1988,6 +2118,16 @@ Begin
   lLstCharacter  := THsStringListEx.CreateList();
   lLstConsumable := THsStringListEx.CreateList();
   Try
+    lNbItems := 0;
+    lCurItem := 0;
+    If Assigned(AProgress) Then
+      For X := 0 To Count - 1 Do
+        If Category[X].Enabled And CategoryHaveNonSellableItem(Category[X]) Then
+          For Y := 0 To Category[X].Count - 1 Do
+            For Z := 0 To Category[X][Y].Count - 1 Do
+              If (Not Category[X][Y][Z].Storable Or Not Category[X][Y][Z].Sellable) And Category[X][Y][Z].OverRide Then
+                Inc(lNbItems);
+
     For X := 0 To Count - 1 Do
       If Category[X].Enabled Then
       Begin
@@ -2010,6 +2150,15 @@ Begin
               For Z := 0 To Category[X][Y].Count - 1 Do
                 If (Not Category[X][Y][Z].Storable Or Not Category[X][Y][Z].Sellable) And Category[X][Y][Z].OverRide Then
                 Begin
+                  If Assigned(AProgress) Then
+                  Begin
+                    Inc(lCurItem);
+
+                    AProgress.CurArchiveName  := Category[X].Name + ' - ' + Category[X][Y][Z].Name;
+                    AProgress.ArchiveProgress := Round(lCurItem / lNbItems * 100);
+                    Application.ProcessMessages();
+                  End;
+
                   lCurLst := Nil;
 
                   If SameText(Category[X][Y].PackageType, 'Building') Then
@@ -2081,8 +2230,6 @@ Begin
         End;
       End;
 
-//    lLst.Add('<NonSellableItemEvent>');
-
     lLst.Add('<List name="KhnBuildingNSSE">');
     lLst.Add(lLstBuilding.Text);
     lLst.Add('</List>');
@@ -2099,9 +2246,12 @@ Begin
     lLst.Add(lLstConsumable.Text);
     lLst.Add('</Consumables>');
 
-//    lLst.Add('</NonSellableItemEvent>');
-
     Result := lLst.Text;
+    If Assigned(AProgress) Then
+    Begin
+      AProgress.ArchiveProgress := 100;
+      Application.ProcessMessages();
+    End;
 
     Finally
       lLst := Nil;
@@ -2125,7 +2275,7 @@ Begin
   End;
 End;
 
-Function TTSTOHackMasterListIOImpl.BuildReqsItems() : String;
+Function TTSTOHackMasterListIOImpl.BuildReqsItems(AProgress : IRgbProgress = Nil) : String;
   Function CategoryHaveReqItem(ACategory : ITSTOHackMasterCategoryIO) : Boolean;
     Var X, Y : Integer;
   Begin
@@ -2168,6 +2318,9 @@ Var X, Y, Z : Integer;
     lCmtCharacterAdd  : Boolean;
     lCmtConsumableAdd : Boolean;
     lStrComment       : String;
+
+    lNbItems : Integer;
+    lCurItem : Integer;
 Begin
   lLst           := THsStringListEx.CreateList();
   lLstBuilding   := THsStringListEx.CreateList();
@@ -2175,6 +2328,16 @@ Begin
   lLstCharacter  := THsStringListEx.CreateList();
   lLstConsumable := THsStringListEx.CreateList();
   Try
+    lNbItems := 0;
+    lCurItem := 0;
+    If Assigned(AProgress) Then
+      For X := 0 To Count - 1 Do
+        If Category[X].Enabled And CategoryHaveReqItem(Category[X]) Then
+          For Y := 0 To Category[X].Count - 1 Do
+            For Z := 0 To Category[X][Y].Count - 1 Do
+              If (Category[X][Y][Z].Level > 1) And Category[X][Y][Z].OverRide Then
+                Inc(lNbItems);
+
     For X := 0 To Count - 1 Do
       If Category[X].Enabled Then
       Begin
@@ -2197,6 +2360,15 @@ Begin
               For Z := 0 To Category[X][Y].Count - 1 Do
                 If (Category[X][Y][Z].Level > 1) And Category[X][Y][Z].OverRide Then
                 Begin
+                  If Assigned(AProgress) Then
+                  Begin
+                    Inc(lCurItem);
+
+                    AProgress.CurArchiveName  := Category[X].Name + ' - ' + Category[X][Y][Z].Name;
+                    AProgress.ArchiveProgress := Round(lCurItem / lNbItems * 100);
+                    Application.ProcessMessages();
+                  End;
+
                   lCurLst := Nil;
 
                   If SameText(Category[X][Y].PackageType, 'Building') Then
@@ -2285,6 +2457,11 @@ Begin
     lLst.Add('</Consumables>');
 
     Result := lLst.Text;
+    If Assigned(AProgress) Then
+    Begin
+      AProgress.ArchiveProgress := 100;
+      Application.ProcessMessages();
+    End;
 
     Finally
       lLst := Nil;
@@ -2308,7 +2485,7 @@ Begin
   End;
 End;
 
-Function TTSTOHackMasterListIOImpl.BuildDeleteBadItems() : String;
+Function TTSTOHackMasterListIOImpl.BuildDeleteBadItems(AProgress : IRgbProgress = Nil) : String;
   Function CategoryHaveBadItems(ACategory : ITSTOHackMasterCategoryIO) : Boolean;
   Var X, Y : Integer;
   Begin
@@ -2336,9 +2513,21 @@ Function TTSTOHackMasterListIOImpl.BuildDeleteBadItems() : String;
 Var X, Y, Z     : Integer;
     lLst        : IHsStringListEx;
     lStrComment : String;
+    lNbItems : Integer;
+    lCurItem : Integer;
 Begin
   lLst := THsStringListEx.CreateList();
   Try
+    lNbItems := 0;
+    lCurItem := 0;
+    If Assigned(AProgress) Then
+      For X := 0 To Count - 1 Do
+        If Category[X].Enabled And CategoryHaveBadItems(Category[X]) Then
+          For Y := 0 To Category[X].Count - 1 Do
+            For Z := 0 To Category[X][Y].Count - 1 Do
+              If Category[X][Y][Z].IsBadItem Then
+                Inc(lNbItems);
+
     lLst.Add('<KhnDeleteBadItems parallel="true">');
 
     For X := 0 To Count - 1 Do
@@ -2359,6 +2548,15 @@ Begin
             For Z := 0 To Category[X][Y].Count - 1 Do
               If Category[X][Y][Z].IsBadItem Then
               Begin
+                If Assigned(AProgress) Then
+                Begin
+                  Inc(lCurItem);
+
+                  AProgress.CurArchiveName  := Category[X].Name + ' - ' + Category[X][Y][Z].Name;
+                  AProgress.ArchiveProgress := Round(lCurItem / lNbItems * 100);
+                  Application.ProcessMessages();
+                End;
+
                 lLst.Add( '<Action type="runScriptOnAll" ' +
                           'building="' + Category[X][Y][Z].Name + '" ' +
                           'script="KhnDeleteBuilding" ' +
@@ -2370,6 +2568,11 @@ Begin
     lLst.Add('</KhnDeleteBadItems>');
 
     Result := FormatXmlData(lLst.Text);
+    If Assigned(AProgress) Then
+    Begin
+      AProgress.ArchiveProgress := 100;
+      Application.ProcessMessages();
+    End;
 
     Finally
       lLst := Nil;
@@ -2389,16 +2592,43 @@ Begin
   End;
 End;
 
-Function TTSTOHackMasterListIOImpl.BuildStoreRequirements() : String;
+Function TTSTOHackMasterListIOImpl.BuildStoreRequirements(AProgress : IRgbProgress = Nil) : String;
 Var X : Integer;
     lLst : IHsStringListEx;
+    lNbItems : Integer;
+    lCurItem : Integer;
 Begin
   lLst := THsStringListEx.CreateList();
   Try
+    lNbItems := 0;
+    lCurItem := 0;
+
+    If Assigned(AProgress) Then
+      For X := 0 To Count - 1 Do
+        If Category[X].BuildStore Then
+          Inc(lNbItems);
+
     For X := 0 To Count - 1 Do
-      lLst.Add(ListStoreRequirements(Category[X].Name));
+      If Category[X].BuildStore Then
+      Begin
+        If Assigned(AProgress) Then
+        Begin
+          Inc(lCurItem);
+
+          AProgress.CurArchiveName  := Category[X].Name;
+          AProgress.ArchiveProgress := Round(lCurItem / lNbItems * 100);
+          Application.ProcessMessages();
+        End;
+
+        lLst.Add(ListStoreRequirements(Category[X].Name));
+      End;
 
     Result := lLst.Text;
+    If Assigned(AProgress) Then
+    Begin
+      AProgress.ArchiveProgress := 100;
+      Application.ProcessMessages();
+    End;
 
     Finally
       lLst := Nil;
