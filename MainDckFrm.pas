@@ -206,7 +206,6 @@ Type
     popTvWSBuildMod: TSpTBXItem;
 
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
     procedure mnuSettingsClick(Sender: TObject);
@@ -262,6 +261,8 @@ Type
     procedure popBuildHackConfigClick(Sender: TObject);
     procedure popTvWSApplyModClick(Sender: TObject);
     procedure popTvWSBuildModClick(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormDestroy(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -320,8 +321,6 @@ Type
     Procedure GetRgbNodeList(Sender : TBaseVirtualTree; Node : PVirtualNode; Data : Pointer; Var Abort : Boolean);
     Procedure ExtractRgbFiles(APackageList : ITSTOPackageNodes);
     Procedure LoadDlcIndexes();
-
-  public
 
   end;
 
@@ -668,7 +667,7 @@ procedure TFrmDckMain.FormDestroy(Sender: TObject);
 Var lStrStream : IStringStreamEx;
     lDckSetting : IXmlDocumentEx;
     lNode : IXmlNodeEx;
-Begin
+begin
   With FPrj.Settings Do
   Begin
     BuildCustomStore := chkBuildStore.Checked;
@@ -709,7 +708,18 @@ Begin
   FPrj       := Nil;
   FBCell     := Nil;
   FDefLayout := Nil;
-End;
+end;
+
+procedure TFrmDckMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := True;
+
+  If FWorkSpace.Modified Then
+    Case MessageDlg('Save changes to ' + FWorkSpace.ProjectGroupName + ' ?', mtInformation, [mbYes, mbNo, mbCancel], 0) Of
+      mrYes : FWorkSpace.SaveToFile(FWorkSpace.FileName);
+      mrCancel : CanClose := False;
+    End;
+end;
 
 Procedure TFrmDckMain.ShowPanelClick(Sender: TObject);
 Begin

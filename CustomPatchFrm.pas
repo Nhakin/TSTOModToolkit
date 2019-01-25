@@ -12,23 +12,11 @@ uses
 
 type
   TFrmCustomPatches = class(TForm)
-    SplitterV1: TSplitter;
     PanInfo: TPanel;
-    gbPatchInfoV1: TGroupBox;
-    lblPatchDesc: TLabel;
-    lblPatchName: TLabel;
-    EditPatchName: TEdit;
-    EditPatchDesc: TEdit;
-    panToolBar: TPanel;
-    tbMain: TToolBar;
-    tbSaveOld: TToolButton;
     PanTreeView: TPanel;
-    EditPatchFileName: TEdit;
-    lblPatchFileName: TLabel;
     popVSTCustomPatches: TPopupMenu;
     popAdd: TMenuItem;
     popDelete: TMenuItem;
-    tsXmlV1: TTabSet;
     EditXml: TSynEdit;
     SynXMLSyn1: TSynXMLSyn;
     vstPatchData: TSpTBXVirtualStringTree;
@@ -42,6 +30,12 @@ type
     tsXPathResult: TSpTBXTabItem;
     tsInput: TSpTBXTabItem;
     vstCustomPacthes: TSpTBXVirtualStringTree;
+    lblPatchName: TLabel;
+    EditPatchName: TEdit;
+    lblPatchDesc: TLabel;
+    EditPatchDesc: TEdit;
+    lblPatchFileName: TLabel;
+    EditPatchFileName: TEdit;
 
     procedure FormCreate(Sender: TObject);
     procedure tbSaveOldClick(Sender: TObject);
@@ -109,53 +103,33 @@ Var lTop, lLeft : Integer;
 begin
   FPrevPatch     := Nil;
   FPrevPatchData := Nil;
-
-  If DataModuleImage.IsV1 Then
+(*
+  For X := gbPatchInfoV1.ControlCount - 1 DownTo 0 Do
   Begin
-    dckTbMain.Visible := False;
-    gbPatchInfoV2.Visible := False;
-    SplitterV2.Visible := False;
-    tsXmlV2.Visible := False;
-
-    With vstPatchData.TreeOptions Do
+    lControl := gbPatchInfoV1.Controls[X];
+    lLeft := lControl.Left;
+    lTop  := lControl.Top;
+    If lControl Is TLabel Then
     Begin
-      PaintOptions := PaintOptions - [toAlwaysHideSelection, toHotTrack];
+      lControl := TSpTBXLabel.Create(Self);
+      TSpTbxLabel(lControl).Caption := TLabel(gbPatchInfoV1.Controls[X]).Caption;
+      lControl.Height := gbPatchInfoV1.Controls[X].Height;
+      lControl.Width  := gbPatchInfoV1.Controls[X].Width;
     End;
-  End
-  Else
+    lControl.Parent := gbPatchInfoV2;
+    lControl.Left := lLeft;
+    lControl.Top  := lTop;
+  End;
+*)
+  If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
   Begin
-    panToolBar.Visible := False;
-    gbPatchInfoV1.Visible := False;
-    SplitterV1.Visible := False;
-    tsXmlV1.Visible := False;
+    vstCustomPacthes.Color := $00262525;
+    vstPatchData.Color := $00262525;
+    PanTreeView.Color := $00262525;
+    PanInfo.Color := $00262525;
 
-    For X := gbPatchInfoV1.ControlCount - 1 DownTo 0 Do
-    Begin
-      lControl := gbPatchInfoV1.Controls[X];
-      lLeft := lControl.Left;
-      lTop  := lControl.Top;
-      If lControl Is TLabel Then
-      Begin
-        lControl := TSpTBXLabel.Create(Self);
-        TSpTbxLabel(lControl).Caption := TLabel(gbPatchInfoV1.Controls[X]).Caption;
-        lControl.Height := gbPatchInfoV1.Controls[X].Height;
-        lControl.Width  := gbPatchInfoV1.Controls[X].Width;
-      End;
-      lControl.Parent := gbPatchInfoV2;
-      lControl.Left := lLeft;
-      lControl.Top  := lTop;
-    End;
-
-    If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
-    Begin
-      vstCustomPacthes.Color := $00262525;
-      vstPatchData.Color := $00262525;
-      PanTreeView.Color := $00262525;
-      PanInfo.Color := $00262525;
-
-      With SkinManager.CurrentSkin Do
-        Options(skncListItem, sknsNormal).TextColor := $00F1F1F1;
-    End;
+    With SkinManager.CurrentSkin Do
+      Options(skncListItem, sknsNormal).TextColor := $00F1F1F1;
   End;
 end;
 
@@ -276,10 +250,7 @@ Var lXml   : IXmlDocumentEx;
 Begin
   EditXml.Lines.Text := '';
   If AIndex = -1 Then
-    If DataModuleImage.IsV1 Then
-      AIndex := tsXmlV1.TabIndex
-    Else
-      AIndex := tsXmlV2.ActiveTabIndex;
+    AIndex := tsXmlV2.ActiveTabIndex;
 
   If FileExists(FProject.Settings.SourcePath + APatch.FileName) Then
     Case AIndex Of
@@ -668,64 +639,61 @@ Var lRect : TRect;
     lCellText : String;
     lPatchData : ITSTOPatchDataIO;
 begin
-  If Not DataModuleImage.IsV1 Then
-  Begin
-    lRect := TVirtualStringTree(Sender).Header.Columns[Column].GetRect();
-    TargetCanvas.Brush.Color := TVirtualStringTree(Sender).Color;
-    TargetCanvas.Pen.Color   := TargetCanvas.Brush.Color;
-    TargetCanvas.Rectangle(CellRect);
+  lRect := TVirtualStringTree(Sender).Header.Columns[Column].GetRect();
+  TargetCanvas.Brush.Color := TVirtualStringTree(Sender).Color;
+  TargetCanvas.Pen.Color   := TargetCanvas.Brush.Color;
+  TargetCanvas.Rectangle(CellRect);
 
-    lRect.Top := CellRect.Top;
-    lRect.Bottom := CellRect.Bottom;
+  lRect.Top := CellRect.Top;
+  lRect.Bottom := CellRect.Bottom;
 
-    With TVirtualStringTree(Sender), TreeOptions Do
-      If (Node = FocusedNode) And
-         ((Column = Sender.FocusedColumn) Or (toFullRowSelect In SelectionOptions)) Then
-      Begin
-        If CurrentSkin.Options(skncListItem, sknsChecked).IsEmpty Then
-          lCurState := sknsHotTrack
-        Else
-          lCurState := sknsChecked;
-      End
-      Else If (Node = HotNode) And
-              (MouseInCell() Or (toFullRowSelect In SelectionOptions)) Then
+  With TVirtualStringTree(Sender), TreeOptions Do
+    If (Node = FocusedNode) And
+       ((Column = Sender.FocusedColumn) Or (toFullRowSelect In SelectionOptions)) Then
+    Begin
+      If CurrentSkin.Options(skncListItem, sknsChecked).IsEmpty Then
         lCurState := sknsHotTrack
       Else
-        lCurState := sknsNormal;
+        lCurState := sknsChecked;
+    End
+    Else If (Node = HotNode) And
+            (MouseInCell() Or (toFullRowSelect In SelectionOptions)) Then
+      lCurState := sknsHotTrack
+    Else
+      lCurState := sknsNormal;
 
-    If (lCurState <> sknsNormal) And
-       Not CurrentSkin.Options(skncListItem, lCurState).IsEmpty Then
-      CurrentSkin.PaintBackground(
-        TargetCanvas, lRect,
-        skncListItem, lCurState,
-        True, True
-      );
+  If (lCurState <> sknsNormal) And
+     Not CurrentSkin.Options(skncListItem, lCurState).IsEmpty Then
+    CurrentSkin.PaintBackground(
+      TargetCanvas, lRect,
+      skncListItem, lCurState,
+      True, True
+    );
 
-    TargetCanvas.Brush.Style := bsClear;
-    TargetCanvas.Font.Assign(Sender.Font);
-    If CurrentSkin.Options(skncListItem, lCurState).TextColor <> clNone Then
-      TargetCanvas.Font.Color := CurrentSkin.Options(skncListItem, lCurState).TextColor;
+  TargetCanvas.Brush.Style := bsClear;
+  TargetCanvas.Font.Assign(Sender.Font);
+  If CurrentSkin.Options(skncListItem, lCurState).TextColor <> clNone Then
+    TargetCanvas.Font.Color := CurrentSkin.Options(skncListItem, lCurState).TextColor;
 
-    lRect.Left := lRect.Left + 8;
-    lRect.Top  := (lRect.Bottom - lRect.Top - TargetCanvas.TextHeight('XXX')) Div 2;
+  lRect.Left := lRect.Left + 8;
+  lRect.Top  := (lRect.Bottom - lRect.Top - TargetCanvas.TextHeight('XXX')) Div 2;
 
-    lCellText := '';
-    If GetNodeData(Node, ITSTOPatchDataIO, lPatchData) Then
-      Case Column Of
-        0 : lCellText := _PATCH_TYPE[lPatchData.PatchType - 1];
-        1 : lCellText := lPatchData.PatchPath;
-        2 : lCellText := lPatchData.Code;
+  lCellText := '';
+  If GetNodeData(Node, ITSTOPatchDataIO, lPatchData) Then
+    Case Column Of
+      0 : lCellText := _PATCH_TYPE[lPatchData.PatchType - 1];
+      1 : lCellText := lPatchData.PatchPath;
+      2 : lCellText := lPatchData.Code;
 (*##
-        2 :
-        Begin
-          If lPatchData.Code.ChildNodes.Count > 0 Then
-            lCellText := lPatchData.Code.ChildNodes[0].Xml;
-        End;
-*)
+      2 :
+      Begin
+        If lPatchData.Code.ChildNodes.Count > 0 Then
+          lCellText := lPatchData.Code.ChildNodes[0].Xml;
       End;
+*)
+    End;
 
-    TargetCanvas.TextOut( lRect.Left, lRect.Top, lCellText );
-  End;
+  TargetCanvas.TextOut( lRect.Left, lRect.Top, lCellText );
 end;
 
 procedure TFrmCustomPatches.vstPatchDataCreateEditor(Sender: TBaseVirtualTree;

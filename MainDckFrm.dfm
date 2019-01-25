@@ -13,6 +13,7 @@ object FrmDckMain: TFrmDckMain
   OldCreateOrder = False
   Position = poScreenCenter
   WindowState = wsMaximized
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow

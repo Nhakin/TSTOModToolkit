@@ -74,6 +74,8 @@ Type
     Function Add() : ITSTOWorkSpaceProjectIO; OverLoad;
     Function Add(Const AItem : ITSTOWorkSpaceProjectIO) : Integer; OverLoad;
 
+    Function  GetModified() : Boolean;
+
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
 
@@ -94,7 +96,9 @@ Type
 
     Property Items[Index : Integer] : ITSTOWorkSpaceProjectIO Read Get Write Put; Default;
 
-    Property OnChange     : TNotifyEvent      Read GetOnChange     Write SetOnChange;
+    Property Modified : Boolean Read GetModified;
+
+    Property OnChange : TNotifyEvent Read GetOnChange Write SetOnChange;
 
   End;
 
@@ -192,6 +196,7 @@ Type
     FFileName : String;
     FHackSettings : ITSTOHackSettings;
     FOnChange : TNotifyEvent;
+    FModified : Boolean;
 
     FBinImpl : IBinTSTOWorkSpaceProjectGroup;
     FXmlImpl : IXmlTSTOWorkSpaceProjectGroup;
@@ -223,6 +228,7 @@ Type
 
     Function  GetHackSettings() : ITSTOHackSettings;
 
+    Function  GetModified() : Boolean;
     Procedure DoOnChange(Sender : TObject);
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
@@ -239,7 +245,8 @@ Type
     Procedure CompileMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 
   Public
-    Destructor Destroy(); OverRide;
+    Procedure AfterConstruction(); OverRide;
+    Procedure BeforeDestruction(); OverRide;
 
   End;
 
@@ -425,13 +432,20 @@ Begin
   End;
 End;
 
-Destructor TTSTOWorkSpaceProjectGroupIOImpl.Destroy();
+Procedure TTSTOWorkSpaceProjectGroupIOImpl.AfterConstruction();
+Begin
+  FModified := False;
+
+  InHerited AfterConstruction();
+End;
+
+Procedure TTSTOWorkSpaceProjectGroupIOImpl.BeforeDestruction();
 Begin
   FBinImpl := Nil;
   FXmlImpl := Nil;
   FHackSettings := Nil;
 
-  InHerited Destroy();
+  InHerited BeforeDestruction();
 End;
 
 Function TTSTOWorkSpaceProjectGroupIOImpl.GetBinImplementor() : IBinTSTOWorkSpaceProjectGroup;
@@ -556,10 +570,16 @@ Begin
   Result := FHackSettings;
 End;
 
+Function TTSTOWorkSpaceProjectGroupIOImpl.GetModified() : Boolean;
+Begin
+  Result := FModified;
+End;
+
 Procedure TTSTOWorkSpaceProjectGroupIOImpl.DoOnChange(Sender : TObject);
 Begin
   If Assigned(FOnChange) Then
     FOnChange(Sender);
+  FModified := True;
 End;
 
 Function TTSTOWorkSpaceProjectGroupIOImpl.GetOnChange() : TNotifyEvent;
@@ -833,118 +853,88 @@ Begin
         Finally
           lFileList := Nil;
       End;
+    End;
 
-      lZip := THsMemoryZipper.Create();
-      lZero := TBinZeroFile.CreateBinZeroFile();
-      Try
-        lZero.ArchiveDirectory := 'KahnAbyss/TSTO DLC Generator';
-        For Y := 0 To lZips.Count - 1 Do
+    lZero := TBinZeroFile.CreateBinZeroFile();
+    Try
+      lZero.ArchiveDirectory := 'KahnAbyss/TSTO DLC Generator';
+      For Y := 0 To lZips.Count - 1 Do
+      Begin
+        With lZero.FileDatas.Add() Do
         Begin
-          With lZero.FileDatas.Add() Do
-          Begin
-            FileName := lZips[Y].FileName;
-            Crc32    := GetCrc32Value(TStream(lZips[Y].InterfaceObject));
+          FileName := lZips[Y].FileName;
+          Crc32    := GetCrc32Value(TStream(lZips[Y].InterfaceObject));
 
-            For Z := 0 To lZips[Y].Count - 1 Do
-              With ArchivedFiles.Add() Do
-              Begin
-                FileName1     := lZips[Y][Z].FileName;
-                FileExtension := StringReplace(ExtractFileExt(lZips[Y][Z].FileName), '.', '', [rfReplaceAll, rfIgnoreCase]);
-                FileName2     := FileName1;
-                FileSize      := lZips[Y][Z].UncompressedSize;
-                ArchiveFileId := Y;
-                Application.ProcessMessages();
-              End;
+          For Z := 0 To lZips[Y].Count - 1 Do
+            With ArchivedFiles.Add() Do
+            Begin
+              FileName1     := lZips[Y][Z].FileName;
+              FileExtension := StringReplace(ExtractFileExt(lZips[Y][Z].FileName), '.', '', [rfReplaceAll, rfIgnoreCase]);
+              FileName2     := FileName1;
+              FileSize      := lZips[Y][Z].UncompressedSize;
+              ArchiveFileId := Y;
+              Application.ProcessMessages();
+            End;
+        End;
+      End;
+
+      lMem := TMemoryStreamEx.Create();
+      Try
+        If AWorkSpaceProject.ProjectKind = spkRoot Then
+        Begin
+          With lZero.FileDatas[lZero.FileDatas.Count - 1].ArchivedFiles.Add() Do
+          Begin
+            FileName1     := 'ZeroCrc.hex';
+            FileExtension := 'hex';
+            FileName2     := FileName1;
+            FileSize      := 0;
+            ArchiveFileId := lZero.FileDatas.Count - 1
           End;
         End;
 
+        lZero.SaveToStream(lMem);
+
         If AWorkSpaceProject.ProjectKind = spkRoot Then
         Begin
-          lMem := TMemoryStreamEx.Create();
-          Try
-            With lZero.FileDatas[lZero.FileDatas.Count - 1].ArchivedFiles.Add() Do
-            Begin
-              FileName1     := 'ZeroCrc.hex';
-              FileExtension := 'hex';
-              FileName2     := FileName1;
-              FileSize      := 0;
-              ArchiveFileId := lZero.FileDatas.Count - 1
-            End;
-
-            lZero.SaveToStream(lMem);
-
-            If AWorkSpaceProject.PackOutput Then
-            Begin
-              lMem.Size := lMem.Size - SizeOf(DWord);
-              SetCrc32Value(TStream(lMem.InterfaceObject), lMem.Size - SizeOf(QWord), AWorkSpaceProject.ZeroCrc32);
-              lMem.Position := lMem.Size;
-              lMem.WriteDWord(AWorkSpaceProject.ZeroCrc32, True);
-              lMem.Position := 0;
-
-              lZip.AddFromStream('0', lMem);
-
-              For Y := 0 To lZips.Count - 1 Do
-              Begin
-                (lZips[Y] As IMemoryStreamEx).Position := 0;
-                lZip.AddFromStream(lZips[Y].FileName, (lZips[Y] As IMemoryStreamEx));
-              End;
-
-              lZip.SaveToFile(lOutPath + AWorkSpaceProject.ProjectName + '.zip');
-            End
-            Else
-            Begin
-              lMem.SaveToFile(lOutPath + '0');
-
-              For Y := 0 To lZips.Count - 1 Do
-                lZips[Y].SaveToFile(lOutPath + lZips[Y].FileName);
-            End;
-
-            Finally
-              lMem := Nil;
-          End;
-        End
-        Else
-        Begin
-          lMem := TMemoryStreamEx.Create();
-          Try
-            lZero.SaveToStream(lMem);
-            If AWorkSpaceProject.PackOutput Then
-            Begin
-              lMem.Position := 0;
-              lZip.AddFromStream('0', lMem);
-
-              For Y := 0 To lZips.Count - 1 Do
-              Begin
-                (lZips[Y] As IMemoryStreamEx).Position := 0;
-                lZip.AddFromStream(lZips[Y].FileName, (lZips[Y] As IMemoryStreamEx));
-              End;
-
-              lZip.SaveToFile(lOutPath + AWorkSpaceProject.ProjectName + '.zip');
-            End
-            Else
-            Begin
-              lMem.SaveToFile(lOutPath + '0');
-
-              For Y := 0 To lZips.Count - 1 Do
-                lZips[Y].SaveToFile(lOutPath + lZips[Y].FileName);
-            End;
-
-            Finally
-              lMem := Nil;
-          End;
+          lMem.Size := lMem.Size - SizeOf(DWord);
+          SetCrc32Value(TStream(lMem.InterfaceObject), lMem.Size - SizeOf(QWord), AWorkSpaceProject.ZeroCrc32);
+          lMem.Position := lMem.Size;
+          lMem.WriteDWord(AWorkSpaceProject.ZeroCrc32, True);
         End;
 
         Finally
           lZero := Nil;
       End;
 
-(*
-      If Not DirectoryExists(AProject.ProjectFiles[X].OutputPath) Then
-        ForceDirectories(AProject.ProjectFiles[X].OutputPath);
+      If AWorkSpaceProject.PackOutput Or AWorkSpaceProject.WorkSpace.PackOutput Then
+      Begin
+        lMem.Position := 0;
+        lZip := THsMemoryZipper.Create();
+        Try
+          lZip.AddFromStream('0', lMem);
 
-      lZip.SaveToFile( AProject.ProjectFiles[X].OutputPath +
-                       AProject.ProjectFiles[X].OutputFileName);
-*)
+          For X := 0 To lZips.Count - 1 Do
+          Begin
+            (lZips[X] As IMemoryStreamEx).Position := 0;
+            lZip.AddFromStream(lZips[X].FileName, (lZips[X] As IMemoryStreamEx));
+          End;
+
+          lZip.SaveToFile(lOutPath + AWorkSpaceProject.ProjectName + '.zip');
+
+        Finally
+          lZip := Nil;
+        End;
+      End
+      Else
+      Begin
+        lMem.SaveToFile(lOutPath + '0');
+
+        For X := 0 To lZips.Count - 1 Do
+          lZips[X].SaveToFile(lOutPath + lZips[X].FileName);
+      End;
+
+      Finally
+        lMem := Nil;
     End;
 
     Finally
