@@ -512,31 +512,20 @@ End;
 Procedure THsMemoryZipper.AddFiles(Const AFileList : IHsStringListEx; ASearchAttr : Integer);
 Var X : Integer;
 Begin
-//  FZipArchive.OnArchiveSaveProgress := Nil;
-  FZipArchive.OnArchiveProgress     := Nil;
-  FZipArchive.OnArchiveItemProgress := Nil;
+  If FShowProgress Then
+  Begin
+    FZipProgress := TZipperProgress.Create();
+    FZipProgress.Show();
+  End;
+
   Try
-    If FShowProgress Then
-    Begin
-      FZipProgress := TZipperProgress.Create();
-      FZipProgress.Show();
-    End;
-
     For X := 0 To AFileList.Count - 1 Do
-    Begin
-      FZipProgress.CurOperation := 'Adding : ' + ExtractFileName(AFileList[X]);
-      FZipProgress.ArchiveProgress := Round((AFileList.Count / 100) * X);
       FZipArchive.AddFiles(AFileList[X], faAnyFile);
-
-      Application.ProcessMessages();
-    End;
 
     FZipArchive.Save();
 
     Finally
-      FZipArchive.OnArchiveSaveProgress := DoArchiveSaveProgress;
-      FZipArchive.OnArchiveProgress     := DoArchiveExtractProgress;
-      FZipArchive.OnArchiveItemProgress := DoArchiveItemProgress;
+      FZipProgress := Nil;
   End;
 End;
 
