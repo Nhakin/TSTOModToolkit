@@ -1756,6 +1756,7 @@ object FrmDckMain: TFrmDckMain
     object popTvWSProjectGroupItems: TSpTBXSubmenuItem
       object popAddNewProject: TSpTBXItem
         Caption = 'Add New Project...'
+        OnClick = popAddNewProjectClick
       end
       object popAddExistingProject: TSpTBXItem
         Caption = 'Add Existing Project...'
@@ -1769,9 +1770,11 @@ object FrmDckMain: TFrmDckMain
       end
       object popSaveProjectGroupAs: TSpTBXItem
         Caption = 'Save Project Group As...'
+        OnClick = popSaveProjectGroupAsClick
       end
       object popRenameProjectGroup: TSpTBXItem
         Caption = 'Rename'
+        OnClick = popRenameProjectGroupClick
       end
       object SpTBXSeparatorItem13: TSpTBXSeparatorItem
       end
@@ -1793,6 +1796,7 @@ object FrmDckMain: TFrmDckMain
     object popTvWSProjectItems: TSpTBXSubmenuItem
       object popTvWSRenameProject: TSpTBXItem
         Caption = 'Rename'
+        OnClick = popTvWSRenameProjectClick
       end
       object popTvWSRemoveProject: TSpTBXItem
         Caption = 'Remove Project'
@@ -1800,8 +1804,9 @@ object FrmDckMain: TFrmDckMain
       end
       object SpTBXSeparatorItem9: TSpTBXSeparatorItem
       end
-      object popTvWSCleanProject: TSpTBXItem
-        Caption = 'Clean'
+      object popTvWSGenerateScripts: TSpTBXItem
+        Caption = 'Generate Scripts'
+        OnClick = popTvWSGenerateScriptsClick
       end
       object popTvWSApplyMod: TSpTBXItem
         Caption = 'Apply Mod'
@@ -1813,10 +1818,22 @@ object FrmDckMain: TFrmDckMain
       end
       object popTvWSPackMod: TSpTBXItem
         Caption = 'Pack Mod'
+        OnClick = popTvWSPackModClick
       end
-      object popTvWSGenerateScripts: TSpTBXItem
-        Caption = 'Generate Scripts'
-        OnClick = popTvWSGenerateScriptsClick
+      object popTvWSCleanProject: TSpTBXItem
+        Caption = 'Clean'
+        OnClick = popTvWSCleanProjectClick
+      end
+      object SpTBXSubmenuItem1: TSpTBXSubmenuItem
+        Caption = 'From Here'
+        object popTvWSApplyAllModFromHere: TSpTBXItem
+          Caption = 'Apply All Mod From Here'
+          OnClick = popTvWSApplyAllModFromHereClick
+        end
+        object popTvWSBuildAllModFromHere: TSpTBXItem
+          Caption = 'Build All Mod From Here'
+          OnClick = popTvWSBuildAllModFromHereClick
+        end
       end
       object SpTBXSeparatorItem6: TSpTBXSeparatorItem
       end
@@ -1827,12 +1844,6 @@ object FrmDckMain: TFrmDckMain
       object popTvWSProcessLater: TSpTBXItem
         Caption = 'Process Later'
         OnClick = popTvWSProcessLaterClick
-      end
-      object popTvWSApplyAllModFromHere: TSpTBXItem
-        Caption = 'Apply All Mod From Here'
-      end
-      object popTvWSBuildAllModFromHere: TSpTBXItem
-        Caption = 'Pack All Mod From Here'
       end
       object SpTBXSeparatorItem4: TSpTBXSeparatorItem
       end

@@ -204,6 +204,7 @@ Type
     popExportHackConfig: TSpTBXItem;
     popBuildHackConfig: TSpTBXItem;
     popTvWSBuildMod: TSpTBXItem;
+    SpTBXSubmenuItem1: TSpTBXSubmenuItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -263,6 +264,14 @@ Type
     procedure popTvWSBuildModClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormDestroy(Sender: TObject);
+    procedure popTvWSApplyAllModFromHereClick(Sender: TObject);
+    procedure popTvWSBuildAllModFromHereClick(Sender: TObject);
+    procedure popTvWSRenameProjectClick(Sender: TObject);
+    procedure popTvWSPackModClick(Sender: TObject);
+    procedure popTvWSCleanProjectClick(Sender: TObject);
+    procedure popAddNewProjectClick(Sender: TObject);
+    procedure popSaveProjectGroupAsClick(Sender: TObject);
+    procedure popRenameProjectGroupClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -321,6 +330,8 @@ Type
     Procedure GetRgbNodeList(Sender : TBaseVirtualTree; Node : PVirtualNode; Data : Pointer; Var Abort : Boolean);
     Procedure ExtractRgbFiles(APackageList : ITSTOPackageNodes);
     Procedure LoadDlcIndexes();
+
+    Procedure ApplyMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 
   end;
 
@@ -1026,6 +1037,11 @@ begin
     End;
 end;
 
+procedure TFrmDckMain.popAddNewProjectClick(Sender: TObject);
+begin
+  Raise Exception.Create('ToDo');
+end;
+
 procedure TFrmDckMain.popExpandResourcesClick(Sender: TObject);
 begin
   FTvResources.ExpandAllNodes();
@@ -1115,6 +1131,11 @@ begin
   End;
 end;
 
+procedure TFrmDckMain.popRenameProjectGroupClick(Sender: TObject);
+begin
+  Raise Exception.Create('ToDo');
+end;
+
 procedure TFrmDckMain.popCollapseResourcesClick(Sender: TObject);
 begin
   FTvResources.CollapseAllNodes();
@@ -1153,6 +1174,11 @@ begin
   Else
     MessageErr('Index file name AND Hack Zip file name must not be empty.');
 }
+end;
+
+procedure TFrmDckMain.popSaveProjectGroupAsClick(Sender: TObject);
+begin
+  Raise Exception.Create('ToDo');
 end;
 
 procedure TFrmDckMain.popSaveProjectGroupClick(Sender: TObject);
@@ -1245,49 +1271,72 @@ begin
   popTvSTTemplateDelete.Enabled := Assigned(FTvSTVariables.GetFirstSelected());
 end;
 
+Procedure TFrmDckMain.ApplyMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+Begin
+  Case AWorkSpaceProject.ProjectType Of
+    sptScript :
+    Begin
+      FPrj.Settings.AllFreeItems     := chkAllFree.Checked;
+      FPrj.Settings.NonUnique        := chkNonUnique.Checked;
+      FPrj.Settings.BuildCustomStore := chkBuildStore.Checked;
+      FPrj.Settings.InstantBuild     := chkInstantBuild.Checked;
+      FPrj.Settings.FreeLand         := chkFreeLandUpgade.Checked;
+      FPrj.Settings.UnlimitedTime    := chkUnlimitedTime.Checked;
+
+      With TTSTODlcGenerator.Create() Do
+      Try
+        CreateMod(FPrj, AWorkSpaceProject, FPrj.Settings.MasterFiles);
+
+        Finally
+          Free();
+      End;
+    End;
+
+    sptTextPools :
+    Begin
+      With TTSTODlcGenerator.Create() Do
+      Try
+        CreateSbtpMod(AWorkSpaceProject);
+
+        Finally
+          Free();
+      End;
+    End;
+  End;
+End;
+
 procedure TFrmDckMain.popTvWSApplyModClick(Sender: TObject);
-Var lPkg  : ITSTOPackageNode;
-    lPath : AnsiString;
-    lProject : ITSTOWorkSpaceProjectIO;
+Var lProject : ITSTOWorkSpaceProjectIO;
 begin
   If FTvWorkSpace.GetNodeData(FTvWorkSpace.GetFirstSelected(), ITSTOWorkSpaceProjectIO, lProject) Then
   Try
-    Case lProject.ProjectType Of
-      sptScript :
-      Begin
-        FPrj.Settings.AllFreeItems     := chkAllFree.Checked;
-        FPrj.Settings.NonUnique        := chkNonUnique.Checked;
-        FPrj.Settings.BuildCustomStore := chkBuildStore.Checked;
-        FPrj.Settings.InstantBuild     := chkInstantBuild.Checked;
-        FPrj.Settings.FreeLand         := chkFreeLandUpgade.Checked;
-        FPrj.Settings.UnlimitedTime    := chkUnlimitedTime.Checked;
-
-        With TTSTODlcGenerator.Create() Do
-        Try
-          CreateMod(FPrj, lProject, FPrj.Settings.MasterFiles);
-          MessageDlg('Done', mtCustom, [mbOk], 0);
-
-          Finally
-            Free();
-        End;
-      End;
-
-      sptTextPools :
-      Begin
-        With TTSTODlcGenerator.Create() Do
-        Try
-          CreateSbtpMod(lProject);
-          MessageDlg('Done', mtCustom, [mbOk], 0);
-
-          Finally
-            Free();
-        End;
-      End;
-    End;
+    ApplyMod(lProject);
+    MessageDlg('Done', mtCustom, [mbOk], 0);
 
     Finally
       lProject := Nil;
   End;
+end;
+
+procedure TFrmDckMain.popTvWSApplyAllModFromHereClick(Sender: TObject);
+Var lProject : ITSTOWorkSpaceProjectIO;
+    lNode    : PVirtualNode;
+begin
+  lNode := FTvWorkSpace.GetFirstSelected();
+  While Assigned(lNode) Do
+  Begin
+    If FTvWorkSpace.GetNodeData(lNode, ITSTOWorkSpaceProjectIO, lProject) Then
+    Try
+      ApplyMod(lProject);
+
+      Finally
+        lProject := Nil;
+    End;
+
+    lNode := lNode.NextSibling;
+  End;
+
+  MessageDlg('Done', mtCustom, [mbOk], 0);
 end;
 
 procedure TFrmDckMain.popTvWSBuildModClick(Sender: TObject);
@@ -1296,6 +1345,30 @@ begin
   With FTvWorkSpace Do
     If GetNodeData(GetFirstSelected(), ITSTOWorkspaceProjectIO, lWorkSpace) Then
       FWorkSpace.CompileMod(lWorkSpace);
+end;
+
+procedure TFrmDckMain.popTvWSBuildAllModFromHereClick(Sender: TObject);
+Var lWorkSpace : ITSTOWorkspaceProjectIO;
+    lNode      : PVirtualNode;
+begin
+  lNode := FTvWorkSpace.GetFirstSelected();
+  While Assigned(lNode) Do
+  Begin
+    If FTvWorkSpace.GetNodeData(lNode, ITSTOWorkspaceProjectIO, lWorkSpace) Then
+    Try
+      FWorkSpace.CompileMod(lWorkSpace);
+
+      Finally
+        lWorkSpace := Nil;
+    End;
+
+    lNode := lNode.NextSibling;
+  End;
+end;
+
+procedure TFrmDckMain.popTvWSCleanProjectClick(Sender: TObject);
+begin
+  Raise Exception.Create('ToDo');
 end;
 
 procedure TFrmDckMain.popTvWSGenerateScriptsClick(Sender: TObject);
@@ -1314,6 +1387,11 @@ begin
       ShowMessage('Done');
     End;
   End;
+end;
+
+procedure TFrmDckMain.popTvWSPackModClick(Sender: TObject);
+begin
+  Raise Exception.Create('ToDo');
 end;
 
 procedure TFrmDckMain.popTvWSPopup(Sender: TObject);
@@ -1414,6 +1492,11 @@ begin
     FTvWorkSpace.ReinitNode(Nil, True);
     tbSaveWorkSpace.Enabled := True;
   End;
+end;
+
+procedure TFrmDckMain.popTvWSRenameProjectClick(Sender: TObject);
+begin
+  Raise Exception.Create('ToDo');
 end;
 
 Procedure TFrmDckMain.DoFilterNode(Sender : TBaseVirtualTree; Node : PVirtualNode; Data : Pointer; Var Abort : Boolean);
