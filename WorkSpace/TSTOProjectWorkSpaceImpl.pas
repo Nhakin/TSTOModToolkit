@@ -151,14 +151,9 @@ Type
     FHackFileName     : AnsiString;
     FPackOutput       : Boolean;
     FOutputPath       : AnsiString;
-    FIsModified       : Boolean;
-
-    Procedure DoOnProjectChange(Sender : TObject);
 
   Protected
     Function  GetItemClass() : TInterfacedObjectExClass; OverRide;
-
-    Procedure Notify(Ptr : Pointer; Action : TListNotification); OverRide;
 
     Function  Get(Index : Integer) : ITSTOWorkSpaceProject; OverLoad;
     Procedure Put(Index : Integer; Const Item : ITSTOWorkSpaceProject); OverLoad;
@@ -175,8 +170,6 @@ Type
     Function  GetOutputPath() : AnsiString; Virtual;
     Procedure SetOutputPath(Const AOutputPath : AnsiString); Virtual;
 
-    Function GetIsModified() : Boolean;
-
     Function Add() : ITSTOWorkSpaceProject; ReIntroduce; OverLoad;
     Function Add(Const AItem : ITSTOWorkSpaceProject) : Integer; ReIntroduce; OverLoad;
 
@@ -192,9 +185,6 @@ Type
     Property HackFileName     : AnsiString Read GetHackFileName     Write SetHackFileName;
     Property PackOutput       : Boolean    Read GetPackOutput       Write SetPackOutput;
     Property OutputPath       : AnsiString Read GetOutputPath       Write SetOutputPath;
-
-  Public
-    Procedure AfterConstruction(); OverRide;
 
   End;
 
@@ -493,6 +483,25 @@ Begin
     FCustomScriptPath := IncludeTrailingBackSlash(ACustomScriptPath)
   Else
     FCustomScriptPath := '';
+<<<<<<< HEAD
+End;
+
+Function TTSTOWorkSpaceProject.GetCustomModPath() : AnsiString;
+Begin
+  If FCustomModPath <> '' Then
+    Result := IncludeTrailingBackSlash(FCustomModPath)
+  Else
+    Result := '';
+End;
+
+Procedure TTSTOWorkSpaceProject.SetCustomModPath(Const ACustomModPath : AnsiString);
+Begin
+  If ACustomModPath <> '' Then
+    FCustomModPath := IncludeTrailingBackSlash(ACustomModPath)
+  Else
+    FCustomModPath := '';
+=======
+>>>>>>> refs/remotes/origin/DevVersion
 End;
 
 Function TTSTOWorkSpaceProject.GetCustomModPath() : AnsiString;
@@ -514,18 +523,6 @@ End;
 Function TTSTOWorkSpaceProject.GetSrcFolders() : ITSTOWorkSpaceProjectSrcFolders;
 Begin
   Result := FSrcFolders;
-End;
-
-Procedure TTSTOWorkSpaceProjectGroup.AfterConstruction();
-Begin
-  InHerited AfterConstruction();
-
-  FIsModified := False;
-End;
-
-Procedure TTSTOWorkSpaceProjectGroup.DoOnProjectChange(Sender : TObject);
-Begin
-  FIsModified := True;
 End;
 
 Procedure TTSTOWorkSpaceProjectGroup.Assign(ASource : IInterface);
@@ -552,12 +549,6 @@ Begin
   Result := TTSTOWorkSpaceProject;
 End;
 
-Procedure TTSTOWorkSpaceProjectGroup.Notify(Ptr : Pointer; Action : TListNotification);
-Begin
-  If Action In [lnAdded, lnDeleted] Then
-    FIsModified := True;
-End;
-    
 Function TTSTOWorkSpaceProjectGroup.Get(Index : Integer) : ITSTOWorkSpaceProject;
 Begin
   Result := InHerited Items[Index] As ITSTOWorkSpaceProject;
@@ -613,11 +604,6 @@ End;
 Procedure TTSTOWorkSpaceProjectGroup.SetOutputPath(Const AOutputPath : AnsiString);
 Begin
   FOutputPath := AOutputPath;
-End;
-
-Function TTSTOWorkSpaceProjectGroup.GetIsModified() : Boolean;
-Begin
-  Result := FIsModified;
 End;
 
 Function TTSTOWorkSpaceProjectGroup.Add() : ITSTOWorkSpaceProject;

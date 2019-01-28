@@ -3,7 +3,7 @@ object FrmSettings: TFrmSettings
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'Settings'
-  ClientHeight = 282
+  ClientHeight = 246
   ClientWidth = 447
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,42 +19,13 @@ object FrmSettings: TFrmSettings
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object panToolBar: TPanel
+  object dckNewTB: TSpTBXDock
     Left = 0
     Top = 0
     Width = 447
-    Height = 32
-    Align = alTop
-    BevelOuter = bvNone
-    TabOrder = 0
-    object tbMain: TToolBar
-      Left = 0
-      Top = 0
-      Width = 447
-      Height = 31
-      ButtonHeight = 26
-      ButtonWidth = 25
-      EdgeBorders = [ebLeft, ebTop, ebRight, ebBottom]
-      Images = DataModuleImage.imgToolBar
-      TabOrder = 0
-      object tbSave: TToolButton
-        Left = 0
-        Top = 0
-        Hint = 'Synchronize DlcIndex'
-        Caption = 'tbSave'
-        ImageIndex = 2
-        ParentShowHint = False
-        ShowHint = True
-        OnClick = tbSaveClick
-      end
-    end
-  end
-  object dckNewTB: TSpTBXDock
-    Left = 0
-    Top = 32
-    Width = 447
     Height = 26
     AllowDrag = False
+    ExplicitTop = 32
     object tbMainV2: TSpTBXToolbar
       Left = 0
       Top = 0
@@ -73,14 +44,15 @@ object FrmSettings: TFrmSettings
   end
   object SbMainV2: TSpTBXStatusBar
     Left = 0
-    Top = 256
+    Top = 220
     Width = 447
     Height = 26
     Enabled = False
+    ExplicitTop = 256
   end
   object PanData: TSpTBXExPanel
     Left = 0
-    Top = 58
+    Top = 26
     Width = 447
     Height = 195
     Color = clBtnFace
@@ -92,8 +64,9 @@ object FrmSettings: TFrmSettings
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 1
+    TabOrder = 0
     ShowCaption = True
+    ExplicitTop = 58
     DesignSize = (
       447
       195)

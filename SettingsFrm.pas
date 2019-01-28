@@ -10,9 +10,6 @@ uses
 
 type
   TFrmSettings = class(TForm)
-    panToolBar: TPanel;
-    tbMain: TToolBar;
-    tbSave: TToolButton;
     dckNewTB: TSpTBXDock;
     tbMainV2: TSpTBXToolbar;
     tbSaveV2: TSpTBXItem;
@@ -87,53 +84,43 @@ Var lImgList : TImageList;
 Var X, Y : Integer;
     lBmp : TBitMap;
 begin
-  If DataModuleImage.IsV1 Then
+  Constraints.MinHeight := 290;
+  Constraints.MaxHeight := 290;
+
+  If SameText(CurrentSkin.SkinName, 'WMP11') Then
   Begin
-    SbMainV2.Visible := False;
-    tbMainV2.Visible := False;
-  End
-  Else
-  Begin
-    panToolBar.Visible := False;
+    PanData.Color := $00262525;
+    Self.Color := $00262525;
 
-    Constraints.MinHeight := 290;
-    Constraints.MaxHeight := 290;
-
-    If SameText(CurrentSkin.SkinName, 'WMP11') Then
-    Begin
-      PanData.Color := $00262525;
-      Self.Color := $00262525;
-
-      For X := 0 To ComponentCount - 1 Do
-        If Components[X] Is TLabel Then
-          TLabel(Components[X]).Font.Color := CurrentSkin.Options(skncLabel, sknsNormal).TextColor;//$00F1F1F1;
-    End;
-
-    lBmp := TBitMap.Create();
-    Try
-      lBmp.LoadFromResourceName(HInstance, 'Magnifier');
-
-      lImgList := TImageList.Create(Self);
-      lImgList.DrawingStyle := dsTransparent;
-      lImgList.Width  := 12;
-      lImgList.Height := 12;
-      lImgList.AddMasked(lBmp, clOlive);
-
-      Finally
-        lBmp.Free();
-    End;
-
-    FEditDLCPath      := CreateButtonEdit(EditDLCPath);
-    FEditHackPath     := CreateButtonEdit(EditHackPath);
-    FEditHackFileName := CreateButtonEdit(EditHackFileName);
-    FEditResourcePath := CreateButtonEdit(EditResourcePath);
-
-    FEditDLCPath.EditButton.OnClick      := DoEditDLCPathButtonClick;
-    FEditHackPath.EditButton.OnClick     := DoEditHackPathButtonClick;
-    FEditHackFileName.EditButton.OnClick := DoEditHackFileNameButtonClick;
-    FEditResourcePath.EditButton.OnClick := DoEditResourcePathButtonClick;
+    For X := 0 To ComponentCount - 1 Do
+      If Components[X] Is TLabel Then
+        TLabel(Components[X]).Font.Color := CurrentSkin.Options(skncLabel, sknsNormal).TextColor;//$00F1F1F1;
   End;
-end;
+
+  lBmp := TBitMap.Create();
+  Try
+    lBmp.LoadFromResourceName(HInstance, 'Magnifier');
+
+    lImgList := TImageList.Create(Self);
+    lImgList.DrawingStyle := dsTransparent;
+    lImgList.Width  := 12;
+    lImgList.Height := 12;
+    lImgList.AddMasked(lBmp, clOlive);
+
+    Finally
+      lBmp.Free();
+  End;
+
+  FEditDLCPath      := CreateButtonEdit(EditDLCPath);
+  FEditHackPath     := CreateButtonEdit(EditHackPath);
+  FEditHackFileName := CreateButtonEdit(EditHackFileName);
+  FEditResourcePath := CreateButtonEdit(EditResourcePath);
+
+  FEditDLCPath.EditButton.OnClick      := DoEditDLCPathButtonClick;
+  FEditHackPath.EditButton.OnClick     := DoEditHackPathButtonClick;
+  FEditHackFileName.EditButton.OnClick := DoEditHackFileNameButtonClick;
+  FEditResourcePath.EditButton.OnClick := DoEditResourcePathButtonClick;
+End;
 
 Procedure TFrmSettings.DoEditDLCPathButtonClick(Sender : TObject);
 Var lSelDir : AnsiString;
@@ -188,21 +175,10 @@ begin
   EditDLCServer.Text     := FProject.Settings.DLCServer;
   EditSourcePath.Text    := FProject.Settings.SourcePath;
   EditTargetPath.Text    := FProject.Settings.TargetPath;
-
-  If DataModuleImage.IsV1 Then
-  Begin
-    EditDLCPath.Text       := FProject.Settings.DLCPath;
-    EditHackPath.Text      := FProject.Settings.HackPath;
-    EditHackFileName.Text  := FProject.Settings.HackFileName;
-    EditResourcePath.Text  := FProject.Settings.ResourcePath;
-  End
-  Else
-  Begin
-    FEditDLCPath.Text       := FProject.Settings.DLCPath;
-    FEditHackPath.Text      := FProject.Settings.HackPath;
-    FEditHackFileName.Text  := FProject.Settings.HackFileName;
-    FEditResourcePath.Text  := FProject.Settings.ResourcePath;
-  End;
+  FEditDLCPath.Text      := FProject.Settings.DLCPath;
+  FEditHackPath.Text     := FProject.Settings.HackPath;
+  FEditHackFileName.Text := FProject.Settings.HackFileName;
+  FEditResourcePath.Text := FProject.Settings.ResourcePath;
 
   FResourceChanged := False;
 end;
@@ -272,24 +248,13 @@ end;
 
 procedure TFrmSettings.tbSaveClick(Sender: TObject);
 begin
-  FProject.Settings.DLCServer  := AnsiString(EditDLCServer.Text);
-  FProject.Settings.SourcePath := AnsiString(EditSourcePath.Text);
-  FProject.Settings.TargetPath := AnsiString(EditTargetPath.Text);
-
-  If DataModuleImage.IsV1 Then
-  Begin
-    FProject.Settings.DLCPath      := EditDLCPath.Text;
-    FProject.Settings.HackPath     := EditHackPath.Text;
-    FProject.Settings.HackFileName := EditHackFileName.Text;
-    FProject.Settings.ResourcePath := EditResourcePath.Text;
-  End
-  Else
-  Begin
-    FProject.Settings.DLCPath      := FEditDLCPath.Text;
-    FProject.Settings.HackPath     := FEditHackPath.Text;
-    FProject.Settings.HackFileName := FEditHackFileName.Text;
-    FProject.Settings.ResourcePath := FEditResourcePath.Text;
-  End;
+  FProject.Settings.DLCServer    := AnsiString(EditDLCServer.Text);
+  FProject.Settings.SourcePath   := AnsiString(EditSourcePath.Text);
+  FProject.Settings.TargetPath   := AnsiString(EditTargetPath.Text);
+  FProject.Settings.DLCPath      := FEditDLCPath.Text;
+  FProject.Settings.HackPath     := FEditHackPath.Text;
+  FProject.Settings.HackFileName := FEditHackFileName.Text;
+  FProject.Settings.ResourcePath := FEditResourcePath.Text;
 
   ModalResult := mrOk;
 end;

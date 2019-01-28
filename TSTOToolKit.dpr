@@ -3,7 +3,6 @@ program TSTOToolKit;
 uses
   Forms,
   CustomPatchFrm in 'CustomPatchFrm.pas' {FrmCustomPatches},
-  DlcDownloadFrm in 'DlcDownloadFrm.pas' {DlcDownload},
   dmImage in 'dmImage.pas' {DataModuleImage: TDataModule},
   HsAlarmEx in 'HsUnits\HsAlarmEx.pas',
   HsBase64Ex in 'HsUnits\HsBase64Ex.pas' {,
@@ -104,7 +103,7 @@ uses
   TSTOSbtpIntf in 'SbtpFile\TSTOSbtpIntf.pas',
   TSTOSbtpIntfReg in 'SbtpFile\TSTOSbtpIntfReg.pas',
   TSTOSbtpTypes in 'SbtpFile\TSTOSbtpTypes.pas',
-  TSTOScriptTemplate.Bin in 'ScriptTemplates\IO\DataPlugins\TSTOScriptTemplate.Bin.pas' {$R *.res},
+  TSTOScriptTemplate.Bin in 'ScriptTemplates\IO\DataPlugins\TSTOScriptTemplate.Bin.pas',
   TSTOScriptTemplate.IO in 'ScriptTemplates\IO\TSTOScriptTemplate.IO.pas',
   TSTOScriptTemplate.Xml in 'ScriptTemplates\IO\DataPlugins\TSTOScriptTemplate.Xml.pas',
   TSTOScriptTemplateImpl in 'ScriptTemplates\TSTOScriptTemplateImpl.pas',
@@ -131,9 +130,6 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.Title := 'TSTOModToolKit';
   Application.CreateForm(TDataModuleImage, DataModuleImage);
-  If DataModuleImage.IsV1 Then
-    Application.CreateForm(TDlcDownload, DlcDownload)
-  Else
-    Application.CreateForm(TFrmDckMain, FrmDckMain);
+  Application.CreateForm(TFrmDckMain, FrmDckMain);
   Application.Run;
 end.

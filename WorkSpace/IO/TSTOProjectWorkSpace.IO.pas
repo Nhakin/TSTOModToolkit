@@ -74,6 +74,8 @@ Type
     Function Add() : ITSTOWorkSpaceProjectIO; OverLoad;
     Function Add(Const AItem : ITSTOWorkSpaceProjectIO) : Integer; OverLoad;
 
+    Function  GetModified() : Boolean;
+
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
 
@@ -83,9 +85,11 @@ Type
     Procedure SaveToStream(ATarget : IStreamEx);
     Procedure SaveToFile(Const AFileName : String);
 
-    Procedure CreateWsGroupProject(APath : String);
-    Procedure CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProject);
-    Procedure GenerateScripts(AProject : ITSTOWorkSpaceProject);
+    Procedure CreateWsGroupProject(APath : String; Const AHackFileName : String);
+    Procedure CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProjectIO);
+    Procedure GenerateScripts(AProject : ITSTOWorkSpaceProjectIO);
+    Procedure CompileMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+    Procedure PackMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 
     Property FileName     : String            Read GetFileName;
     Property AsXml        : String            Read GetAsXml        Write SetAsXml;
@@ -93,7 +97,9 @@ Type
 
     Property Items[Index : Integer] : ITSTOWorkSpaceProjectIO Read Get Write Put; Default;
 
-    Property OnChange     : TNotifyEvent      Read GetOnChange     Write SetOnChange;
+    Property Modified : Boolean Read GetModified;
+
+    Property OnChange : TNotifyEvent Read GetOnChange Write SetOnChange;
 
   End;
 
@@ -106,8 +112,9 @@ Type
 implementation
 
 Uses
-  SysUtils, HsXmlDocEx,
-  TSTOProjectWorkSpaceImpl, TSTOProjectWorkSpace.Types,
+  Forms, SysUtils,
+  HsXmlDocEx, HsZipUtils, HsCheckSumEx, HsStringListEx, HsFunctionsEx,
+  TSTOZero.Bin, TSTOProjectWorkSpaceImpl, TSTOProjectWorkSpace.Types,
   TSTOProjectWorkSpace.Bin, TSTOProjectWorkSpace.Xml;
 
 Type
@@ -190,6 +197,7 @@ Type
     FFileName : String;
     FHackSettings : ITSTOHackSettings;
     FOnChange : TNotifyEvent;
+    FModified : Boolean;
 
     FBinImpl : IBinTSTOWorkSpaceProjectGroup;
     FXmlImpl : IXmlTSTOWorkSpaceProjectGroup;
@@ -221,6 +229,7 @@ Type
 
     Function  GetHackSettings() : ITSTOHackSettings;
 
+    Function  GetModified() : Boolean;
     Procedure DoOnChange(Sender : TObject);
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
@@ -231,12 +240,16 @@ Type
     Procedure SaveToStream(ATarget : IStreamEx);
     Procedure SaveToFile(Const AFileName : String);
 
-    Procedure CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProject);
-    Procedure CreateWsGroupProject(APath : String);
-    Procedure GenerateScripts(AProject : ITSTOWorkSpaceProject);
+    Procedure CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProjectIO);
+    Procedure CreateWsGroupProject(APath : String; Const AHackFileName : String);
+    Procedure GenerateScripts(AProject : ITSTOWorkSpaceProjectIO);
+
+    Procedure CompileMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+    Procedure PackMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 
   Public
-    Destructor Destroy(); OverRide;
+    Procedure AfterConstruction(); OverRide;
+    Procedure BeforeDestruction(); OverRide;
 
   End;
 
@@ -422,13 +435,24 @@ Begin
   End;
 End;
 
+<<<<<<< HEAD
 Destructor TTSTOWorkSpaceProjectGroupIOImpl.Destroy();
+=======
+Procedure TTSTOWorkSpaceProjectGroupIOImpl.AfterConstruction();
+Begin
+  FModified := False;
+
+  InHerited AfterConstruction();
+End;
+
+Procedure TTSTOWorkSpaceProjectGroupIOImpl.BeforeDestruction();
+>>>>>>> refs/remotes/origin/DevVersion
 Begin
   FBinImpl := Nil;
   FXmlImpl := Nil;
   FHackSettings := Nil;
 
-  InHerited Destroy();
+  InHerited BeforeDestruction();
 End;
 
 Function TTSTOWorkSpaceProjectGroupIOImpl.GetBinImplementor() : IBinTSTOWorkSpaceProjectGroup;
@@ -553,10 +577,16 @@ Begin
   Result := FHackSettings;
 End;
 
+Function TTSTOWorkSpaceProjectGroupIOImpl.GetModified() : Boolean;
+Begin
+  Result := FModified;
+End;
+
 Procedure TTSTOWorkSpaceProjectGroupIOImpl.DoOnChange(Sender : TObject);
 Begin
   If Assigned(FOnChange) Then
     FOnChange(Sender);
+  FModified := True;
 End;
 
 Function TTSTOWorkSpaceProjectGroupIOImpl.GetOnChange() : TNotifyEvent;
@@ -649,8 +679,8 @@ Begin
     FHackSettings.SaveToFile();
 End;
 
-Procedure TTSTOWorkSpaceProjectGroupIOImpl.CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProject);
-  Procedure RecursiveSearch(AStartPath : String; AProject : ITSTOWorkSpaceProject);
+Procedure TTSTOWorkSpaceProjectGroupIOImpl.CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProjectIO);
+  Procedure RecursiveSearch(AStartPath : String; AProject : ITSTOWorkSpaceProjectIO);
   Var lSr  : TSearchRec;
       lMem : IMemoryStreamEx;
   Begin
@@ -693,9 +723,9 @@ Begin
   RecursiveSearch(APath, AProject);
 End;
 
-Procedure TTSTOWorkSpaceProjectGroupIOImpl.CreateWsGroupProject(APath : String);
+Procedure TTSTOWorkSpaceProjectGroupIOImpl.CreateWsGroupProject(APath : String; Const AHackFileName : String);
 Var lSr : TSearchRec;
-    lProject : ITSTOWorkSpaceProject;
+    lProject : ITSTOWorkSpaceProjectIO;
 Begin
   Clear();
 
@@ -703,12 +733,20 @@ Begin
   If FindFirst(APath + '*.*', faDirectory, lSr) = 0 Then
   Try
     ProjectGroupName := ExtractFileName(ExcludeTrailingBackslash(APath));
+    OutputPath       := APath + 'Output\' + ProjectGroupName + '\%ProjectName%\';
+    HackFileName     := AHackFileName;
 
     Repeat
       If (lSr.Attr And faDirectory <> 0) And Not SameText(lSr.Name, '.') And Not SameText(lSr.Name, '..') Then
       Begin
         lProject := Add();
         lProject.ProjectName := lSr.Name;
+        lProject.CustomModPath := APath + lSr.Name + '\1.src';
+        If Pos(UpperCase(lSr.Name), 'TEXTPOOL') > 0 Then
+          lProject.ProjectType := sptTextPools
+        Else If Pos(UpperCase(lSr.Name), 'GAMESCRIPT') > 0 Then
+          lProject.ProjectType := sptScript;
+
         CreateWsProject(APath + lSr.Name + '\', lProject);
       End;
     Until FindNext(lSr) <> 0
@@ -718,7 +756,7 @@ Begin
   End;
 End;
 
-Procedure TTSTOWorkSpaceProjectGroupIOImpl.GenerateScripts(AProject : ITSTOWorkSpaceProject);
+Procedure TTSTOWorkSpaceProjectGroupIOImpl.GenerateScripts(AProject : ITSTOWorkSpaceProjectIO);
 Var lTemplate : ITSTOScriptTemplateHacksIO;
     X, Y, Z : Integer;
     lOutPath : String;
@@ -781,6 +819,187 @@ Begin
 
   If lModified Then
     DoOnChange(Self);
+End;
+
+Procedure TTSTOWorkSpaceProjectGroupIOImpl.CompileMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+Var lZips   : IHsMemoryZippers;
+    lZip    : IHsMemoryZipper;
+    X, Y, Z : Integer;
+    lPos    : Integer;
+    lZero   : IBinZeroFile;
+    lMem    : IMemoryStreamEx;
+    lFileList : IHsStringListEx;
+    lOutPath  : String;
+Begin
+  lZips := THsMemoryZippers.Create();
+  Try
+    lZips.Clear();
+
+    lOutPath := AWorkSpaceProject.OutputPath;
+    If lOutPath = '' Then
+      lOutPath := AWorkSpaceProject.WorkSpace.OutputPath;
+    lOutPath := IncludeTrailingBackSlash(StringReplace(lOutPath, '%ProjectName%', AWorkSpaceProject.ProjectName, [rfReplaceAll, rfIgnoreCase]));
+
+    If Not DirectoryExists(lOutPath) Then
+      ForceDirectories(lOutPath);
+
+    For X := 0 To AWorkSpaceProject.SrcFolders.Count - 1 Do
+    Begin
+      lZip := lZips.Add();
+
+      lFileList := THsStringListEx.CreateList();
+      Try
+        For Y := 0 To AWorkSpaceProject.SrcFolders[X].SrcFileCount - 1 Do
+          With AWorkSpaceProject.SrcFolders[X] Do
+            If FileExists(IncludeTrailingBackslash(SrcPath) + SrcFiles[Y].FileName) Then
+              lFileList.Add(IncludeTrailingBackslash(SrcPath) + SrcFiles[Y].FileName);
+        lZip.AddFiles(lFileList, faAnyFile);
+        lZip.FileName := ChangeFileExt(ExtractFileName(ExcludeTrailingBackslash(AWorkSpaceProject.SrcFolders[X].SrcPath)), '');
+        TStream(lZip.InterfaceObject).Position := 0;
+
+        Finally
+          lFileList := Nil;
+      End;
+    End;
+
+    lZero := TBinZeroFile.CreateBinZeroFile();
+    Try
+      lZero.ArchiveDirectory := 'KahnAbyss/TSTO DLC Generator';
+      For Y := 0 To lZips.Count - 1 Do
+      Begin
+        With lZero.FileDatas.Add() Do
+        Begin
+          FileName := lZips[Y].FileName;
+          Crc32    := GetCrc32Value(TStream(lZips[Y].InterfaceObject));
+
+          For Z := 0 To lZips[Y].Count - 1 Do
+            With ArchivedFiles.Add() Do
+            Begin
+              FileName1     := lZips[Y][Z].FileName;
+              FileExtension := StringReplace(ExtractFileExt(lZips[Y][Z].FileName), '.', '', [rfReplaceAll, rfIgnoreCase]);
+              FileName2     := FileName1;
+              FileSize      := lZips[Y][Z].UncompressedSize;
+              ArchiveFileId := Y;
+              Application.ProcessMessages();
+            End;
+        End;
+      End;
+
+      lMem := TMemoryStreamEx.Create();
+      Try
+        If AWorkSpaceProject.ProjectKind = spkRoot Then
+        Begin
+          With lZero.FileDatas[lZero.FileDatas.Count - 1].ArchivedFiles.Add() Do
+          Begin
+            FileName1     := 'ZeroCrc.hex';
+            FileExtension := 'hex';
+            FileName2     := FileName1;
+            FileSize      := 0;
+            ArchiveFileId := lZero.FileDatas.Count - 1
+          End;
+        End;
+
+        lZero.SaveToStream(lMem);
+
+        If AWorkSpaceProject.ProjectKind = spkRoot Then
+        Begin
+          lMem.Size := lMem.Size - SizeOf(DWord);
+          SetCrc32Value(TStream(lMem.InterfaceObject), lMem.Size - SizeOf(QWord), AWorkSpaceProject.ZeroCrc32);
+          lMem.Position := lMem.Size;
+          lMem.WriteDWord(AWorkSpaceProject.ZeroCrc32, True);
+        End;
+
+        Finally
+          lZero := Nil;
+      End;
+
+      If AWorkSpaceProject.PackOutput Or AWorkSpaceProject.WorkSpace.PackOutput Then
+      Begin
+        lMem.Position := 0;
+        lZip := THsMemoryZipper.Create();
+        Try
+          lZip.AddFromStream('0', lMem);
+
+          For X := 0 To lZips.Count - 1 Do
+          Begin
+            (lZips[X] As IMemoryStreamEx).Position := 0;
+            lZip.AddFromStream(lZips[X].FileName, (lZips[X] As IMemoryStreamEx));
+          End;
+
+          lZip.SaveToFile(lOutPath + AWorkSpaceProject.ProjectName + '.zip');
+
+          Finally
+            lZip := Nil;
+        End;
+      End
+      Else
+      Begin
+        lMem.SaveToFile(lOutPath + '0');
+
+        For X := 0 To lZips.Count - 1 Do
+          lZips[X].SaveToFile(lOutPath + lZips[X].FileName);
+      End;
+
+      Finally
+        lMem := Nil;
+    End;
+
+    Finally
+      lZips := Nil;
+  End;
+End;
+
+Procedure TTSTOWorkSpaceProjectGroupIOImpl.PackMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+Var lOutPath : String;
+    lSr      : TSearchRec;
+    lCanPack : Boolean;
+    lZip     : IHsMemoryZipper;
+Begin
+  lCanPack := False;
+
+  If AWorkSpaceProject.OutputPath <> '' Then
+    lOutPath := AWorkSpaceProject.OutputPath
+  Else
+    lOutPath := OutputPath;
+
+  lOutPath := IncludeTrailingBackSlash(StringReplace(lOutPath, '%ProjectName%', AWorkSpaceProject.ProjectName, [rfReplaceAll, rfIgnoreCase]));
+
+  If DirectoryExists(lOutPath) Then
+  Begin
+    If FindFirst(lOutPath + '*.*', faAnyFile, lSr) = 0 Then
+    Try
+      Repeat
+        If lSr.Attr * faDirectory <> faDirectory Then
+        Begin
+          lCanPack := True;
+          Break;
+        End;
+      Until FindNext(lSr) <> 0;
+      Finally
+        FindClose(lSr);
+    End;
+  End;
+
+  If Not lCanPack Then
+  Begin
+    If MessageConfirm('Project haven''t been built do you want to buid it now?') Then
+    Begin
+      CompileMod(AWorkSpaceProject);
+      lCanPack := True;
+    End;
+  End;
+
+  If lCanPack Then
+  Begin
+    lZip := THsMemoryZipper.Create();
+    Try
+      lZip.AddFiles(lOutPath + '*.*', faAnyFile);
+      lZip.SaveToFile(ExtractFilePath(ExcludeTrailingBackslash(lOutPath)) + AWorkSpaceProject.ProjectName + '.zip');
+
+      Finally
+        lZip := Nil;
+    End;
+  End;
 End;
 
 end.

@@ -44,7 +44,8 @@ Type
     Function  GetStoreOptions() : TAbStoreOptions;
     Procedure SetStoreOptions(Const AStoreOptions : TAbStoreOptions);
 
-    Procedure AddFiles(Const AFileMask : String; ASearchAttr : Integer);
+    Procedure AddFiles(Const AFileMask : String; ASearchAttr : Integer); OverLoad;
+    Procedure AddFiles(Const AFileList : IHsStringListEx; ASearchAttr : Integer); OverLoad;
     Procedure AddFromStream(Const AFileName : String; AFromStream : TStream); OverLoad;
     Procedure AddFromStream(Const AFileName : String; AFromStream : IStreamEx); OverLoad;
     Procedure ExtractToStream(Const AFileName : String; AToStream : TStream); OverLoad;
@@ -120,7 +121,8 @@ Type
     Function  GetStoreOptions() : TAbStoreOptions;
     Procedure SetStoreOptions(Const AStoreOptions : TAbStoreOptions);
 
-    Procedure AddFiles(Const AFileMask : String; ASearchAttr : Integer);
+    Procedure AddFiles(Const AFileMask : String; ASearchAttr : Integer); OverLoad;
+    Procedure AddFiles(Const AFileList : IHsStringListEx; ASearchAttr : Integer); OverLoad;
     Procedure AddFromStream(Const AFileName : String; AFromStream : TStream); OverLoad;
     Procedure AddFromStream(Const AFileName : String; AFromStream : IStreamEx); OverLoad;
     Procedure ExtractToStream(Const AFileName : String; AToStream : TStream); OverLoad;
@@ -352,7 +354,7 @@ End;
 
 procedure THsMemoryZipper.DoArchiveItemProgress(Sender : TObject;
   Item : TAbArchiveItem; Progress : Byte; var Abort : Boolean);
-Var lCurOp : String;  
+Var lCurOp : String;
 Begin
   If Assigned(FZipProgress) Then
   Begin
@@ -500,6 +502,26 @@ Begin
 
   Try
     FZipArchive.AddFiles(AFileMask, ASearchAttr);
+    FZipArchive.Save();
+
+    Finally
+      FZipProgress := Nil;
+  End;
+End;
+
+Procedure THsMemoryZipper.AddFiles(Const AFileList : IHsStringListEx; ASearchAttr : Integer);
+Var X : Integer;
+Begin
+  If FShowProgress Then
+  Begin
+    FZipProgress := TZipperProgress.Create();
+    FZipProgress.Show();
+  End;
+
+  Try
+    For X := 0 To AFileList.Count - 1 Do
+      FZipArchive.AddFiles(AFileList[X], faAnyFile);
+
     FZipArchive.Save();
 
     Finally

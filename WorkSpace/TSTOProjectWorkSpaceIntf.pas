@@ -127,8 +127,6 @@ Type
     Function  GetOutputPath() : AnsiString;
     Procedure SetOutputPath(Const AOutputPath : AnsiString);
 
-    Function GetIsModified() : Boolean;
-
     Function Add() : ITSTOWorkSpaceProject; OverLoad;
     Function Add(Const AItem : ITSTOWorkSpaceProject) : Integer; OverLoad;
 
@@ -142,8 +140,6 @@ Type
     Property HackFileName     : AnsiString Read GetHackFileName     Write SetHackFileName;
     Property PackOutput       : Boolean    Read GetPackOutput       Write SetPackOutput;
     Property OutputPath       : AnsiString Read GetOutputPath       Write SetOutputPath;
-
-    Property IsModified       : Boolean     Read GetIsModified;
 
   End;
 

@@ -2,7 +2,7 @@ unit TSTOScriptTemplate.IO;
 
 interface
 
-Uses Classes, HsStreamEx,
+Uses Classes, HsStreamEx, RgbExtractProgress,
   TSTOScriptTemplateIntf, TSTOHackMasterList.IO;
 
 Type
@@ -51,7 +51,7 @@ Type
     Function  GetOnChanged() : TNotifyEvent;
     Procedure SetOnChanged(AOnChanged : TNotifyEvent);
 
-    Function GenenrateScript(AHackMasterList : ITSTOHackMasterListIO) : String;
+    Function GenenrateScript(AHackMasterList : ITSTOHackMasterListIO; AProgress : IRgbProgress = Nil) : String;
 
     Property Variables : ITSTOScriptTemplateVariablesIO Read GetVariables;
     Property Settings  : ITSTOScriptTemplateSettingsIO  Read GetSettings;
@@ -109,7 +109,7 @@ Type
 
 implementation
 
-Uses Dialogs,
+Uses Forms, Dialogs,
   SysUtils, HsXmlDocEx, HsInterfaceEx, HsStringListEx,
   TSTOScriptTemplateImpl, TSTOScriptTemplate.Xml, TSTOScriptTemplate.Bin;
 
@@ -185,7 +185,7 @@ Type
     Function  GetOnChanged() : TNotifyEvent;
     Procedure SetOnChanged(AOnChanged : TNotifyEvent);
 
-    Function GenenrateScript(AHackMasterList : ITSTOHackMasterListIO) : String;
+    Function GenenrateScript(AHackMasterList : ITSTOHackMasterListIO; AProgress : IRgbProgress = Nil) : String;
 
   Public
     Procedure AfterConstruction(); OverRide;
@@ -488,7 +488,7 @@ Begin
   FOnChanged := AOnChanged;
 End;
 
-Function TTSTOScriptTemplateHackIO.GenenrateScript(AHackMasterList : ITSTOHackMasterListIO) : String;
+Function TTSTOScriptTemplateHackIO.GenenrateScript(AHackMasterList : ITSTOHackMasterListIO; AProgress : IRgbProgress = Nil) : String;
 Var lLst : IHsStringListEx;
     lVar : IHsStringListEx;
     lVars : ITSTOScriptTemplateVariablesIO;
@@ -507,23 +507,23 @@ Begin
       lVar.Text := '';
 
       If SameText(lVars[X].VarFunc, 'hmBuildStoreMenu') Then
-        lVar.Text := AHackMasterList.BuildStoreMenu(lSettings)
+        lVar.Text := AHackMasterList.BuildStoreMenu(lSettings, AProgress)
       Else If SameText(lVars[X].VarFunc, 'hmBuildInventoryMenu') Then
-        lVar.Text := AHackMasterList.BuildInventoryMenu(lSettings)
+        lVar.Text := AHackMasterList.BuildInventoryMenu(lSettings, AProgress)
       Else If SameText(lVars[X].VarFunc, 'hmBuildStoreItems') Then
-        lVar.Text := AHackMasterList.BuildStoreItems(lSettings)
+        lVar.Text := AHackMasterList.BuildStoreItems(lSettings, AProgress)
       Else If SameText(lVars[X].VarFunc, 'hmBuildStoreReqs') Then
-        lVar.Text := AHackMasterList.BuildStoreRequirements()
+        lVar.Text := AHackMasterList.BuildStoreRequirements(AProgress)
       Else If SameText(lVars[X].VarFunc, 'hmBuildDeleteBadItems') Then
-        lVar.Text := AHackMasterList.BuildDeleteBadItems()
+        lVar.Text := AHackMasterList.BuildDeleteBadItems(AProgress)
       Else If SameText(lVars[X].VarFunc, 'hmBuildFreeItems') Then
-        lVar.Text := AHackMasterList.BuildFreeItems()
+        lVar.Text := AHackMasterList.BuildFreeItems(AProgress)
       Else If SameText(lVars[X].VarFunc, 'hmBuildUniqueItems') Then
-        lVar.Text := AHackMasterList.BuildUniqueItems()
+        lVar.Text := AHackMasterList.BuildUniqueItems(AProgress)
       Else If SameText(lVars[X].VarFunc, 'hmBuildReqsItems') Then
-        lVar.Text := AHackMasterList.BuildReqsItems()
+        lVar.Text := AHackMasterList.BuildReqsItems(AProgress)
       Else If SameText(lVars[X].VarFunc, 'hmBuildNonSellableItems') Then
-        lVar.Text := AHackMasterList.BuildNonSellableItems();
+        lVar.Text := AHackMasterList.BuildNonSellableItems(AProgress);
 
       lLst.Text := StringReplace(lLst.Text, lVars[X].Name, lVar.Text, [rfReplaceAll, rfIgnoreCase]);
     End;
@@ -707,22 +707,40 @@ Procedure TTSTOScriptTemplateHacksIOImpl.GenerateScripts(AHackMasterList : ITSTO
 Var X : Integer;
     lLst : IHsStringListEx;
     lItem : ITSTOScriptTemplateHackIO;
+    lNbScripts : Integer;
+    lProgress : IRgbProgress;
 Begin
-  lLst := THsStringListEx.CreateList();
-  Try
-    For X := 0 To Count - 1 Do
-    Begin
-      lItem := Get(X);
+  lNbScripts := 0;
+  For X := 0 To Count - 1 Do
+    If Get(X).Enabled Then
+      Inc(lNbScripts);
 
-      If lItem.Enabled Then
+  If lNbScripts > 0 Then
+  Begin
+    lLst := THsStringListEx.CreateList();
+    lProgress := TRgbProgress.CreateRgbProgress();
+    Try
+      lProgress.Show();
+
+      For X := 0 To Count - 1 Do
       Begin
-        lLst.Text := lItem.GenenrateScript(AHackMasterList);
-        lLst.SaveToFile(lItem.Settings.OutputFileName);
-      End;
-    End;
+        lItem := Get(X);
 
-    Finally
-      lLst := Nil;
+        If lItem.Enabled Then
+        Begin
+          lProgress.CurOperation := lItem.Name;
+          lProgress.ItemProgress := Round((X + 1) / lNbScripts * 100);
+          Application.ProcessMessages();
+
+          lLst.Text := lItem.GenenrateScript(AHackMasterList, lProgress);
+          lLst.SaveToFile(lItem.Settings.OutputFileName);
+        End;
+      End;
+
+      Finally
+        lLst := Nil;
+        lProgress := Nil;
+    End;
   End;
 End;
 

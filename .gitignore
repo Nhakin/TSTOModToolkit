@@ -88,6 +88,7 @@ ThirdParty/
 Misc/
 _*.*
 RgbViewer/
+Deprecated/
 
 # Castalia statistics file (since XE7 Castalia is distributed with Delphi)
 *.stat
