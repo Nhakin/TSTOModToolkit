@@ -333,6 +333,7 @@ Type
     Procedure LoadDlcIndexes();
 
     Procedure ApplyMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+    Procedure ValidateHackMasterList(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 
   end;
 
@@ -528,6 +529,7 @@ End;
 procedure TFrmDckMain.FormCreate(Sender: TObject);
 Var X : Integer;
     lSbMnu : TSpTBXCustomItem;
+    lPath : String;
 begin
   FEditFilter := THsVTButtonEdit.Create(Self);
   FEditFilter.Parent        := PanFilter;
@@ -552,7 +554,12 @@ begin
     FPrj := TTSTOXmlTSTOProject.LoadTSTOProject(ChangeFileExt(ParamStr(0), '.xml'))
   Else
   Begin
+    lPath := IncludeTrailingBackSlash(ExtractFilePath(ParamStr(0)));
     FPrj := TTSTOXmlTSTOProject.NewTSTOProject();
+    FPrj.Settings.DLCPath := lPath + 'DLCServer\';
+    FPrj.Settings.ResourcePath := lPath + 'Res\';
+    FPrj.Settings.HackPath := lPath + 'Hack\';
+
     MessageDlg('No configuration file found.', mtInformation, [mbOk], 0);
     With TFrmSettings.Create(Self) Do
     Try
@@ -750,7 +757,29 @@ End;
 
 procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
 Var lStrStrm : IStringStreamEx;
+    lMemStrm : IMemoryStreamEx;
+    lSettings : ITSTOHackSettings;
 begin
+  lSettings := TTSTOHackSettings.CreateHackSettings();
+  Try
+    lSettings.NewHackFile();
+    lSettings.SaveToFile('Z:\Temp\TSTO\Bin\Hack\ThaHack.zip');
+    ShowMessage('Done');
+
+    Finally
+      lSettings := Nil;
+  End;
+Exit;
+  lMemStrm := TMemoryStreamEx.Create();
+  lMemStrm.WriteDWord($504B0506, True);
+  lMemStrm.WriteDWord($0);
+  lMemStrm.WriteDWord($0);
+  lMemStrm.WriteDWord($0);
+  lMemStrm.WriteDWord($0);
+  lMemStrm.WriteWord($0);
+
+  lMemStrm.SaveToFile('00EmptyZip.zip');
+Exit;
   lStrStrm := TStringStreamEx.Create(FWorkSpace.AsXml);
   Try
     lStrStrm.SaveToFile(ChangeFileExt(FWorkSpace.FileName, '.xml'));
@@ -1274,6 +1303,8 @@ end;
 
 Procedure TFrmDckMain.ApplyMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 Begin
+  ValidateHackMasterList(AWorkSpaceProject);
+
   Case AWorkSpaceProject.ProjectType Of
     sptScript :
     Begin
@@ -1302,6 +1333,57 @@ Begin
         Finally
           Free();
       End;
+    End;
+  End;
+End;
+
+Procedure TFrmDckMain.ValidateHackMasterList(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+Var lPrj : ITSTOXMLProject;
+Begin
+  If (AWorkSpaceProject.ProjectType = sptScript) And
+     (AWorkSpaceProject.WorkSpace.HackSettings.HackMasterList.Count = 0) And
+     MessageConfirm('Hack MasterList is empty.'#$D#$A'Do you want to create a new one?') Then
+  Begin
+    lPrj := TTSTOXmlTSTOProject.NewTSTOProject();
+    Try
+      lPrj.Settings.SourcePath := AWorkSpaceProject.SrcPath;
+
+      With lPrj.Settings.MasterFiles.Add() Do
+      Begin
+        FileName := 'BuildingMasterList.xml';
+        NodeName := 'Building';
+        NodeKind := 'building';
+      End;
+
+      With lPrj.Settings.MasterFiles.Add() Do
+      Begin
+        FileName := 'CharacterMasterList.xml';
+        NodeName := 'Character';
+        NodeKind := 'character';
+      End;
+
+      With lPrj.Settings.MasterFiles.Add() Do
+      Begin
+        FileName := 'CharacterSkinMasterList.xml';
+        NodeName := 'Consumable';
+        NodeKind := 'consumable';
+      End;
+
+      With lPrj.Settings.MasterFiles.Add() Do
+      Begin
+        FileName := 'ConsumableMasterList.xml';
+        NodeName := 'Consumable';
+        NodeKind := 'consumable';
+      End;
+
+      FWorkSpace.HackSettings.HackMasterList.BuildMasterList(lPrj);
+      FWorkSpace.HackSettings.HackMasterList.Sort();
+      FWorkSpace.HackSettings.HackMasterList.EnhanceMasterList(lPrj);
+      FWorkSpace.HackSettings.HackMasterList.SaveToFile('00Criss.xml');
+
+
+      Finally
+        lPrj := Nil;
     End;
   End;
 End;

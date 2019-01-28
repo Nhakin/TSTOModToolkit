@@ -74,7 +74,9 @@ Type
     Function IndexOf(Const ACategoryName : String) : Integer;
 
     Procedure BuildMasterList(AProject : ITSTOXMLProject);
-    Function ListStoreRequirements(Const ACategoryName : String) : String;
+    Procedure EnhanceMasterList(AProject : ITSTOXMLProject);
+
+    Function  ListStoreRequirements(Const ACategoryName : String) : String;
 
     Function  BuildStoreMenu(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String; OverLoad;
     Function  BuildStoreMenu() : String; OverLoad;
