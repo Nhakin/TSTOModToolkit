@@ -1834,6 +1834,10 @@ object FrmDckMain: TFrmDckMain
           Caption = 'Build All Mod From Here'
           OnClick = popTvWSBuildAllModFromHereClick
         end
+        object PackAllModFromHere: TSpTBXItem
+          Caption = 'Pack All Mod From Here'
+          OnClick = PackAllModFromHereClick
+        end
       end
       object SpTBXSeparatorItem6: TSpTBXSeparatorItem
       end

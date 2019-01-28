@@ -204,7 +204,7 @@ Type
     popExportHackConfig: TSpTBXItem;
     popBuildHackConfig: TSpTBXItem;
     popTvWSBuildMod: TSpTBXItem;
-    SpTBXSubmenuItem1: TSpTBXSubmenuItem;
+    PackAllModFromHere: TSpTBXItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -272,6 +272,7 @@ Type
     procedure popAddNewProjectClick(Sender: TObject);
     procedure popSaveProjectGroupAsClick(Sender: TObject);
     procedure popRenameProjectGroupClick(Sender: TObject);
+    procedure PackAllModFromHereClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -1390,8 +1391,33 @@ begin
 end;
 
 procedure TFrmDckMain.popTvWSPackModClick(Sender: TObject);
+Var lProject : ITSTOWorkspaceProjectIO;
 begin
-  Raise Exception.Create('ToDo');
+  With FTvWorkSpace Do
+    If GetNodeData(GetFirstSelected(), ITSTOWorkspaceProjectIO, lProject) Then
+    Begin
+      FWorkSpace.PackMod(lProject);
+      ShowMessage('Done');
+    End;
+end;
+
+procedure TFrmDckMain.PackAllModFromHereClick(Sender: TObject);
+Var lWorkSpace : ITSTOWorkspaceProjectIO;
+    lNode      : PVirtualNode;
+begin
+  lNode := FTvWorkSpace.GetFirstSelected();
+  While Assigned(lNode) Do
+  Begin
+    If FTvWorkSpace.GetNodeData(lNode, ITSTOWorkspaceProjectIO, lWorkSpace) Then
+    Try
+      FWorkSpace.PackMod(lWorkSpace);
+
+      Finally
+        lWorkSpace := Nil;
+    End;
+
+    lNode := lNode.NextSibling;
+  End;
 end;
 
 procedure TFrmDckMain.popTvWSPopup(Sender: TObject);

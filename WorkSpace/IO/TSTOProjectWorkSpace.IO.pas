@@ -89,6 +89,7 @@ Type
     Procedure CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProjectIO);
     Procedure GenerateScripts(AProject : ITSTOWorkSpaceProjectIO);
     Procedure CompileMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+    Procedure PackMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 
     Property FileName     : String            Read GetFileName;
     Property AsXml        : String            Read GetAsXml        Write SetAsXml;
@@ -111,9 +112,9 @@ Type
 implementation
 
 Uses
-  Forms, SysUtils, HsXmlDocEx, HsZipUtils, HsCheckSumEx, HsStringListEx,
-  TSTOZero.Bin,
-  TSTOProjectWorkSpaceImpl, TSTOProjectWorkSpace.Types,
+  Forms, SysUtils,
+  HsXmlDocEx, HsZipUtils, HsCheckSumEx, HsStringListEx, HsFunctionsEx,
+  TSTOZero.Bin, TSTOProjectWorkSpaceImpl, TSTOProjectWorkSpace.Types,
   TSTOProjectWorkSpace.Bin, TSTOProjectWorkSpace.Xml;
 
 Type
@@ -242,7 +243,9 @@ Type
     Procedure CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProjectIO);
     Procedure CreateWsGroupProject(APath : String; Const AHackFileName : String);
     Procedure GenerateScripts(AProject : ITSTOWorkSpaceProjectIO);
+
     Procedure CompileMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+    Procedure PackMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 
   Public
     Procedure AfterConstruction(); OverRide;
@@ -921,8 +924,8 @@ Begin
 
           lZip.SaveToFile(lOutPath + AWorkSpaceProject.ProjectName + '.zip');
 
-        Finally
-          lZip := Nil;
+          Finally
+            lZip := Nil;
         End;
       End
       Else
@@ -939,6 +942,59 @@ Begin
 
     Finally
       lZips := Nil;
+  End;
+End;
+
+Procedure TTSTOWorkSpaceProjectGroupIOImpl.PackMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+Var lOutPath : String;
+    lSr      : TSearchRec;
+    lCanPack : Boolean;
+    lZip     : IHsMemoryZipper;
+Begin
+  lCanPack := False;
+
+  If AWorkSpaceProject.OutputPath <> '' Then
+    lOutPath := AWorkSpaceProject.OutputPath
+  Else
+    lOutPath := OutputPath;
+
+  lOutPath := IncludeTrailingBackSlash(StringReplace(lOutPath, '%ProjectName%', AWorkSpaceProject.ProjectName, [rfReplaceAll, rfIgnoreCase]));
+
+  If DirectoryExists(lOutPath) Then
+  Begin
+    If FindFirst(lOutPath + '*.*', faAnyFile, lSr) = 0 Then
+    Try
+      Repeat
+        If lSr.Attr * faDirectory <> faDirectory Then
+        Begin
+          lCanPack := True;
+          Break;
+        End;
+      Until FindNext(lSr) <> 0;
+      Finally
+        FindClose(lSr);
+    End;
+  End;
+
+  If Not lCanPack Then
+  Begin
+    If MessageConfirm('Project haven''t been built do you want to buid it now?') Then
+    Begin
+      CompileMod(AWorkSpaceProject);
+      lCanPack := True;
+    End;
+  End;
+
+  If lCanPack Then
+  Begin
+    lZip := THsMemoryZipper.Create();
+    Try
+      lZip.AddFiles(lOutPath + '*.*', faAnyFile);
+      lZip.SaveToFile(ExtractFilePath(ExcludeTrailingBackslash(lOutPath)) + AWorkSpaceProject.ProjectName + '.zip');
+
+      Finally
+        lZip := Nil;
+    End;
   End;
 End;
 
