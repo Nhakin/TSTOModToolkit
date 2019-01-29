@@ -1376,11 +1376,9 @@ Begin
         NodeKind := 'consumable';
       End;
 
-      FWorkSpace.HackSettings.HackMasterList.BuildMasterList(lPrj);
+      FWorkSpace.HackSettings.HackMasterList.BuildMasterList(lPrj, True);
       FWorkSpace.HackSettings.HackMasterList.Sort();
-      FWorkSpace.HackSettings.HackMasterList.EnhanceMasterList(lPrj);
-      FWorkSpace.HackSettings.HackMasterList.SaveToFile('00Criss.xml');
-
+      FWorkSpace.ForceChanged();
 
       Finally
         lPrj := Nil;
@@ -1464,6 +1462,8 @@ begin
 
     If GetNodeData(lNode, ITSTOWorkspaceProjectIO, lWorkSpace) Then
     Begin
+      ValidateHackMasterList(lWorkSpace);
+
       FWorkSpace.GenerateScripts(lWorkSpace);
       ReinitNode(lNode, True);
 

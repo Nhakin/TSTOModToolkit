@@ -73,7 +73,8 @@ Type
     Function Add(Const AItem : ITSTOHackMasterCategoryIO) : Integer; OverLoad;
     Function IndexOf(Const ACategoryName : String) : Integer;
 
-    Procedure BuildMasterList(AProject : ITSTOXMLProject);
+    Procedure BuildMasterList(AProject : ITSTOXMLProject); OverLoad;
+    Procedure BuildMasterList(AProject : ITSTOXMLProject; Const ASaveInfo : Boolean); OverLoad;
     Procedure EnhanceMasterList(AProject : ITSTOXMLProject);
 
     Function  ListStoreRequirements(Const ACategoryName : String) : String;
@@ -215,7 +216,8 @@ Type
     Procedure SaveToFile(Const AFileName : String); OverLoad;
     Procedure SaveToFile(Const AFileName : String; AProject : ITSTOXMLProject; Const ASaveInfo : Boolean = True); OverLoad;
 
-    Procedure BuildMasterList(AProject : ITSTOXMLProject);
+    Procedure BuildMasterList(AProject : ITSTOXMLProject); OverLoad;
+    Procedure BuildMasterList(AProject : ITSTOXMLProject; Const ASaveInfo : Boolean); OverLoad;
     Procedure EnhanceMasterList(AProject : ITSTOXMLProject);
     Function  ListStoreRequirements(Const ACategoryName : String) : String;
 
@@ -782,6 +784,16 @@ Begin
             lXmlMaster := Nil;
         End;
       End;
+End;
+
+Procedure TTSTOHackMasterListIOImpl.BuildMasterList(AProject : ITSTOXMLProject; Const ASaveInfo : Boolean);
+Begin
+  BuildMasterList(AProject);
+  If ASaveInfo Then
+  Begin
+    EnhanceMasterList(AProject);
+    SetAsXml(FormatXmlData(FXmlImpl.Xml));
+  End;
 End;
 
 Procedure TTSTOHackMasterListIOImpl.EnhanceMasterList(AProject : ITSTOXMLProject);
