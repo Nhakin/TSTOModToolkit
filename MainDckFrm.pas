@@ -205,6 +205,7 @@ Type
     popBuildHackConfig: TSpTBXItem;
     popTvWSBuildMod: TSpTBXItem;
     PackAllModFromHere: TSpTBXItem;
+    popCompareHackMasterList: TSpTBXItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -273,6 +274,7 @@ Type
     procedure popSaveProjectGroupAsClick(Sender: TObject);
     procedure popRenameProjectGroupClick(Sender: TObject);
     procedure PackAllModFromHereClick(Sender: TObject);
+    procedure popCompareHackMasterListClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -555,10 +557,41 @@ begin
   Else
   Begin
     lPath := IncludeTrailingBackSlash(ExtractFilePath(ParamStr(0)));
+
+    //Fill with some default value
     FPrj := TTSTOXmlTSTOProject.NewTSTOProject();
     FPrj.Settings.DLCPath := lPath + 'DLCServer\';
     FPrj.Settings.ResourcePath := lPath + 'Res\';
     FPrj.Settings.HackPath := lPath + 'Hack\';
+    FPrj.Settings.SkinName := 'WMP11';
+
+    With FPrj.Settings.MasterFiles.Add() Do
+    Begin
+      FileName := 'BuildingMasterList.xml';
+      NodeName := 'Building';
+      NodeKind := 'building';
+    End;
+
+    With FPrj.Settings.MasterFiles.Add() Do
+    Begin
+      FileName := 'CharacterMasterList.xml';
+      NodeName := 'Character';
+      NodeKind := 'character';
+    End;
+
+    With FPrj.Settings.MasterFiles.Add() Do
+    Begin
+      FileName := 'CharacterSkinMasterList.xml';
+      NodeName := 'Consumable';
+      NodeKind := 'consumable';
+    End;
+
+    With FPrj.Settings.MasterFiles.Add() Do
+    Begin
+      FileName := 'ConsumableMasterList.xml';
+      NodeName := 'Consumable';
+      NodeKind := 'consumable';
+    End;
 
     MessageDlg('No configuration file found.', mtInformation, [mbOk], 0);
     With TFrmSettings.Create(Self) Do
@@ -759,7 +792,30 @@ procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
 Var lStrStrm : IStringStreamEx;
     lMemStrm : IMemoryStreamEx;
     lSettings : ITSTOHackSettings;
+    lHML      : ITSTOHackMasterListIO;
+    lFileName : String;
 begin
+  Try
+    lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Q05J1Z865ELK\gamescripts-r446295-4OM0YFP9\HackMasterList - 20190129.xml';
+    lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+    lHML.LoadFromFile(lFileName);
+    With FWorkSpace.HackSettings.HackMasterList.GetDiff(lHML) Do
+    Begin
+      lStrStrm := TStringStreamEx.Create(AsXml);
+      Try
+        lStrStrm.SaveToFile(ChangeFileExt(lFileName, 'Diff.xml'));
+
+        Finally
+          lStrStrm := Nil;
+      End;
+    End;
+
+    Finally
+      lHML := Nil
+  End;
+
+  ShowMessage('Done');
+Exit;
   lSettings := TTSTOHackSettings.CreateHackSettings();
   Try
     lSettings.NewHackFile();
@@ -1204,6 +1260,42 @@ begin
   Else
     MessageErr('Index file name AND Hack Zip file name must not be empty.');
 }
+end;
+
+procedure TFrmDckMain.popCompareHackMasterListClick(Sender: TObject);
+Var lHML : ITSTOHackMasterListIO;
+    lStrStrm : IStringStreamEx;
+begin
+  With TOpenDialog.Create(Self) Do
+  Try
+    Filter := 'Xml File|*.xml';
+    If Execute() Then
+    Begin
+      lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+      Try
+        lHML.LoadFromFile(FileName);
+
+        With FWorkSpace.HackSettings.HackMasterList.GetDiff(lHML) Do
+        Begin
+          lStrStrm := TStringStreamEx.Create(AsXml);
+          Try
+            lStrStrm.SaveToFile(ChangeFileExt(FileName, 'Diff.xml'));
+
+            Finally
+              lStrStrm := Nil;
+          End;
+        End;
+
+        Finally
+          lHML := Nil
+      End;
+    End;
+
+    Finally
+      Free();
+  End;
+
+  ShowMessage('Done');
 end;
 
 procedure TFrmDckMain.popSaveProjectGroupAsClick(Sender: TObject);

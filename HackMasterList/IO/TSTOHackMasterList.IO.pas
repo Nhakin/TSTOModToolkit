@@ -3,7 +3,7 @@ unit TSTOHackMasterList.IO;
 interface
 
 Uses
-  HsStreamEx, RgbExtractProgress,
+  Classes, HsInterfaceEx, HsStreamEx, RgbExtractProgress,
   TSTOHackMasterListIntf, TSTOProject.Xml, TSTOScriptTemplateIntf;
 
 Type
@@ -116,6 +116,8 @@ Type
     Procedure SaveToFile(Const AFileName : String); OverLoad;
     Procedure SaveToFile(Const AFileName : String; AProject : ITSTOXMLProject; Const ASaveInfo : Boolean = True); OverLoad;
 
+    Function GetDiff(AMasterList : ITSTOHackMasterListIO) : ITSTOHackMasterListIO;
+
     Property Category[Index : Integer] : ITSTOHackMasterCategoryIO Read Get; Default;
 
     Property AsXml : String Read GetAsXml Write SetAsXml;
@@ -130,8 +132,8 @@ Type
 
 implementation
 
-Uses SysUtils, Classes, Forms, Dialogs, TypInfo, Math, XMLIntf,
-  HsInterfaceEx, HsXmlDocEx, HsStringListEx,
+Uses SysUtils, Forms, Dialogs, TypInfo, Math, XMLIntf,
+  HsXmlDocEx, HsStringListEx,
   TSTOHackMasterListImpl, TSTOHackMasterList.Xml, TSTOHackMasterList.Bin, TSTOScriptTemplateImpl;
 
 Type
@@ -215,6 +217,8 @@ Type
     Procedure SaveToStream(AStream : IStreamEx);
     Procedure SaveToFile(Const AFileName : String); OverLoad;
     Procedure SaveToFile(Const AFileName : String; AProject : ITSTOXMLProject; Const ASaveInfo : Boolean = True); OverLoad;
+
+    Function GetDiff(AMasterList : ITSTOHackMasterListIO) : ITSTOHackMasterListIO;
 
     Procedure BuildMasterList(AProject : ITSTOXMLProject); OverLoad;
     Procedure BuildMasterList(AProject : ITSTOXMLProject; Const ASaveInfo : Boolean); OverLoad;
@@ -650,7 +654,7 @@ Begin
     Try
       Text := FormatXmlData(FXmlImpl.Xml);
       SaveToFile(AFileName);
-      
+
       Finally
         Free();
         FXmlImpl := Nil;
@@ -658,6 +662,92 @@ Begin
   End
   Else
     SaveToFile(AFileName);
+End;
+
+Function TTSTOHackMasterListIOImpl.GetDiff(AMasterList : ITSTOHackMasterListIO) : ITSTOHackMasterListIO;
+Var X, Y, Z : Integer;
+    lCIdx, lPIdx, lIdx : Integer;
+    lCurPkg : ITSTOHackMasterPackageIO;
+    lCurCat : ITSTOHackMasterCategoryIO;
+Begin
+  Result := TTSTOHackMasterListIO.CreateHackMasterList();
+
+  For X := 0 To AMasterList.Count - 1 Do
+  Begin
+    lCIdx := IndexOf(AMasterList[X].Name);
+
+    If lCIdx = -1 Then
+      Result.Add().Assign(AMasterList[X])
+    Else
+    Begin
+      For Y := 0 To AMasterList[X].Count - 1 Do
+      Begin
+        lPIdx := Category[lCIdx].IndexOf(AMasterList[X][Y].PackageType, AMasterList[X][Y].XmlFile);
+
+        If lPIdx = -1 Then
+        Begin
+          lIdx := Result.IndexOf(AMasterList[X].Name);
+
+          If lIdx = -1 Then
+          Begin
+            lCurCat := Result.Add();
+
+            With lCurCat Do
+            Begin
+              Name       := AMasterList[X].Name;
+              Enabled    := AMasterList[X].Enabled;
+              BuildStore := AMasterList[X].BuildStore;
+            End;
+          End
+          Else
+            lCurCat := Result[lIdx];
+
+          lCurCat.Add().Assign(AMasterList[X][Y]);
+        End
+        Else
+        Begin
+          For Z := 0 To AMasterList[X][Y].Count - 1 Do
+          Begin
+            lIdx := Category[lCIdx][lPIdx].IndexOf(AMasterList[X][Y][Z].Id);
+
+            If lIdx = -1 Then
+            Begin
+              lIdx := Result.IndexOf(AMasterList[X].Name);
+
+              If lIdx = -1 Then
+              Begin
+                lCurCat := Result.Add();
+
+                With lCurCat Do
+                Begin
+                  Name       := AMasterList[X].Name;
+                  Enabled    := AMasterList[X].Enabled;
+                  BuildStore := AMasterList[X].BuildStore;
+                End;
+              End
+              Else
+                lCurCat := Result[lIdx];
+
+              lIdx := lCurCat.IndexOf(AMasterList[X][Y].PackageType, AMasterList[X][Y].XmlFile);
+
+              If lIdx = -1 Then
+              Begin
+                lCurPkg := lCurCat.Add();
+
+                lCurPkg.PackageType := AMasterList[X][Y].PackageType;
+                lCurPkg.XmlFile     := AMasterList[X][Y].XmlFile;
+                lCurPkg.Enabled     := AMasterList[X][Y].Enabled;
+              End
+              Else
+                lCurPkg := lCurCat[lIdx];
+
+              lCurPkg.Add().Assign(AMasterList[X][Y][Z]);
+            End;
+          End;
+        End;
+      End;
+    End;
+  End;
 End;
 
 Procedure TTSTOHackMasterListIOImpl.BuildMasterList(AProject : ITSTOXMLProject);

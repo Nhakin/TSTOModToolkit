@@ -25,7 +25,6 @@ uses
   ImagingRgb in 'Vampyre\ImagingRgb.pas',
   IntfReg in 'IntfReg.pas',
   MainDckFrm in 'MainDckFrm.pas' {FrmDckMain},
-  msxmldom in 'Xml\msxmldom.pas',
   ProjectGroupSettingFrm in 'ProjectGroupSettingFrm.pas' {FrmProjectGroupSettings},
   ProjectSettingFrm in 'ProjectSettingFrm.pas' {FrmProjectSettings},
   RemoveFileFromProjectFrm in 'RemoveFileFromProjectFrm.pas' {FrmRemoveFileFromProject},

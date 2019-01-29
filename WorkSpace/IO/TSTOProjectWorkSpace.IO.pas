@@ -653,6 +653,7 @@ Procedure TTSTOWorkSpaceProjectGroupIOImpl.SaveToStream(ATarget : IStreamEx);
 Begin
   BinImpl.SaveToStream(ATarget);
   FBinImpl := Nil;
+  FModified := False;
 End;
 
 Procedure TTSTOWorkSpaceProjectGroupIOImpl.SaveToFile(Const AFileName : String);
@@ -682,6 +683,8 @@ Begin
 
   If Assigned(FHackSettings) Then
     FHackSettings.SaveToFile();
+
+  FModified := False;
 End;
 
 Procedure TTSTOWorkSpaceProjectGroupIOImpl.CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProjectIO);

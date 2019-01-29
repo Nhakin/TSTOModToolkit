@@ -141,6 +141,7 @@ object FrmDckMain: TFrmDckMain
         end
         object SpTBXItem3: TSpTBXItem
           ImageIndex = 35
+          Visible = False
           OnClick = SpTBXItem3Click
         end
       end
@@ -1785,6 +1786,10 @@ object FrmDckMain: TFrmDckMain
       object popBuildHackConfig: TSpTBXItem
         Caption = 'Build Hack Config'
         OnClick = popBuildHackConfigClick
+      end
+      object popCompareHackMasterList: TSpTBXItem
+        Caption = 'Compare HackMaster List'
+        OnClick = popCompareHackMasterListClick
       end
       object SpTBXSeparatorItem12: TSpTBXSeparatorItem
       end

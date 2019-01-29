@@ -686,10 +686,9 @@ Begin
   lHacks := TTSTOBinScriptTemplateHacks.CreateScriptTemplateHacks();
   lHacks.Assign(Self);
   lHacks.SaveToStream(AStream);
+
+  FModified := False;
 End;
-//Begin
-//  BinImpl.SaveToStream(AStream);
-//End;
 
 Procedure TTSTOScriptTemplateHacksIOImpl.SaveToFile(Const AFileName : String);
 Begin
@@ -697,6 +696,7 @@ Begin
   Try
     Text := GetAsXml();
     SaveToFile(AFileName);
+    FModified := False;
 
     Finally
       Free();
