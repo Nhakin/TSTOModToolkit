@@ -125,7 +125,6 @@ Type
     chkInstantBuild: TSpTBXCheckBox;
     chkBuildStore: TSpTBXCheckBox;
     tbBuildList: TSpTBXItem;
-    tbCreateMasterList: TSpTBXItem;
     mnuDownloadAllIndexes: TSpTBXItem;
     mnuIndexes: TSpTBXSubmenuItem;
     SpTBXSeparatorItem1: TSpTBXSeparatorItem;
@@ -206,6 +205,9 @@ Type
     popTvWSBuildMod: TSpTBXItem;
     PackAllModFromHere: TSpTBXItem;
     popCompareHackMasterList: TSpTBXItem;
+    tbCreateMasterList: TSpTBXSubmenuItem;
+    popDiffHackMasterList: TSpTBXItem;
+    popNewHackMasterList: TSpTBXItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -275,6 +277,7 @@ Type
     procedure popRenameProjectGroupClick(Sender: TObject);
     procedure PackAllModFromHereClick(Sender: TObject);
     procedure popCompareHackMasterListClick(Sender: TObject);
+    procedure popDiffHackMasterListClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -1431,6 +1434,7 @@ End;
 
 Procedure TFrmDckMain.ValidateHackMasterList(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 Var lPrj : ITSTOXMLProject;
+    X    : Integer;
 Begin
   If (AWorkSpaceProject.ProjectType = sptScript) And
      (AWorkSpaceProject.WorkSpace.HackSettings.HackMasterList.Count = 0) And
@@ -1440,33 +1444,13 @@ Begin
     Try
       lPrj.Settings.SourcePath := AWorkSpaceProject.SrcPath;
 
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'BuildingMasterList.xml';
-        NodeName := 'Building';
-        NodeKind := 'building';
-      End;
-
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'CharacterMasterList.xml';
-        NodeName := 'Character';
-        NodeKind := 'character';
-      End;
-
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'CharacterSkinMasterList.xml';
-        NodeName := 'Consumable';
-        NodeKind := 'consumable';
-      End;
-
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'ConsumableMasterList.xml';
-        NodeName := 'Consumable';
-        NodeKind := 'consumable';
-      End;
+      For X := 0 To FPrj.Settings.MasterFiles.Count - 1 Do
+        With lPrj.Settings.MasterFiles.Add() Do
+        Begin
+          FileName := FPrj.Settings.MasterFiles[X].FileName;
+          NodeName := FPrj.Settings.MasterFiles[X].NodeName;
+          NodeKind := FPrj.Settings.MasterFiles[X].NodeKind;
+        End;
 
       FWorkSpace.HackSettings.HackMasterList.BuildMasterList(lPrj, True);
       FWorkSpace.HackSettings.HackMasterList.Sort();
@@ -1800,8 +1784,14 @@ Begin
   lName := '_' + StringReplace(AXmlFileName, '.', '', [rfReplaceAll]) + IntToStr(Length(ExtractFileExt(AXmlFileName)) - 1);
   lComponent := FindComponent(lName);
 
-  If Assigned(lComponent) Then
-    TControl(lComponent).Show
+  If Assigned(lComponent) And (lComponent Is TLMDScintillaDockPanel) Then
+  Begin
+    With TLMDScintillaDockPanel(lComponent) Do
+    Begin
+      Lines.Text := AXmlString;
+      Show();
+    End;
+  End
   Else
   Begin
     lXmlPan := TLMDScintillaDockPanel.Create(Self);
@@ -2310,49 +2300,68 @@ Var lSelDir  : AnsiString;
     lHackML  : ITSTOHackMasterListIO;
     lPrj     : ITSTOXMLProject;
     lDateStr : AnsiString;
+    X        : Integer;
 begin
   If SelectDirectoryEx('Source Directory', FPrj.Settings.HackPath,
     lSelDir,True, False, False) Then
   Begin
     lDateStr := FormatDateTime('yyyymmdd', Now());
-    
+
     lHackML := TTSTOHackMasterListIO.CreateHackMasterList();
     lPrj := TTSTOXmlTSTOProject.NewTSTOProject();
     Try
       lPrj.Settings.SourcePath := lSelDir;
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'BuildingMasterList.xml';
-        NodeName := 'Building';
-        NodeKind := 'building';
-      End;
 
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'CharacterMasterList.xml';
-        NodeName := 'Character';
-        NodeKind := 'character';
-      End;
-
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'CharacterSkinMasterList.xml';
-        NodeName := 'Consumable';
-        NodeKind := 'consumable';
-      End;
-
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'ConsumableMasterList.xml';
-        NodeName := 'Consumable';
-        NodeKind := 'consumable';
-      End;
+      For X := 0 To FPrj.Settings.MasterFiles.Count - 1 Do
+        With lPrj.Settings.MasterFiles.Add() Do
+        Begin
+          FileName := FPrj.Settings.MasterFiles[X].FileName;
+          NodeName := FPrj.Settings.MasterFiles[X].NodeName;
+          NodeKind := FPrj.Settings.MasterFiles[X].NodeKind;
+        End;
 
       lHackML.BuildMasterList(lPrj);
       lHackML.Sort();
       lHackML.SaveToFile(ExtractFilePath(ExcludeTrailingBackslash(lSelDir)) + 'HackMasterList - ' + lDateStr + '.xml', lPrj);
 
       ShowMessage('Done');
+
+      Finally
+        lPrj := Nil;
+        lHackML := Nil;
+    End;
+  End;
+end;
+
+procedure TFrmDckMain.popDiffHackMasterListClick(
+  Sender: TObject);
+Var lSelDir  : AnsiString;
+    lHackML  : ITSTOHackMasterListIO;
+    lPrj     : ITSTOXMLProject;
+    lDateStr : AnsiString;
+    X        : Integer;
+begin
+  If SelectDirectoryEx('Source Directory', FPrj.Settings.HackPath,
+    lSelDir,True, False, False) Then
+  Begin
+    lDateStr := FormatDateTime('yyyymmdd', Now());
+
+    lHackML := TTSTOHackMasterListIO.CreateHackMasterList();
+    lPrj := TTSTOXmlTSTOProject.NewTSTOProject();
+    Try
+      lPrj.Settings.SourcePath := lSelDir;
+
+      For X := 0 To FPrj.Settings.MasterFiles.Count - 1 Do
+        With lPrj.Settings.MasterFiles.Add() Do
+        Begin
+          FileName := FPrj.Settings.MasterFiles[X].FileName;
+          NodeName := FPrj.Settings.MasterFiles[X].NodeName;
+          NodeKind := FPrj.Settings.MasterFiles[X].NodeKind;
+        End;
+
+      lHackML.BuildMasterList(lPrj, True);
+      lHackML.Sort();
+      CreateXmlTab(FWorkSpace.HackSettings.HackMasterList.GetDiff(lHackML).AsXml, 'HackMasterListDiff.xml');
 
       Finally
         lPrj := Nil;

@@ -1689,11 +1689,20 @@ object FrmDckMain: TFrmDckMain
         ImageIndex = 111
         OnClick = tbValidateXmlOldClick
       end
-      object tbCreateMasterList: TSpTBXItem
-        Caption = 'Create Masterlist'
-        Hint = 'Create Masterlist'
+      object tbCreateMasterList: TSpTBXSubmenuItem
+        Caption = 'HackMasterlist'
         ImageIndex = 70
         OnClick = tbCreateMasterListClick
+        DropdownCombo = True
+        HideEmptyPopup = True
+        object popNewHackMasterList: TSpTBXItem
+          Caption = 'New HackMasterlist'
+          OnClick = tbCreateMasterListClick
+        end
+        object popDiffHackMasterList: TSpTBXItem
+          Caption = 'Diff HackMasterlist'
+          OnClick = popDiffHackMasterListClick
+        end
       end
       object tbBuildList: TSpTBXItem
         Caption = 'Build ReqLists'
