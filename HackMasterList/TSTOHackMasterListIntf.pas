@@ -22,16 +22,28 @@ Type
     Function  GetIsBadItem() : Boolean;
     Procedure SetIsBadItem(Const AIsBadItem : Boolean);
 
+    Function  GetObjectType() : String;
+    Procedure SetObjectType(Const AObjectType : String);
+
+    Function  GetNPCCharacter() : Boolean;
+    Procedure SetNPCCharacter(Const ANPCCharacter : Boolean);
+
+    Function  GetCharacter() : String;
+    Procedure SetCharacter(Const ACharacter : String);
+
     Function GetMiscData() : IHsStringListEx;
 
     Procedure Assign(ASource : IInterface);
 
-    Property Id         : Integer         Read GetId         Write SetId;
-    Property Name       : String          Read GetName       Write SetName;
-    Property AddInStore : Boolean         Read GetAddInStore Write SetAddInStore;
-    Property OverRide   : Boolean         Read GetOverRide   Write SetOverRide;
-    Property IsBadItem  : Boolean         Read GetIsBadItem  Write SetIsBadItem;
-    Property MiscData   : IHsStringListEx Read GetMiscData;
+    Property Id           : Integer         Read GetId           Write SetId;
+    Property Name         : String          Read GetName         Write SetName;
+    Property AddInStore   : Boolean         Read GetAddInStore   Write SetAddInStore;
+    Property OverRide     : Boolean         Read GetOverRide     Write SetOverRide;
+    Property IsBadItem    : Boolean         Read GetIsBadItem    Write SetIsBadItem;
+    Property ObjectType   : String          Read GetObjectType   Write SetObjectType;
+    Property NPCCharacter : Boolean         Read GetNPCCharacter Write SetNPCCharacter;
+    Property Character    : String          Read GetCharacter    Write SetCharacter;
+    Property MiscData     : IHsStringListEx Read GetMiscData;
 
   End;
 

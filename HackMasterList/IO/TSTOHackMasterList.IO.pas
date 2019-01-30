@@ -540,7 +540,7 @@ End;
 
 Procedure TTSTOHackMasterListIOImpl.SetAsXml(Const AXmlString : String);
 Begin
-   Assign(TXmlTSTOHackMasterList.CreateMasterList(AXmlString));
+  Assign(TXmlTSTOHackMasterList.CreateMasterList(AXmlString));
 {
   FXmlImpl := TXmlTSTOHackMasterList.CreateMasterList(AXmlString);
   Try
@@ -853,8 +853,6 @@ Begin
                     Begin
                       Id         := AttributeNodes['id'].NodeValue;
                       Name       := AttributeNodes['name'].NodeValue;
-                      AddInStore := True;
-                      OverRide   := True;
                     End;
 
                     Except
@@ -896,9 +894,8 @@ Var X, Y, Z    : Integer;
     lNodeAttr  : IXmlNodeEx;
     lIsUnique  : Boolean;
 Begin
+  lXmlMLHack := XmlImpl.OwnerDocument;
   Try
-    lXmlMLHack := XmlImpl.OwnerDocument;
-
     For X := 0 To Count - 1 Do
     Begin
       For Y := 0 To Category[X].Count - 1 Do
@@ -923,8 +920,37 @@ Begin
                 lNodeML := lXmlMLHack.SelectNode('//Package[@XmlFile="' + Category[X][Y].XmlFile + '"]/DataID[@id="' + IntToStr(Category[X][Y][Z].Id) + '" and @name="' + Category[X][Y][Z].Name + '"]');
                 If Assigned(lNodeML) Then
                 Try
+                  lNodeML.Attributes['AddInStore'] := True;
+                  lNodeML.Attributes['OverRide']   := True;
+
                   If SameText(Category[X][Y].PackageType, 'Consumable') And lNodeSrc.HasAttribute('type') Then
+                  Begin
                     lNodeML.Attributes['Type'] := lNodeSrc.AttributeNodes['type'].Text;
+
+                    If SameText(lNodeSrc.AttributeNodes['type'].Text, 'Script') Or
+                       SameText(lNodeSrc.AttributeNodes['type'].Text, 'Prestige') Or
+                       SameText(lNodeSrc.AttributeNodes['type'].Text, 'PrizeBox') Then
+                    Begin
+                      lNodeML.Attributes['AddInStore'] := False;
+                      lNodeML.Attributes['OverRide']   := False;
+                    End
+                    Else If SameText(lNodeSrc.AttributeNodes['type'].Text, 'CharacterSkin') And
+                            lNodeSrc.HasAttribute('object') Then
+                      lNodeML.Attributes['Character'] := lNodeSrc.AttributeNodes['object'].Text;
+                  End;
+
+                  If SameText(Category[X][Y].PackageType, 'Character') Then
+                  Begin
+                    lNodeAttr := lXmlSrc.SelectNode('Set', lNodeSrc);
+                    If Assigned(lNodeAttr) Then
+                      lNodeML.ChildNodes.Add(lNodeAttr.CloneNode(True))
+                    Else
+                    Begin
+                      lNodeML.Attributes['AddInStore'] := False;
+                      lNodeML.Attributes['OverRide']   := False;
+                      lNodeML.Attributes['NPCCharacter'] := True;
+                    End;
+                  End;
 
                   lNodeAttr := lXmlSrc.SelectNode('Cost', lNodeSrc);
                   If Assigned(lNodeAttr) Then

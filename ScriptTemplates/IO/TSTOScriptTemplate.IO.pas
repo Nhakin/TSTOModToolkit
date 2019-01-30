@@ -729,11 +729,13 @@ Begin
         If lItem.Enabled Then
         Begin
           lProgress.CurOperation := lItem.Name;
-          lProgress.ItemProgress := Round((X + 1) / lNbScripts * 100);
           Application.ProcessMessages();
 
           lLst.Text := lItem.GenenrateScript(AHackMasterList, lProgress);
           lLst.SaveToFile(lItem.Settings.OutputFileName);
+
+          lProgress.ItemProgress := Round((X + 1) / lNbScripts * 100);
+          Application.ProcessMessages();
         End;
       End;
 

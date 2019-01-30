@@ -792,12 +792,123 @@ End;
 (******************************************************************************)
 
 procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
+  Procedure InternalAddItem(ACategory : ITSTOHackMasterCategoryIO;
+    APackage : ITSTOHackMasterPackageIO;
+    AItem : ITSTOHackMasterDataIDIO; AResult : ITSTOHackMasterListIO);
+  Var lIdx     : Integer;
+      lCurCat  : ITSTOHackMasterCategoryIO;
+      lCurPkg  : ITSTOHackMasterPackageIO;
+      lCurItem : ITSTOHackMasterDataIDIO;
+  Begin
+    lIdx := AResult.IndexOf('KahnCharacterSkin');
+    If lIdx = -1 Then
+    Begin
+      lCurCat := AResult.Add();
+
+      lCurCat.Name       := 'KahnCharacterSkin';
+      lCurCat.BuildStore := True;
+      lCurCat.Enabled    := True;
+    End
+    Else
+      lCurCat := AResult[lIdx];
+
+    lIdx := lCurCat.IndexOf(APackage.PackageType, APackage.XmlFile);
+    If lIdx = -1 Then
+    Begin
+      lCurPkg := lCurCat.Add();
+
+      lCurPkg.PackageType := APackage.PackageType;
+      lCurPkg.XmlFile     := APackage.XmlFile;
+      lCurPkg.Enabled     := APackage.Enabled;
+    End
+    Else
+      lCurPkg := lCurCat[lIdx];
+
+    lIdx := lCurPkg.IndexOf(AItem.Id);
+    If lIdx = -1 Then
+    Begin
+      With lCurPkg.Add() Do
+      Begin
+        Id           := AItem.Id;
+        Name         := AItem.Name;
+        AddInStore   := AItem.AddInStore;
+        OverRide     := AItem.OverRide;
+        IsBadItem    := AItem.IsBadItem;
+        ObjectType   := AItem.ObjectType;
+        NPCCharacter := AItem.NPCCharacter;
+      End;
+    End;
+  End;
+
 Var lStrStrm : IStringStreamEx;
     lMemStrm : IMemoryStreamEx;
     lSettings : ITSTOHackSettings;
     lHML      : ITSTOHackMasterListIO;
     lFileName : String;
+    X, Y, Z : Integer;
+    lCIdx, lPIdx, lIdx : Integer;
 begin
+(*  lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+  Try
+    With FWorkSpace.HackSettings.HackMasterList Do
+      For X := 0 To Count - 1 Do
+        For Y := 0 To Category[X].Count - 1 Do
+          For Z := 0 To Category[X][Y].Count - 1 Do
+            If SameText(Category[X][Y][Z].ObjectType, 'CharacterSkin') Then
+              InternalAddItem(Category[X], Category[X][Y], Category[X][Y][Z], lHML);
+
+    CreateXmlTab(lHML.AsXml, 'CharacterSkinList.xml');
+
+    Finally
+      lHML := Nil;
+  End;
+Exit;*)
+  lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Q05J1Z865ELK\gamescripts-r446295-4OM0YFP9\HackMasterList - 20190130.xml';
+  lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+  Try
+    lHML.LoadFromFile(lFileName);
+
+    With FWorkSpace.HackSettings.HackMasterList Do
+      For X := 0 To Count - 1 Do
+      Begin
+        lCIdx := lHML.IndexOf(Category[X].Name);
+
+        If lCIdx > -1 Then
+        Begin
+          For Y := 0 To Category[X].Count - 1 Do
+          Begin
+            lPIdx := lHML[lCIdx].IndexOf(Category[X][Y].PackageType, Category[X][Y].XmlFile);
+
+            If lPIdx > -1 Then
+            Begin
+              For Z := 0 To Category[X][Y].Count - 1 Do
+              Begin
+                lIdx := lHML[lCIdx][lPIdx].IndexOf(Category[X][Y][Z].Id);
+
+                If lIdx > -1 Then
+                Begin
+                  Category[X][Y][Z].NPCCharacter := lHML[lCIdx][lPIdx][lIdx].NPCCharacter;
+                  Category[X][Y][Z].Character    := lHML[lCIdx][lPIdx][lIdx].Character;
+                End;
+
+                If Category[X][Y][Z].NPCCharacter Then
+                Begin
+                  Category[X][Y][Z].AddInStore := False;
+                  Category[X][Y][Z].OverRide   := False;
+                End;
+              End;
+            End;
+          End;
+        End;
+      End;
+
+    Finally
+      lHML := Nil;
+  End;
+
+  FWorkSpace.HackSettings.HackMasterList.SaveToFile('Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Q05J1Z865ELK\gamescripts-r446295-4OM0YFP9\HackMasterListNew.xml');
+  ShowMessage('Done');
+Exit;
   Try
     lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Q05J1Z865ELK\gamescripts-r446295-4OM0YFP9\HackMasterList - 20190129.xml';
     lHML := TTSTOHackMasterListIO.CreateHackMasterList();
@@ -2421,8 +2532,8 @@ begin
 end;
 
 procedure TFrmDckMain.tbDownloadOldClick(Sender: TObject);
-Var lPkgList : ITSTOPackageNodes;
-    lDown    : ITSTODownloader;
+Var lPkgList  : ITSTOPackageNodes;
+    lDown     : ITSTODownloader;
 begin
   lPkgList := TTSTOPackageNodes.Create();
   Try
@@ -2452,12 +2563,36 @@ end;
 
 procedure TFrmDckMain.tbExtractRgbOldClick(Sender: TObject);
 Var lPkgList : ITSTOPackageNodes;
+    lNode     : PVirtualNode;
+    lTierItem : ITSTOTierPackageNode;
 begin
   If MessageDlg('Do you want to extract RGB Files?', mtConfirmation, [mbYes, mbNo], 0) = mrYes Then
   Begin
     AppLogFile('Extracting Rgb files from (1) : ' + FCurDlcIndex);
     lPkgList := TTSTOPackageNodes.Create();
     Try
+      With FTvDlcServer Do
+      Begin
+        lNode := GetFirstSelected();
+
+        If GetNodeData(lNode, ITSTOTierPackageNode, lTierItem) Then
+        Try
+          If (lTierItem.Packages.Count > 0) And (lNode.ChildCount = 0) Then
+          Begin
+            BeginUpdate();
+            Try
+              ReinitChildren(lNode, False)
+
+              Finally
+                EndUpdate();
+            End;
+          End;
+
+          Finally
+            lTierItem := Nil;
+        End;
+      End;
+
       FTvDlcServer.IterateSubtree(FTvDlcServer.GetFirstSelected(), GetRgbNodeList, @lPkgList);
       lPkgList.Sort();
       ExtractRgbFiles(lPkgList);

@@ -7,12 +7,15 @@ Uses HsInterfaceEx, HsStringListEx, TSTOHackMasterListIntf;
 Type
   TTSTOHackMasterDataID = Class(TInterfacedObjectEx, ITSTOHackMasterDataID)
   Private
-    FId         : Integer;
-    FName       : String;
-    FAddInStore : Boolean;
-    FOverRide   : Boolean;
-    FIsBadItem  : Boolean;
-    FMiscData   : IHsStringListEx;
+    FId           : Integer;
+    FName         : String;
+    FAddInStore   : Boolean;
+    FOverRide     : Boolean;
+    FIsBadItem    : Boolean;
+    FObjectType   : String;
+    FNPCCharacter : Boolean;
+    FCharacter    : String;
+    FMiscData     : IHsStringListEx;
 
   Protected
     Procedure Created(); OverRide;
@@ -31,6 +34,15 @@ Type
 
     Function  GetIsBadItem() : Boolean;
     Procedure SetIsBadItem(Const AIsBadItem : Boolean);
+
+    Function  GetObjectType() : String;
+    Procedure SetObjectType(Const AObjectType : String);
+
+    Function  GetNPCCharacter() : Boolean;
+    Procedure SetNPCCharacter(Const ANPCCharacter : Boolean);
+
+    Function  GetCharacter() : String;
+    Procedure SetCharacter(Const ACharacter : String);
 
     Function GetMiscData() : IHsStringListEx;
 
@@ -170,6 +182,9 @@ Begin
     FAddInStore    := lSrc.AddInStore;
     FOverRide      := lSrc.OverRide;
     FIsBadItem     := lSrc.IsBadItem;
+    FObjectType    := lSrc.ObjectType;
+    FNPCCharacter  := lSrc.NPCCharacter;
+    FCharacter     := lSrc.Character;
     FMiscData.Text := lSrc.MiscData.Text;
   End
   Else
@@ -224,6 +239,36 @@ End;
 Procedure TTSTOHackMasterDataID.SetIsBadItem(Const AIsBadItem : Boolean);
 Begin
   FIsBadItem := AIsBadItem;
+End;
+
+Function TTSTOHackMasterDataID.GetObjectType() : String;
+Begin
+  Result := FObjectType;
+End;
+
+Procedure TTSTOHackMasterDataID.SetObjectType(Const AObjectType : String);
+Begin
+  FObjectType := AObjectType;
+End;
+
+Function TTSTOHackMasterDataID.GetNPCCharacter() : Boolean;
+Begin
+  Result := FNPCCharacter;
+End;
+
+Procedure TTSTOHackMasterDataID.SetNPCCharacter(Const ANPCCharacter : Boolean);
+Begin
+  FNPCCharacter := ANPCCharacter;
+End;
+
+Function TTSTOHackMasterDataID.GetCharacter() : String;
+Begin
+  Result := FCharacter;
+End;
+
+Procedure TTSTOHackMasterDataID.SetCharacter(Const ACharacter : String);
+Begin
+  FCharacter := ACharacter;
 End;
 
 Function TTSTOHackMasterDataID.GetMiscData() : IHsStringListEx;
