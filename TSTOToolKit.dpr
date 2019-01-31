@@ -104,7 +104,9 @@ uses
 {$R Images.res}
 
 begin
-  ReportMemoryLeaksOnShutdown := True;
+  {$IfDef Debug}
+    ReportMemoryLeaksOnShutdown := True;
+  {$EndIf}
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;

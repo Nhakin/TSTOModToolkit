@@ -5,6 +5,39 @@ Interface
 Uses Classes, SysUtils, RTLConsts, HsInterfaceEx, HsStringListEx;
 
 Type
+  ITSTOHackMasterMovedItem = Interface(IInterfaceEx)
+    ['{4B61686E-29A0-2112-86ED-11F68463C280}']
+    Function  GetXmlFileName() : String;
+    Procedure SetXmlFileName(Const APackageXmlFileName : String);
+
+    Function  GetOldCategory() : String;
+    Procedure SetOldCategory(Const AOldCategory : String);
+
+    Function  GetNewCategory() : String;
+    Procedure SetNewCategory(Const ANewCategory : String);
+
+    Procedure Assign(ASource : IInterface);
+
+    Property XmlFileName : String Read GetXmlFileName Write SetXmlFileName;
+    Property OldCategory : String Read GetOldCategory Write SetOldCategory;
+    Property NewCategory : String Read GetNewCategory Write SetNewCategory;
+
+  End;
+
+  ITSTOHackMasterMovedItems = Interface(IInterfaceListEx)
+    ['{4B61686E-29A0-2112-B067-0A6B4097DD41}']
+    Function  Get(Index : Integer) : ITSTOHackMasterMovedItem;
+    Procedure Put(Index : Integer; Const Item : ITSTOHackMasterMovedItem);
+
+    Function Add() : ITSTOHackMasterMovedItem; OverLoad;
+    Function Add(Const AItem : ITSTOHackMasterMovedItem) : Integer; OverLoad;
+
+    Procedure Assign(ASource : IInterface);
+
+    Property Items[Index : Integer] : ITSTOHackMasterMovedItem Read Get Write Put; Default;
+
+  End;
+
   ITSTOHackMasterDataID = Interface(IInterfaceEx)
     ['{4B61686E-29A0-2112-A5E4-CE2614077B1B}']
     Function  GetId() : Integer;
@@ -105,6 +138,8 @@ Type
     ['{4B61686E-29A0-2112-ABF9-59B79A7BC175}']
     Function Get(Index : Integer) : ITSTOHackMasterCategory;
 
+    Function GetMovedItems() : ITSTOHackMasterMovedItems;
+
     Function Add() : ITSTOHackMasterCategory; OverLoad;
     Function Add(Const AItem : ITSTOHackMasterCategory) : Integer; OverLoad;
 
@@ -113,6 +148,7 @@ Type
 
     Property Category[Index : Integer] : ITSTOHackMasterCategory Read Get; Default;
 
+    Property MovedItems : ITSTOHackMasterMovedItems Read GetMovedItems;
   End;
 
 (******************************************************************************)

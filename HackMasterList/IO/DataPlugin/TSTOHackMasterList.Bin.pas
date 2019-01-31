@@ -32,6 +32,7 @@ Type
     Procedure LoadFromStreamV001(AStream : IStreamEx);
     Procedure LoadFromStreamV002(AStream : IStreamEx);
     Procedure LoadFromStreamV003(AStream : IStreamEx);
+    Procedure LoadFromStreamV004(AStream : IStreamEx);
 
   Protected
     Procedure LoadFromStream(AStream : IStreamEx);
@@ -64,7 +65,7 @@ End;
 (******************************************************************************)
 
 Const
-  cFileVersion = 3;
+  cFileVersion = 4;
 
   cCategoryEnabled = 1;
   cBuildStore = 2;
@@ -72,6 +73,25 @@ Const
   cNPCCharacter = 8;
   cAddInStore = 1;
   cOverRide = 2;
+
+Procedure TBinTSTOHackMasterListImpl.LoadFromStreamV004(AStream : IStreamEx);
+Var lNbItem : Word;
+Begin
+  lNbItem := AStream.ReadWord();
+  While lNbItem > 0 Do
+  Begin
+    With GetMovedItems().Add Do
+    Begin
+      XmlFileName := AStream.ReadAnsiString();
+      OldCategory := AStream.ReadAnsiString();
+      NewCategory := AStream.ReadAnsiString();
+    End;
+
+    Dec(lNbItem);
+  End;
+
+  LoadFromStreamV003(AStream);
+End;
 
 Procedure TBinTSTOHackMasterListImpl.LoadFromStreamV003(AStream : IStreamEx);
 Var X, Y, Z, W : Integer;
@@ -258,6 +278,7 @@ Begin
     1 : LoadFromStreamV001(AStream);
     2 : LoadFromStreamV002(AStream);
     3 : LoadFromStreamV003(AStream);
+    4 : LoadFromStreamV004(AStream);
 
     Else
       Raise Exception.Create('Invalid file version');
@@ -269,8 +290,19 @@ Var X, Y, Z, W : Integer;
     lItemFlags : Byte;
 Begin
   AStream.WriteByte(cFileVersion);
-  AStream.WriteWord(Count);
 
+  AStream.WriteWord(GetMovedItems().Count);
+  For X := 0 To GetMovedItems().Count - 1 Do
+  Begin
+    With GetMovedItems()[X] Do
+    Begin
+      AStream.WriteAnsiString(XmlFileName);
+      AStream.WriteAnsiString(OldCategory);
+      AStream.WriteAnsiString(NewCategory);
+    End;
+  End;
+
+  AStream.WriteWord(Count);
   For X := 0 To Count - 1 Do
   Begin
     AStream.WriteAnsiString(Category[X].Name);
