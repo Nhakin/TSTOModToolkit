@@ -141,6 +141,7 @@ object FrmDckMain: TFrmDckMain
         end
         object SpTBXItem3: TSpTBXItem
           ImageIndex = 35
+          Visible = False
           OnClick = SpTBXItem3Click
         end
       end
@@ -1688,11 +1689,20 @@ object FrmDckMain: TFrmDckMain
         ImageIndex = 111
         OnClick = tbValidateXmlOldClick
       end
-      object tbCreateMasterList: TSpTBXItem
-        Caption = 'Create Masterlist'
-        Hint = 'Create Masterlist'
+      object tbCreateMasterList: TSpTBXSubmenuItem
+        Caption = 'HackMasterlist'
         ImageIndex = 70
         OnClick = tbCreateMasterListClick
+        DropdownCombo = True
+        HideEmptyPopup = True
+        object popNewHackMasterList: TSpTBXItem
+          Caption = 'New HackMasterlist'
+          OnClick = tbCreateMasterListClick
+        end
+        object popDiffHackMasterList: TSpTBXItem
+          Caption = 'Diff HackMasterlist'
+          OnClick = popDiffHackMasterListClick
+        end
       end
       object tbBuildList: TSpTBXItem
         Caption = 'Build ReqLists'
@@ -1785,6 +1795,10 @@ object FrmDckMain: TFrmDckMain
       object popBuildHackConfig: TSpTBXItem
         Caption = 'Build Hack Config'
         OnClick = popBuildHackConfigClick
+      end
+      object popCompareHackMasterList: TSpTBXItem
+        Caption = 'Compare HackMaster List'
+        OnClick = popCompareHackMasterListClick
       end
       object SpTBXSeparatorItem12: TSpTBXSeparatorItem
       end

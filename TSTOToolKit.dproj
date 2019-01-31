@@ -107,6 +107,7 @@
         <DCC_IncludePath>C:\Projects\ReportGenerator\Indy10\Sources\Core;C:\Projects\ReportGenerator\Indy10\Sources\System;C:\Projects\ReportGenerator\Indy10\Sources\Protocols;C:\Projects\DelphiCodeGenerator\Sources\VirtualTree;xC:\Projet\Composant\VirtualTree 5.51\Source;.\Oxml 1.9;.\AviWriter 2.1;$(DCC_IncludePath)</DCC_IncludePath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <DCC_ExeOutput>..\Bin\</DCC_ExeOutput>
         <DCC_DebugDCUs>false</DCC_DebugDCUs>
         <DCC_IMPLICIT_STRING_CAST>false</DCC_IMPLICIT_STRING_CAST>
         <Debugger_RunParams>OxldUi</Debugger_RunParams>
@@ -631,7 +632,6 @@
         <DCCReference Include="MainDckFrm.pas">
             <Form>FrmDckMain</Form>
         </DCCReference>
-        <DCCReference Include="Xml\msxmldom.pas"/>
         <DCCReference Include="ProjectGroupSettingFrm.pas">
             <Form>FrmProjectGroupSettings</Form>
         </DCCReference>

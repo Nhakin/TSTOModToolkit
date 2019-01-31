@@ -3,7 +3,7 @@ object FrmSettings: TFrmSettings
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'Settings'
-  ClientHeight = 246
+  ClientHeight = 221
   ClientWidth = 447
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -25,7 +25,6 @@ object FrmSettings: TFrmSettings
     Width = 447
     Height = 26
     AllowDrag = False
-    ExplicitTop = 32
     object tbMainV2: TSpTBXToolbar
       Left = 0
       Top = 0
@@ -44,19 +43,19 @@ object FrmSettings: TFrmSettings
   end
   object SbMainV2: TSpTBXStatusBar
     Left = 0
-    Top = 220
+    Top = 195
     Width = 447
     Height = 26
     Enabled = False
-    ExplicitTop = 256
+    ExplicitTop = 220
   end
   object PanData: TSpTBXExPanel
     Left = 0
     Top = 26
     Width = 447
-    Height = 195
+    Height = 169
     Color = clBtnFace
-    Align = alTop
+    Align = alClient
     UseDockManager = True
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -66,10 +65,10 @@ object FrmSettings: TFrmSettings
     ParentFont = False
     TabOrder = 0
     ShowCaption = True
-    ExplicitTop = 58
+    ExplicitHeight = 170
     DesignSize = (
       447
-      195)
+      169)
     object LblDLCServer: TLabel
       Left = 11
       Top = 9
@@ -139,6 +138,7 @@ object FrmSettings: TFrmSettings
       Font.Style = []
       ParentFont = False
       Transparent = True
+      Visible = False
     end
     object LblTargetPath: TLabel
       Left = 11
@@ -153,10 +153,11 @@ object FrmSettings: TFrmSettings
       Font.Style = []
       ParentFont = False
       Transparent = True
+      Visible = False
     end
     object LblResourcePath: TLabel
       Left = 11
-      Top = 170
+      Top = 116
       Width = 70
       Height = 13
       Caption = 'Resource Path'
@@ -207,6 +208,7 @@ object FrmSettings: TFrmSettings
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 4
+      Visible = False
     end
     object EditTargetPath: TEdit
       Left = 105
@@ -215,10 +217,11 @@ object FrmSettings: TFrmSettings
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 5
+      Visible = False
     end
     object EditResourcePath: TEdit
       Left = 105
-      Top = 167
+      Top = 113
       Width = 303
       Height = 21
       Anchors = [akLeft, akTop, akRight]
@@ -226,7 +229,7 @@ object FrmSettings: TFrmSettings
     end
     object SbReloadRessourceIndex: TSpTBXSpeedButton
       Left = 414
-      Top = 167
+      Top = 113
       Width = 23
       Height = 22
       Hint = 'Rebuild index'

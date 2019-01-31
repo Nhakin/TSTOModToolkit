@@ -523,7 +523,11 @@ Begin
       Else If SameText(lVars[X].VarFunc, 'hmBuildReqsItems') Then
         lVar.Text := AHackMasterList.BuildReqsItems(AProgress)
       Else If SameText(lVars[X].VarFunc, 'hmBuildNonSellableItems') Then
-        lVar.Text := AHackMasterList.BuildNonSellableItems(AProgress);
+        lVar.Text := AHackMasterList.BuildNonSellableItems(AProgress)
+      Else If SameText(lVars[X].VarFunc, 'hmBuildCharacterSkins') Then
+        lVar.Text := AHackMasterList.BuildCharacterSkins()
+      Else If SameText(lVars[X].VarFunc, 'hmBuildBuildingSkins') Then
+        lVar.Text := AHackMasterList.BuildBuildingSkins();
 
       lLst.Text := StringReplace(lLst.Text, lVars[X].Name, lVar.Text, [rfReplaceAll, rfIgnoreCase]);
     End;
@@ -686,10 +690,9 @@ Begin
   lHacks := TTSTOBinScriptTemplateHacks.CreateScriptTemplateHacks();
   lHacks.Assign(Self);
   lHacks.SaveToStream(AStream);
+
+  FModified := False;
 End;
-//Begin
-//  BinImpl.SaveToStream(AStream);
-//End;
 
 Procedure TTSTOScriptTemplateHacksIOImpl.SaveToFile(Const AFileName : String);
 Begin
@@ -697,6 +700,7 @@ Begin
   Try
     Text := GetAsXml();
     SaveToFile(AFileName);
+    FModified := False;
 
     Finally
       Free();
@@ -729,11 +733,13 @@ Begin
         If lItem.Enabled Then
         Begin
           lProgress.CurOperation := lItem.Name;
-          lProgress.ItemProgress := Round((X + 1) / lNbScripts * 100);
           Application.ProcessMessages();
 
           lLst.Text := lItem.GenenrateScript(AHackMasterList, lProgress);
           lLst.SaveToFile(lItem.Settings.OutputFileName);
+
+          lProgress.ItemProgress := Round((X + 1) / lNbScripts * 100);
+          Application.ProcessMessages();
         End;
       End;
 

@@ -63,7 +63,7 @@ implementation
 
 Uses
   SpTbxSkins, HsFunctionsEx, HsZipUtils, HsStreamEx, uSelectDirectoryEx,
-  TSTORessource, TSTOSbtp.IO;
+  TSTORessource, TSTOHackSettings;
 
 {$R *.dfm}
 
@@ -184,9 +184,7 @@ begin
 end;
 
 procedure TFrmSettings.SbCreateNewHackClick(Sender: TObject);
-Var lZip : IHsMemoryZipper;
-    lSbtpPatches : ISbtpFilesIO;
-    lMemStrm     : IMemoryStreamEx;
+Var lNewHack : ITSTOHackSettings;
 begin
   With TSaveDialog.Create(Self) Do
   Try
@@ -197,23 +195,14 @@ begin
       If Not SameText(ExtractFileExt(FileName), '.zip') Then
         FileName := FileName + '.zip';
 
-      lZip := THsMemoryZipper.Create();
+      lNewHack := TTSTOHackSettings.CreateHackSettings();
       Try
-        lSbtpPatches := TSbtpFilesIO.CreateSbtpFiles();
-        lMemStrm := TMemoryStreamEx.Create();
-        Try
-          lSbtpPatches.SaveToStream(lMemStrm);
-          lMemStrm.Position := 0;
-          lZip.AddFromStream('TextPools', lMemStrm);
-
-          Finally
-            lSbtpPatches := Nil;
-        End;
-
-        lZip.SaveToFile(FileName);
+        lNewHack.NewHackFile();
+        lNewHack.SaveToFile(FileName);
+        ShowMessage('Done');
 
         Finally
-          lZip := Nil;
+          lNewHack := Nil;
       End;
 
       FEditHackFileName.Text := FileName;
@@ -248,6 +237,10 @@ end;
 
 procedure TFrmSettings.tbSaveClick(Sender: TObject);
 begin
+  If (FEditHackFileName.Text = '') And
+     MessageConfirm('No default hack file selected.'#$D#$A'Do you want to create one?') Then
+    SbCreateNewHackClick(Self);
+
   FProject.Settings.DLCServer    := AnsiString(EditDLCServer.Text);
   FProject.Settings.SourcePath   := AnsiString(EditSourcePath.Text);
   FProject.Settings.TargetPath   := AnsiString(EditTargetPath.Text);

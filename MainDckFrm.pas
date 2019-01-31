@@ -125,7 +125,6 @@ Type
     chkInstantBuild: TSpTBXCheckBox;
     chkBuildStore: TSpTBXCheckBox;
     tbBuildList: TSpTBXItem;
-    tbCreateMasterList: TSpTBXItem;
     mnuDownloadAllIndexes: TSpTBXItem;
     mnuIndexes: TSpTBXSubmenuItem;
     SpTBXSeparatorItem1: TSpTBXSeparatorItem;
@@ -205,6 +204,10 @@ Type
     popBuildHackConfig: TSpTBXItem;
     popTvWSBuildMod: TSpTBXItem;
     PackAllModFromHere: TSpTBXItem;
+    popCompareHackMasterList: TSpTBXItem;
+    tbCreateMasterList: TSpTBXSubmenuItem;
+    popDiffHackMasterList: TSpTBXItem;
+    popNewHackMasterList: TSpTBXItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -261,8 +264,6 @@ Type
     procedure popExportHackConfigClick(Sender: TObject);
     procedure popBuildHackConfigClick(Sender: TObject);
     procedure popTvWSApplyModClick(Sender: TObject);
-<<<<<<< HEAD
-=======
     procedure popTvWSBuildModClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormDestroy(Sender: TObject);
@@ -275,7 +276,8 @@ Type
     procedure popSaveProjectGroupAsClick(Sender: TObject);
     procedure popRenameProjectGroupClick(Sender: TObject);
     procedure PackAllModFromHereClick(Sender: TObject);
->>>>>>> refs/remotes/origin/DevVersion
+    procedure popCompareHackMasterListClick(Sender: TObject);
+    procedure popDiffHackMasterListClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -336,6 +338,7 @@ Type
     Procedure LoadDlcIndexes();
 
     Procedure ApplyMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+    Procedure ValidateHackMasterList(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 
   end;
 
@@ -531,6 +534,7 @@ End;
 procedure TFrmDckMain.FormCreate(Sender: TObject);
 Var X : Integer;
     lSbMnu : TSpTBXCustomItem;
+    lPath : String;
 begin
   FEditFilter := THsVTButtonEdit.Create(Self);
   FEditFilter.Parent        := PanFilter;
@@ -555,7 +559,43 @@ begin
     FPrj := TTSTOXmlTSTOProject.LoadTSTOProject(ChangeFileExt(ParamStr(0), '.xml'))
   Else
   Begin
+    lPath := IncludeTrailingBackSlash(ExtractFilePath(ParamStr(0)));
+
+    //Fill with some default value
     FPrj := TTSTOXmlTSTOProject.NewTSTOProject();
+    FPrj.Settings.DLCPath := lPath + 'DLCServer\';
+    FPrj.Settings.ResourcePath := lPath + 'Res\';
+    FPrj.Settings.HackPath := lPath + 'Hack\';
+    FPrj.Settings.SkinName := 'WMP11';
+
+    With FPrj.Settings.MasterFiles.Add() Do
+    Begin
+      FileName := 'BuildingMasterList.xml';
+      NodeName := 'Building';
+      NodeKind := 'building';
+    End;
+
+    With FPrj.Settings.MasterFiles.Add() Do
+    Begin
+      FileName := 'CharacterMasterList.xml';
+      NodeName := 'Character';
+      NodeKind := 'character';
+    End;
+
+    With FPrj.Settings.MasterFiles.Add() Do
+    Begin
+      FileName := 'CharacterSkinMasterList.xml';
+      NodeName := 'Consumable';
+      NodeKind := 'consumable';
+    End;
+
+    With FPrj.Settings.MasterFiles.Add() Do
+    Begin
+      FileName := 'ConsumableMasterList.xml';
+      NodeName := 'Consumable';
+      NodeKind := 'consumable';
+    End;
+
     MessageDlg('No configuration file found.', mtInformation, [mbOk], 0);
     With TFrmSettings.Create(Self) Do
     Try
@@ -753,15 +793,58 @@ End;
 
 procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
 Var lStrStrm : IStringStreamEx;
+    lMemStrm : IMemoryStreamEx;
+    lSettings : ITSTOHackSettings;
+    lHML      : ITSTOHackMasterListIO;
+    lFileName : String;
+    X, Y, Z : Integer;
+    lCIdx, lPIdx, lIdx : Integer;
 begin
-  lStrStrm := TStringStreamEx.Create(FWorkSpace.AsXml);
+  lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Patch1_M2GH56LYT8SG\gamescripts-r446813-690QPXAE\HackMasterList - 20190131.xml';
+  lHML := TTSTOHackMasterListIO.CreateHackMasterList();
   Try
-    lStrStrm.SaveToFile(ChangeFileExt(FWorkSpace.FileName, '.xml'));
-    ShowMessage('Done');
+    lHML.LoadFromFile(lFileName);
+
+    With FWorkSpace.HackSettings.HackMasterList Do
+      For X := 0 To Count - 1 Do
+      Begin
+        lCIdx := lHML.IndexOf(Category[X].Name);
+
+        If lCIdx > -1 Then
+        Begin
+          For Y := 0 To Category[X].Count - 1 Do
+          Begin
+            lPIdx := lHML[lCIdx].IndexOf(Category[X][Y].PackageType, Category[X][Y].XmlFile);
+
+            If lPIdx > -1 Then
+            Begin
+              For Z := 0 To Category[X][Y].Count - 1 Do
+              Begin
+                lIdx := lHML[lCIdx][lPIdx].IndexOf(Category[X][Y][Z].Id);
+
+                If lIdx > -1 Then
+                Begin
+                  Category[X][Y][Z].NPCCharacter := lHML[lCIdx][lPIdx][lIdx].NPCCharacter;
+                  Category[X][Y][Z].SkinObject   := lHML[lCIdx][lPIdx][lIdx].SkinObject;
+                End;
+
+                If Category[X][Y][Z].NPCCharacter Then
+                Begin
+                  Category[X][Y][Z].AddInStore := False;
+                  Category[X][Y][Z].OverRide   := False;
+                End;
+              End;
+            End;
+          End;
+        End;
+      End;
 
     Finally
-      lStrStrm := Nil;
+      lHML := Nil;
   End;
+
+  FWorkSpace.HackSettings.HackMasterList.SaveToFile('Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Patch1_M2GH56LYT8SG\gamescripts-r446813-690QPXAE\HackMasterListNew.xml');
+  ShowMessage('Done');
 end;
 
 procedure TFrmDckMain.sptbxMainMenuMouseDown(Sender: TObject;
@@ -1180,6 +1263,42 @@ begin
 }
 end;
 
+procedure TFrmDckMain.popCompareHackMasterListClick(Sender: TObject);
+Var lHML : ITSTOHackMasterListIO;
+    lStrStrm : IStringStreamEx;
+begin
+  With TOpenDialog.Create(Self) Do
+  Try
+    Filter := 'Xml File|*.xml';
+    If Execute() Then
+    Begin
+      lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+      Try
+        lHML.LoadFromFile(FileName);
+
+        With FWorkSpace.HackSettings.HackMasterList.GetDiff(lHML) Do
+        Begin
+          lStrStrm := TStringStreamEx.Create(AsXml);
+          Try
+            lStrStrm.SaveToFile(ChangeFileExt(FileName, 'Diff.xml'));
+
+            Finally
+              lStrStrm := Nil;
+          End;
+        End;
+
+        Finally
+          lHML := Nil
+      End;
+    End;
+
+    Finally
+      Free();
+  End;
+
+  ShowMessage('Done');
+end;
+
 procedure TFrmDckMain.popSaveProjectGroupAsClick(Sender: TObject);
 begin
   Raise Exception.Create('ToDo');
@@ -1275,49 +1394,10 @@ begin
   popTvSTTemplateDelete.Enabled := Assigned(FTvSTVariables.GetFirstSelected());
 end;
 
-<<<<<<< HEAD
-procedure TFrmDckMain.popTvWSApplyModClick(Sender: TObject);
-Var lPkg  : ITSTOPackageNode;
-    lPath : AnsiString;
-    lProject : ITSTOWorkSpaceProjectIO;
-begin
-  If FTvWorkSpace.GetNodeData(FTvWorkSpace.GetFirstSelected(), ITSTOWorkSpaceProjectIO, lProject) Then
-  Try
-    Case lProject.ProjectType Of
-      sptScript :
-      Begin
-        FPrj.Settings.AllFreeItems     := chkAllFree.Checked;
-        FPrj.Settings.NonUnique        := chkNonUnique.Checked;
-        FPrj.Settings.BuildCustomStore := chkBuildStore.Checked;
-        FPrj.Settings.InstantBuild     := chkInstantBuild.Checked;
-        FPrj.Settings.FreeLand         := chkFreeLandUpgade.Checked;
-        FPrj.Settings.UnlimitedTime    := chkUnlimitedTime.Checked;
-
-        With TTSTODlcGenerator.Create() Do
-        Try
-          CreateMod(FPrj, lProject, FPrj.Settings.MasterFiles);
-          MessageDlg('Done', mtCustom, [mbOk], 0);
-
-          Finally
-            Free();
-        End;
-      End;
-
-      sptTextPools :
-      Begin
-        With TTSTODlcGenerator.Create() Do
-        Try
-          CreateSbtpMod(lProject);
-          MessageDlg('Done', mtCustom, [mbOk], 0);
-
-          Finally
-            Free();
-        End;
-      End;
-    End;
-=======
 Procedure TFrmDckMain.ApplyMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
 Begin
+  ValidateHackMasterList(AWorkSpaceProject);
+
   Case AWorkSpaceProject.ProjectType Of
     sptScript :
     Begin
@@ -1350,6 +1430,36 @@ Begin
   End;
 End;
 
+Procedure TFrmDckMain.ValidateHackMasterList(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+Var lPrj : ITSTOXMLProject;
+    X    : Integer;
+Begin
+  If (AWorkSpaceProject.ProjectType = sptScript) And
+     (AWorkSpaceProject.WorkSpace.HackSettings.HackMasterList.Count = 0) And
+     MessageConfirm('Hack MasterList is empty.'#$D#$A'Do you want to create a new one?') Then
+  Begin
+    lPrj := TTSTOXmlTSTOProject.NewTSTOProject();
+    Try
+      lPrj.Settings.SourcePath := AWorkSpaceProject.SrcPath;
+
+      For X := 0 To FPrj.Settings.MasterFiles.Count - 1 Do
+        With lPrj.Settings.MasterFiles.Add() Do
+        Begin
+          FileName := FPrj.Settings.MasterFiles[X].FileName;
+          NodeName := FPrj.Settings.MasterFiles[X].NodeName;
+          NodeKind := FPrj.Settings.MasterFiles[X].NodeKind;
+        End;
+
+      FWorkSpace.HackSettings.HackMasterList.BuildMasterList(lPrj, True);
+      FWorkSpace.HackSettings.HackMasterList.Sort();
+      FWorkSpace.ForceChanged();
+
+      Finally
+        lPrj := Nil;
+    End;
+  End;
+End;
+
 procedure TFrmDckMain.popTvWSApplyModClick(Sender: TObject);
 Var lProject : ITSTOWorkSpaceProjectIO;
 begin
@@ -1357,17 +1467,12 @@ begin
   Try
     ApplyMod(lProject);
     MessageDlg('Done', mtCustom, [mbOk], 0);
->>>>>>> refs/remotes/origin/DevVersion
 
     Finally
       lProject := Nil;
   End;
 end;
 
-<<<<<<< HEAD
-procedure TFrmDckMain.popTvWSGenerateScriptsClick(Sender: TObject);
-Var lWorkSpace : ITSTOWorkspaceProject;
-=======
 procedure TFrmDckMain.popTvWSApplyAllModFromHereClick(Sender: TObject);
 Var lProject : ITSTOWorkSpaceProjectIO;
     lNode    : PVirtualNode;
@@ -1399,7 +1504,6 @@ end;
 
 procedure TFrmDckMain.popTvWSBuildAllModFromHereClick(Sender: TObject);
 Var lWorkSpace : ITSTOWorkspaceProjectIO;
->>>>>>> refs/remotes/origin/DevVersion
     lNode      : PVirtualNode;
 begin
   lNode := FTvWorkSpace.GetFirstSelected();
@@ -1432,6 +1536,8 @@ begin
 
     If GetNodeData(lNode, ITSTOWorkspaceProjectIO, lWorkSpace) Then
     Begin
+      ValidateHackMasterList(lWorkSpace);
+
       FWorkSpace.GenerateScripts(lWorkSpace);
       ReinitNode(lNode, True);
 
@@ -1676,8 +1782,14 @@ Begin
   lName := '_' + StringReplace(AXmlFileName, '.', '', [rfReplaceAll]) + IntToStr(Length(ExtractFileExt(AXmlFileName)) - 1);
   lComponent := FindComponent(lName);
 
-  If Assigned(lComponent) Then
-    TControl(lComponent).Show
+  If Assigned(lComponent) And (lComponent Is TLMDScintillaDockPanel) Then
+  Begin
+    With TLMDScintillaDockPanel(lComponent) Do
+    Begin
+      Lines.Text := AXmlString;
+      Show();
+    End;
+  End
   Else
   Begin
     lXmlPan := TLMDScintillaDockPanel.Create(Self);
@@ -2186,49 +2298,68 @@ Var lSelDir  : AnsiString;
     lHackML  : ITSTOHackMasterListIO;
     lPrj     : ITSTOXMLProject;
     lDateStr : AnsiString;
+    X        : Integer;
 begin
   If SelectDirectoryEx('Source Directory', FPrj.Settings.HackPath,
     lSelDir,True, False, False) Then
   Begin
     lDateStr := FormatDateTime('yyyymmdd', Now());
-    
+
     lHackML := TTSTOHackMasterListIO.CreateHackMasterList();
     lPrj := TTSTOXmlTSTOProject.NewTSTOProject();
     Try
       lPrj.Settings.SourcePath := lSelDir;
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'BuildingMasterList.xml';
-        NodeName := 'Building';
-        NodeKind := 'building';
-      End;
 
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'CharacterMasterList.xml';
-        NodeName := 'Character';
-        NodeKind := 'character';
-      End;
-
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'CharacterSkinMasterList.xml';
-        NodeName := 'Consumable';
-        NodeKind := 'consumable';
-      End;
-
-      With lPrj.Settings.MasterFiles.Add() Do
-      Begin
-        FileName := 'ConsumableMasterList.xml';
-        NodeName := 'Consumable';
-        NodeKind := 'consumable';
-      End;
+      For X := 0 To FPrj.Settings.MasterFiles.Count - 1 Do
+        With lPrj.Settings.MasterFiles.Add() Do
+        Begin
+          FileName := FPrj.Settings.MasterFiles[X].FileName;
+          NodeName := FPrj.Settings.MasterFiles[X].NodeName;
+          NodeKind := FPrj.Settings.MasterFiles[X].NodeKind;
+        End;
 
       lHackML.BuildMasterList(lPrj);
       lHackML.Sort();
       lHackML.SaveToFile(ExtractFilePath(ExcludeTrailingBackslash(lSelDir)) + 'HackMasterList - ' + lDateStr + '.xml', lPrj);
 
       ShowMessage('Done');
+
+      Finally
+        lPrj := Nil;
+        lHackML := Nil;
+    End;
+  End;
+end;
+
+procedure TFrmDckMain.popDiffHackMasterListClick(
+  Sender: TObject);
+Var lSelDir  : AnsiString;
+    lHackML  : ITSTOHackMasterListIO;
+    lPrj     : ITSTOXMLProject;
+    lDateStr : AnsiString;
+    X        : Integer;
+begin
+  If SelectDirectoryEx('Source Directory', FPrj.Settings.HackPath,
+    lSelDir,True, False, False) Then
+  Begin
+    lDateStr := FormatDateTime('yyyymmdd', Now());
+
+    lHackML := TTSTOHackMasterListIO.CreateHackMasterList();
+    lPrj := TTSTOXmlTSTOProject.NewTSTOProject();
+    Try
+      lPrj.Settings.SourcePath := lSelDir;
+
+      For X := 0 To FPrj.Settings.MasterFiles.Count - 1 Do
+        With lPrj.Settings.MasterFiles.Add() Do
+        Begin
+          FileName := FPrj.Settings.MasterFiles[X].FileName;
+          NodeName := FPrj.Settings.MasterFiles[X].NodeName;
+          NodeKind := FPrj.Settings.MasterFiles[X].NodeKind;
+        End;
+
+      lHackML.BuildMasterList(lPrj, True);
+      lHackML.Sort();
+      CreateXmlTab(FWorkSpace.HackSettings.HackMasterList.GetDiff(lHackML).AsXml, 'HackMasterListDiff.xml');
 
       Finally
         lPrj := Nil;
@@ -2288,8 +2419,8 @@ begin
 end;
 
 procedure TFrmDckMain.tbDownloadOldClick(Sender: TObject);
-Var lPkgList : ITSTOPackageNodes;
-    lDown    : ITSTODownloader;
+Var lPkgList  : ITSTOPackageNodes;
+    lDown     : ITSTODownloader;
 begin
   lPkgList := TTSTOPackageNodes.Create();
   Try
@@ -2319,12 +2450,36 @@ end;
 
 procedure TFrmDckMain.tbExtractRgbOldClick(Sender: TObject);
 Var lPkgList : ITSTOPackageNodes;
+    lNode     : PVirtualNode;
+    lTierItem : ITSTOTierPackageNode;
 begin
   If MessageDlg('Do you want to extract RGB Files?', mtConfirmation, [mbYes, mbNo], 0) = mrYes Then
   Begin
     AppLogFile('Extracting Rgb files from (1) : ' + FCurDlcIndex);
     lPkgList := TTSTOPackageNodes.Create();
     Try
+      With FTvDlcServer Do
+      Begin
+        lNode := GetFirstSelected();
+
+        If GetNodeData(lNode, ITSTOTierPackageNode, lTierItem) Then
+        Try
+          If (lTierItem.Packages.Count > 0) And (lNode.ChildCount = 0) Then
+          Begin
+            BeginUpdate();
+            Try
+              ReinitChildren(lNode, False)
+
+              Finally
+                EndUpdate();
+            End;
+          End;
+
+          Finally
+            lTierItem := Nil;
+        End;
+      End;
+
       FTvDlcServer.IterateSubtree(FTvDlcServer.GetFirstSelected(), GetRgbNodeList, @lPkgList);
       lPkgList.Sort();
       ExtractRgbFiles(lPkgList);

@@ -3,7 +3,7 @@ unit TSTOHackMasterList.IO;
 interface
 
 Uses
-  HsStreamEx, RgbExtractProgress,
+  Classes, HsInterfaceEx, HsStreamEx, RgbExtractProgress,
   TSTOHackMasterListIntf, TSTOProject.Xml, TSTOScriptTemplateIntf;
 
 Type
@@ -73,8 +73,11 @@ Type
     Function Add(Const AItem : ITSTOHackMasterCategoryIO) : Integer; OverLoad;
     Function IndexOf(Const ACategoryName : String) : Integer;
 
-    Procedure BuildMasterList(AProject : ITSTOXMLProject);
-    Function ListStoreRequirements(Const ACategoryName : String) : String;
+    Procedure BuildMasterList(AProject : ITSTOXMLProject); OverLoad;
+    Procedure BuildMasterList(AProject : ITSTOXMLProject; Const ASaveInfo : Boolean); OverLoad;
+    Procedure EnhanceMasterList(AProject : ITSTOXMLProject);
+
+    Function  ListStoreRequirements(Const ACategoryName : String) : String;
 
     Function  BuildStoreMenu(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String; OverLoad;
     Function  BuildStoreMenu() : String; OverLoad;
@@ -106,12 +109,17 @@ Type
     Function  BuildStoreRequirements(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildStoreRequirements(Const AFileName : String); OverLoad;
 
+    Function  BuildCharacterSkins() : String;
+    Function  BuildBuildingSkins() : String;
+
     Procedure LoadFromStream(ASource : IStreamEx);
     Procedure LoadFromFile(Const AFileName : String);
 
     Procedure SaveToStream(ATarget : IStreamEx);
     Procedure SaveToFile(Const AFileName : String); OverLoad;
     Procedure SaveToFile(Const AFileName : String; AProject : ITSTOXMLProject; Const ASaveInfo : Boolean = True); OverLoad;
+
+    Function GetDiff(AMasterList : ITSTOHackMasterListIO) : ITSTOHackMasterListIO;
 
     Property Category[Index : Integer] : ITSTOHackMasterCategoryIO Read Get; Default;
 
@@ -127,8 +135,8 @@ Type
 
 implementation
 
-Uses SysUtils, Classes, Forms, Dialogs, TypInfo, Math, XMLIntf,
-  HsInterfaceEx, HsXmlDocEx, HsStringListEx,
+Uses SysUtils, Forms, Dialogs, TypInfo, Math, XMLIntf,
+  HsXmlDocEx, HsStringListEx,
   TSTOHackMasterListImpl, TSTOHackMasterList.Xml, TSTOHackMasterList.Bin, TSTOScriptTemplateImpl;
 
 Type
@@ -213,7 +221,10 @@ Type
     Procedure SaveToFile(Const AFileName : String); OverLoad;
     Procedure SaveToFile(Const AFileName : String; AProject : ITSTOXMLProject; Const ASaveInfo : Boolean = True); OverLoad;
 
-    Procedure BuildMasterList(AProject : ITSTOXMLProject);
+    Function GetDiff(AMasterList : ITSTOHackMasterListIO) : ITSTOHackMasterListIO;
+
+    Procedure BuildMasterList(AProject : ITSTOXMLProject); OverLoad;
+    Procedure BuildMasterList(AProject : ITSTOXMLProject; Const ASaveInfo : Boolean); OverLoad;
     Procedure EnhanceMasterList(AProject : ITSTOXMLProject);
     Function  ListStoreRequirements(Const ACategoryName : String) : String;
 
@@ -231,6 +242,10 @@ Type
 
     Function  BuildStoreRequirements(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildStoreRequirements(Const AFileName : String); OverLoad;
+
+    Function  ListObjectType(ACategory : ITSTOHackMasterCategoryIO) : String;
+    Function  BuildCharacterSkins() : String;
+    Function  BuildBuildingSkins() : String;
 
     Function  BuildFreeItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildFreeItems(Const AFileName : String); OverLoad;
@@ -532,7 +547,7 @@ End;
 
 Procedure TTSTOHackMasterListIOImpl.SetAsXml(Const AXmlString : String);
 Begin
-   Assign(TXmlTSTOHackMasterList.CreateMasterList(AXmlString));
+  Assign(TXmlTSTOHackMasterList.CreateMasterList(AXmlString));
 {
   FXmlImpl := TXmlTSTOHackMasterList.CreateMasterList(AXmlString);
   Try
@@ -646,7 +661,7 @@ Begin
     Try
       Text := FormatXmlData(FXmlImpl.Xml);
       SaveToFile(AFileName);
-      
+
       Finally
         Free();
         FXmlImpl := Nil;
@@ -654,6 +669,92 @@ Begin
   End
   Else
     SaveToFile(AFileName);
+End;
+
+Function TTSTOHackMasterListIOImpl.GetDiff(AMasterList : ITSTOHackMasterListIO) : ITSTOHackMasterListIO;
+Var X, Y, Z : Integer;
+    lCIdx, lPIdx, lIdx : Integer;
+    lCurPkg : ITSTOHackMasterPackageIO;
+    lCurCat : ITSTOHackMasterCategoryIO;
+Begin
+  Result := TTSTOHackMasterListIO.CreateHackMasterList();
+
+  For X := 0 To AMasterList.Count - 1 Do
+  Begin
+    lCIdx := IndexOf(AMasterList[X].Name);
+
+    If lCIdx = -1 Then
+      Result.Add().Assign(AMasterList[X])
+    Else
+    Begin
+      For Y := 0 To AMasterList[X].Count - 1 Do
+      Begin
+        lPIdx := Category[lCIdx].IndexOf(AMasterList[X][Y].PackageType, AMasterList[X][Y].XmlFile);
+
+        If lPIdx = -1 Then
+        Begin
+          lIdx := Result.IndexOf(AMasterList[X].Name);
+
+          If lIdx = -1 Then
+          Begin
+            lCurCat := Result.Add();
+
+            With lCurCat Do
+            Begin
+              Name       := AMasterList[X].Name;
+              Enabled    := AMasterList[X].Enabled;
+              BuildStore := AMasterList[X].BuildStore;
+            End;
+          End
+          Else
+            lCurCat := Result[lIdx];
+
+          lCurCat.Add().Assign(AMasterList[X][Y]);
+        End
+        Else
+        Begin
+          For Z := 0 To AMasterList[X][Y].Count - 1 Do
+          Begin
+            lIdx := Category[lCIdx][lPIdx].IndexOf(AMasterList[X][Y][Z].Id);
+
+            If lIdx = -1 Then
+            Begin
+              lIdx := Result.IndexOf(AMasterList[X].Name);
+
+              If lIdx = -1 Then
+              Begin
+                lCurCat := Result.Add();
+
+                With lCurCat Do
+                Begin
+                  Name       := AMasterList[X].Name;
+                  Enabled    := AMasterList[X].Enabled;
+                  BuildStore := AMasterList[X].BuildStore;
+                End;
+              End
+              Else
+                lCurCat := Result[lIdx];
+
+              lIdx := lCurCat.IndexOf(AMasterList[X][Y].PackageType, AMasterList[X][Y].XmlFile);
+
+              If lIdx = -1 Then
+              Begin
+                lCurPkg := lCurCat.Add();
+
+                lCurPkg.PackageType := AMasterList[X][Y].PackageType;
+                lCurPkg.XmlFile     := AMasterList[X][Y].XmlFile;
+                lCurPkg.Enabled     := AMasterList[X][Y].Enabled;
+              End
+              Else
+                lCurPkg := lCurCat[lIdx];
+
+              lCurPkg.Add().Assign(AMasterList[X][Y][Z]);
+            End;
+          End;
+        End;
+      End;
+    End;
+  End;
 End;
 
 Procedure TTSTOHackMasterListIOImpl.BuildMasterList(AProject : ITSTOXMLProject);
@@ -759,8 +860,6 @@ Begin
                     Begin
                       Id         := AttributeNodes['id'].NodeValue;
                       Name       := AttributeNodes['name'].NodeValue;
-                      AddInStore := True;
-                      OverRide   := True;
                     End;
 
                     Except
@@ -782,6 +881,16 @@ Begin
       End;
 End;
 
+Procedure TTSTOHackMasterListIOImpl.BuildMasterList(AProject : ITSTOXMLProject; Const ASaveInfo : Boolean);
+Begin
+  BuildMasterList(AProject);
+  If ASaveInfo Then
+  Begin
+    EnhanceMasterList(AProject);
+    SetAsXml(FormatXmlData(FXmlImpl.Xml));
+  End;
+End;
+
 Procedure TTSTOHackMasterListIOImpl.EnhanceMasterList(AProject : ITSTOXMLProject);
 Var X, Y, Z    : Integer;
     lXmlSrc    : IXmlDocumentEx;
@@ -792,9 +901,8 @@ Var X, Y, Z    : Integer;
     lNodeAttr  : IXmlNodeEx;
     lIsUnique  : Boolean;
 Begin
+  lXmlMLHack := XmlImpl.OwnerDocument;
   Try
-    lXmlMLHack := XmlImpl.OwnerDocument;
-
     For X := 0 To Count - 1 Do
     Begin
       For Y := 0 To Category[X].Count - 1 Do
@@ -819,8 +927,38 @@ Begin
                 lNodeML := lXmlMLHack.SelectNode('//Package[@XmlFile="' + Category[X][Y].XmlFile + '"]/DataID[@id="' + IntToStr(Category[X][Y][Z].Id) + '" and @name="' + Category[X][Y][Z].Name + '"]');
                 If Assigned(lNodeML) Then
                 Try
+                  lNodeML.Attributes['AddInStore'] := True;
+                  lNodeML.Attributes['OverRide']   := True;
+
                   If SameText(Category[X][Y].PackageType, 'Consumable') And lNodeSrc.HasAttribute('type') Then
+                  Begin
                     lNodeML.Attributes['Type'] := lNodeSrc.AttributeNodes['type'].Text;
+
+                    If SameText(lNodeSrc.AttributeNodes['type'].Text, 'Script') Or
+                       SameText(lNodeSrc.AttributeNodes['type'].Text, 'Prestige') Or
+                       SameText(lNodeSrc.AttributeNodes['type'].Text, 'PrizeBox') Then
+                    Begin
+                      lNodeML.Attributes['AddInStore'] := False;
+                      lNodeML.Attributes['OverRide']   := False;
+                    End
+                    Else If ( SameText(lNodeSrc.AttributeNodes['type'].Text, 'CharacterSkin') Or
+                              SameText(lNodeSrc.AttributeNodes['type'].Text, 'BuildingSkin') ) And
+                            lNodeSrc.HasAttribute('object') Then
+                      lNodeML.Attributes['SkinObject'] := lNodeSrc.AttributeNodes['object'].Text;
+                  End;
+
+                  If SameText(Category[X][Y].PackageType, 'Character') Then
+                  Begin
+                    lNodeAttr := lXmlSrc.SelectNode('Set', lNodeSrc);
+                    If Assigned(lNodeAttr) Then
+                      lNodeML.ChildNodes.Add(lNodeAttr.CloneNode(True))
+                    Else
+                    Begin
+                      lNodeML.Attributes['AddInStore'] := False;
+                      lNodeML.Attributes['OverRide']   := False;
+                      lNodeML.Attributes['NPCCharacter'] := True;
+                    End;
+                  End;
 
                   lNodeAttr := lXmlSrc.SelectNode('Cost', lNodeSrc);
                   If Assigned(lNodeAttr) Then
@@ -2652,5 +2790,94 @@ Begin
   End;
 End;
 
+Function TTSTOHackMasterListIOImpl.ListObjectType(ACategory : ITSTOHackMasterCategoryIO) : String;
+  Procedure InternalAddItem(ACategory : ITSTOHackMasterCategoryIO;
+    APackage : ITSTOHackMasterPackageIO;
+    AItem : ITSTOHackMasterDataIDIO);
+  Var lIdx    : Integer;
+      lCurPkg : ITSTOHackMasterPackageIO;
+  Begin
+    lIdx := ACategory.IndexOf(APackage.PackageType, APackage.XmlFile);
+    If lIdx = -1 Then
+    Begin
+      lCurPkg := ACategory.Add();
+
+      lCurPkg.PackageType := APackage.PackageType;
+      lCurPkg.XmlFile     := APackage.XmlFile;
+      lCurPkg.Enabled     := True;
+    End
+    Else
+      lCurPkg := ACategory[lIdx];
+
+    If lCurPkg.IndexOf(AItem.Id) = -1 Then
+    Begin
+      With lCurPkg.Add() Do
+      Begin
+        Id           := AItem.Id;
+        Name         := AItem.Name;
+        AddInStore   := AItem.AddInStore;
+        OverRide     := AItem.OverRide;
+        IsBadItem    := AItem.IsBadItem;
+        ObjectType   := AItem.ObjectType;
+        NPCCharacter := AItem.NPCCharacter;
+        SkinObject   := AItem.SkinObject;
+      End;
+    End;
+  End;
+
+Var X, Y, Z : Integer;
+Begin
+  For X := 0 To Count - 1 Do
+    For Y := 0 To Category[X].Count - 1 Do
+      For Z := 0 To Category[X][Y].Count - 1 Do
+        If SameText(Category[X][Y][Z].ObjectType, ACategory.Name) Then
+          InternalAddItem(ACategory, Category[X][Y], Category[X][Y][Z]);
+End;
+
+Function TTSTOHackMasterListIOImpl.BuildCharacterSkins() : String;
+Var lHML    : ITSTOHackMasterListIO;
+    lCurCat : ITSTOHackMasterCategoryIO;
+Begin
+  lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+  Try
+    lCurCat := lHML.Add();
+    With lCurCat Do
+    Begin
+      Name       := 'CharacterSkin';
+      BuildStore := True;
+      Enabled    := True;
+    End;
+
+    ListObjectType(lCurCat);
+
+    Result := lHML.AsXml;
+
+    Finally
+      lHML := Nil;
+  End;
+End;
+
+Function TTSTOHackMasterListIOImpl.BuildBuildingSkins() : String;
+Var lHML    : ITSTOHackMasterListIO;
+    lCurCat : ITSTOHackMasterCategoryIO;
+Begin
+  lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+  Try
+    lCurCat := lHML.Add();
+    With lCurCat Do
+    Begin
+      Name       := 'BuildingSkin';
+      BuildStore := True;
+      Enabled    := True;
+    End;
+
+    ListObjectType(lCurCat);
+
+    Result := lHML.AsXml;
+
+    Finally
+      lHML := Nil;
+  End;
+End;
 
 end.

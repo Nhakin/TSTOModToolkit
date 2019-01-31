@@ -23,6 +23,7 @@ Type
     Procedure SaveToFile(); OverLoad;
     Procedure SaveToFile(Const AFileName : String); OverLoad;
 
+    Procedure NewHackFile();
     Procedure ExtractHackSource(Const AFileFormat : THackIdxFileFormat; APath : String = '');
     Procedure PackHackSource(Const AFileFormat : THackIdxFileFormat; Const AIndexFile, AFileName : String);
 
@@ -157,6 +158,7 @@ Type
     Procedure SaveToFile(Const AFileName : String); OverLoad;
     Procedure SaveToFile(); OverLoad;
 
+    Procedure NewHackFile();
     Procedure ExtractHackSource(Const AFileFormat : THackIdxFileFormat; APath : String = '');
     Procedure PackHackSource(Const AFileFormat : THackIdxFileFormat; Const AIndexFile, AFileName : String);
 
@@ -645,15 +647,155 @@ Begin
     End;
   End;
 
+  If Assigned(FHackMasterList) Then
+  Begin
+    lIdx := HackCfgFiles.IndexOf(hiftHackMasterList);
+    If lIdx > -1 Then
+    Begin
+      If HackCfgFiles[lIdx].FileFormat = hiffBin Then
+      Begin
+        lMemStrm := TMemoryStreamEx.Create();
+        Try
+          FHackMasterList.SaveToStream(lMemStrm);
+          lMemStrm.Position := 0;
+          AddFromStream(HackCfgFiles[lIdx].FileName, lMemStrm);
+
+          Finally
+            lMemStrm := Nil;
+        End;
+      End
+      Else If HackCfgFiles[lIdx].FileFormat = hiffXml Then
+      Begin
+        lStrStrm := TStringStreamEx.Create(FHackMasterList.AsXml);
+        Try
+          lStrStrm.Position := 0;
+          AddFromStream(HackCfgFiles[lIdx].FileName, lStrStrm);
+
+          Finally
+            lStrStrm := Nil;
+        End;
+      End;
+    End;
+  End;
+
   If (Assigned(FScriptTemplates) And FScriptTemplates.Modified) Or
      (Assigned(FCustomPatches) And FCustomPatches.Modified) Or
-     (Assigned(FTextPools) And FTextPools.Modified) Then
+     (Assigned(FTextPools) And FTextPools.Modified) Or
+     (Assigned(FHackMasterList)) Then
     InHerited SaveToFile(AFileName);
 End;
 
 Procedure TTSTOHackSettingsImpl.SaveToFile();
 Begin
   SaveToFile(FFileName);
+End;
+
+Procedure TTSTOHackSettingsImpl.NewHackFile();
+Var lZip : IHsMemoryZipper;
+    lMemStrm : IMemoryStreamEx;
+    lStrStrm : IStringstreamEx;
+    lIdx : Integer;
+Begin
+  With HackCfgFiles Do
+  Begin
+    Clear();
+
+    With Add() Do
+    Begin
+      FileName   := 'CustomPatches';
+      FileType   := hiftCustomPatch;
+      FileFormat := hiffBin;
+    End;
+
+    With Add() Do
+    Begin
+      FileName   := 'HackFilesTemplate';
+      FileType   := hiftHackTemplate;
+      FileFormat := hiffBin;
+    End;
+
+    With Add() Do
+    Begin
+      FileName   := 'HackMasterList';
+      FileType   := hiftHackMasterList;
+      FileFormat := hiffBin;
+    End;
+
+    With Add() Do
+    Begin
+      FileName   := 'TextPools';
+      FileType   := hiftTextPools;
+      FileFormat := hiffBin;
+    End;
+
+    With Add() Do
+    Begin
+      FileName   := 'GameScripts';
+      FileType   := hiftTextPools;
+      FileFormat := hiffZip;
+    End;
+
+    lMemStrm := TMemoryStreamEx.Create();
+    Try
+      FHackCfgFiles.SaveToStream(lMemStrm);
+      lMemStrm.Position := 0;
+      AddFromStream('HackIdx', lMemStrm);
+      lMemStrm.Clear();
+
+      lIdx := HackCfgFiles.IndexOf(hiftCustomPatch);
+      If lIdx > -1 Then
+      Begin
+        lStrStrm := TStringstreamEx.Create(GetCustomPatches().AsXml);
+        Try
+          lStrStrm.Position := 0;
+          AddFromStream(HackCfgFiles[lIdx].FileName, lStrStrm);
+
+          Finally
+            lStrStrm := Nil;
+        End;
+      End;
+
+      lIdx := HackCfgFiles.IndexOf(hiftTextPools);
+      If lIdx > -1 Then
+      Begin
+        GetTextPools().SaveToStream(lMemStrm);
+        lMemStrm.Position := 0;
+        AddFromStream(HackCfgFiles[lIdx].FileName, lMemStrm);
+      End;
+      lMemStrm.Clear();
+
+      lIdx := HackCfgFiles.IndexOf(hiftHackMasterList);
+      If lIdx > -1 Then
+      Begin
+        GetHackMasterList().SaveToStream(lMemStrm);
+        lMemStrm.Position := 0;
+        AddFromStream(HackCfgFiles[lIdx].FileName, lMemStrm);
+      End;
+      lMemStrm.Clear();
+
+      lIdx := HackCfgFiles.IndexOf(hiftHackTemplate);
+      If lIdx > -1 Then
+      Begin
+        GetScriptTemplates().SaveToStream(lMemStrm);
+        lMemStrm.Position := 0;
+        AddFromStream(HackCfgFiles[lIdx].FileName, lMemStrm);
+      End;
+      lMemStrm.Clear();
+
+      //Create an empty zip file
+      lMemStrm.WriteDWord($504B0506, True);
+      lMemStrm.WriteDWord($0);
+      lMemStrm.WriteDWord($0);
+      lMemStrm.WriteDWord($0);
+      lMemStrm.WriteDWord($0);
+      lMemStrm.WriteWord($0);
+
+      lMemStrm.Position := 0;
+      AddFromStream('GameScripts', lMemStrm);
+      Finally
+        lMemStrm := Nil;
+    End;
+  End;
 End;
 
 Procedure TTSTOHackSettingsImpl.ExtractHackSource(Const AFileFormat : THackIdxFileFormat; APath : String = '');

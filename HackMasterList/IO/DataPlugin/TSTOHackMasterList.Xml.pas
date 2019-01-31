@@ -22,16 +22,28 @@ Type
     Function  GetIsBadItem() : Boolean;
     Procedure SetIsBadItem(Const AIsBadItem : Boolean);
 
+    Function  GetObjectType() : String;
+    Procedure SetObjectType(Const AObjectType : String);
+
+    Function  GetNPCCharacter() : Boolean;
+    Procedure SetNPCCharacter(Const ANPCCharacter : Boolean);
+
+    Function  GetSkinObject() : String;
+    Procedure SetSkinObject(Const ASkinObject : String);
+
     Function  GetMiscData() : IHsStringListEx;
 
     Procedure Assign(ASource : IInterface);
 
-    Property Id         : Integer         Read GetId         Write SetId;
-    Property Name       : String          Read GetName       Write SetName;
-    Property AddInStore : Boolean         Read GetAddInStore Write SetAddInStore;
-    Property OverRide   : Boolean         Read GetOverRide   Write SetOverRide;
-    Property IsBadItem  : Boolean         Read GetIsBadItem  Write SetIsBadItem;
-    Property MiscData   : IHsStringListEx Read GetMiscData;
+    Property Id           : Integer         Read GetId           Write SetId;
+    Property Name         : String          Read GetName         Write SetName;
+    Property AddInStore   : Boolean         Read GetAddInStore   Write SetAddInStore;
+    Property OverRide     : Boolean         Read GetOverRide     Write SetOverRide;
+    Property IsBadItem    : Boolean         Read GetIsBadItem    Write SetIsBadItem;
+    Property ObjectType   : String          Read GetObjectType   Write SetObjectType;
+    Property NPCCharacter : Boolean         Read GetNPCCharacter Write SetNPCCharacter;
+    Property SkinObject   : String          Read GetSkinObject   Write SetSkinObject;
+    Property MiscData     : IHsStringListEx Read GetMiscData;
 
   End;
 
@@ -141,12 +153,21 @@ Type
     Function  GetIsBadItem() : Boolean;
     Procedure SetIsBadItem(Const AIsBadItem : Boolean);
 
+    Function  GetObjectType() : String;
+    Procedure SetObjectType(Const AObjectType : String);
+
+    Function  GetNPCCharacter() : Boolean;
+    Procedure SetNPCCharacter(Const ANPCCharacter : Boolean);
+
+    Function  GetSkinObject() : String;
+    Procedure SetSkinObject(Const ASkinObject : String);
+
     Function  GetMiscData() : IHsStringListEx; //All ChidNodes of <DataID/>
 
     Procedure Assign(ASource : IInterface);
 
   Public
-    Procedure AfterConstruction; Override;
+    Procedure AfterConstruction; OverRide;
 
   End;
 
@@ -366,8 +387,11 @@ Begin
     Clear();
 
     SetName(lXmlSrc.Name);
-    SetEnabled(lXmlSrc.Enabled);
-    SetBuildStore(lXmlSrc.BuildStore);
+    If Not lXmlSrc.Enabled Then
+      SetEnabled(lXmlSrc.Enabled);
+    If Not lXmlSrc.BuildStore Then
+      SetBuildStore(lXmlSrc.BuildStore);
+
     For X := 0 To lXmlSrc.Count - 1 Do
       Add().Assign(lXmlSrc[X]);
   End
@@ -376,8 +400,11 @@ Begin
     Clear();
 
     SetName(lSrc.Name);
-    SetEnabled(lSrc.Enabled);
-    SetBuildStore(lSrc.BuildStore);
+    If Not lSrc.Enabled Then
+      SetEnabled(lSrc.Enabled);
+    If Not lSrc.BuildStore Then
+      SetBuildStore(lSrc.Enabled);
+
     For X := 0 To lSrc.Count - 1 Do
       Add().Assign(lSrc[X]);
 
@@ -415,9 +442,9 @@ End;
 Function TTSTOXMLCategory.GetEnabled() : Boolean;
 Begin
   If VarIsNull(AttributeNodes['Enabled'].NodeValue) Then
-    Result := False
+    Result := True
   Else If VarIsStr(AttributeNodes['Enabled'].NodeValue) Then
-    Result := StrToBoolDef(AttributeNodes['Enabled'].NodeValue, False)
+    Result := StrToBoolDef(AttributeNodes['Enabled'].NodeValue, True)
   Else If VarIsNumeric(AttributeNodes['Enabled'].NodeValue) Then
     Result := AttributeNodes['Enabled'].NodeValue <> 0
   Else
@@ -426,7 +453,8 @@ End;
 
 Procedure TTSTOXMLCategory.SetEnabled(Const AEnabled : Boolean);
 Begin
-  SetAttribute('Enabled', AEnabled);
+  If Not AEnabled Then
+    SetAttribute('Enabled', AEnabled);
 
   If Assigned(FCategoryImpl) Then
     FCategoryImpl.Enabled := AEnabled;
@@ -435,9 +463,9 @@ End;
 Function TTSTOXMLCategory.GetBuildStore() : Boolean;
 Begin
   If VarIsNull(AttributeNodes['BuildStore'].NodeValue) Then
-    Result := False
+    Result := True
   Else If VarIsStr(AttributeNodes['BuildStore'].NodeValue) Then
-    Result := StrToBoolDef(AttributeNodes['BuildStore'].NodeValue, False)
+    Result := StrToBoolDef(AttributeNodes['BuildStore'].NodeValue, True)
   Else If VarIsNumeric(AttributeNodes['BuildStore'].NodeValue) Then
     Result := AttributeNodes['BuildStore'].NodeValue <> 0
   Else
@@ -446,7 +474,8 @@ End;
 
 Procedure TTSTOXMLCategory.SetBuildStore(Const ABuildStore : Boolean);
 Begin
-  SetAttribute('BuildStore', ABuildStore);
+  If Not ABuildStore Then
+    SetAttribute('BuildStore', ABuildStore);
 
   If Assigned(FCategoryImpl) Then
     FCategoryImpl.BuildStore := ABuildStore;
@@ -499,7 +528,8 @@ Begin
 
     SetPackageType(lXmlSrc.PackageType);
     SetXmlFile(lXmlSrc.XmlFile);
-    SetEnabled(lXmlSrc.Enabled);
+    If Not lXmlSrc.Enabled Then
+      SetEnabled(lXmlSrc.Enabled);
 
     For X := 0 To lXmlSrc.Count - 1 Do
       Add().Assign(lXmlSrc[X]);
@@ -510,7 +540,8 @@ Begin
 
     SetPackageType(lSrc.PackageType);
     SetXmlFile(lSrc.XmlFile);
-    SetEnabled(lSrc.Enabled);
+    If Not lSrc.Enabled Then
+      SetEnabled(lSrc.Enabled);
 
     For X := 0 To lSrc.Count - 1 Do
       Add().Assign(lSrc[X]);
@@ -529,7 +560,7 @@ Begin
   ATarget.PackageType := GetPackageType();
   ATarget.XmlFile := GetXmlFile();
   ATarget.Enabled := GetEnabled();
-  
+
   For X := 0 To Count - 1 Do
     If Supports(List[X], ITSTOHackMasterDataID, lItem) Then
       ATarget.Add().Assign(lItem);
@@ -564,9 +595,9 @@ End;
 Function TTSTOXMLPackage.GetEnabled() : Boolean;
 Begin
   If VarIsNull(AttributeNodes['Enabled'].NodeValue) Then
-    Result := False
+    Result := True
   Else If VarIsStr(AttributeNodes['Enabled'].NodeValue) Then
-    Result := StrToBoolDef(AttributeNodes['Enabled'].NodeValue, False)
+    Result := StrToBoolDef(AttributeNodes['Enabled'].NodeValue, True)
   Else If VarIsNumeric(AttributeNodes['Enabled'].NodeValue) Then
     Result := AttributeNodes['Enabled'].NodeValue <> 0
   Else
@@ -575,7 +606,8 @@ End;
 
 Procedure TTSTOXMLPackage.SetEnabled(Const AEnabled : Boolean);
 Begin
-  SetAttribute('Enabled', AEnabled);
+  If Not AEnabled Then
+    SetAttribute('Enabled', AEnabled);
 
   If Assigned(FMasterImpl) Then
     FMasterImpl.Enabled := AEnabled;
@@ -636,9 +668,19 @@ Begin
   Begin
     SetId(lXmlSrc.Id);
     SetName(lXmlSrc.Name);
-    SetAddInStore(lXmlSrc.AddInStore);
-    SetOverRide(lXmlSrc.OverRide);
-    SetIsBadItem(lXmlSrc.IsBadItem);
+
+    If Not lXmlSrc.AddInStore Then
+      SetAddInStore(lXmlSrc.AddInStore);
+    If Not lXmlSrc.OverRide Then
+      SetOverRide(lXmlSrc.OverRide);
+    If lXmlSrc.IsBadItem Then
+      SetIsBadItem(lXmlSrc.IsBadItem);
+    If lXmlSrc.ObjectType <> '' Then
+      SetObjectType(lXmlSrc.ObjectType);
+    If lXmlSrc.NPCCharacter Then
+      SetNPCCharacter(lXmlSrc.NPCCharacter);
+    If lXmlSrc.SkinObject <> '' Then
+      SetSkinObject(lXmlSrc.SkinObject);
 
     If lXmlSrc.MiscData.Text <> '' Then
     Begin
@@ -651,9 +693,19 @@ Begin
   Begin
     SetId(lSrc.Id);
     SetName(lSrc.Name);
-    SetAddInStore(lSrc.AddInStore);
-    SetOverRide(lSrc.OverRide);
-    SetIsBadItem(lSrc.IsBadItem);
+
+    If Not lSrc.AddInStore Then
+      SetAddInStore(lSrc.AddInStore);
+    If Not lSrc.OverRide Then
+      SetOverRide(lSrc.OverRide);
+    If lSrc.IsBadItem Then
+      SetIsBadItem(lSrc.IsBadItem);
+    If lSrc.ObjectType <> '' Then
+      SetObjectType(lSrc.ObjectType);
+    If lSrc.NPCCharacter Then
+      SetNPCCharacter(lSrc.NPCCharacter);
+    If lSrc.SkinObject <> '' Then
+      SetSkinObject(lSrc.SkinObject);
 
     If lSrc.MiscData.Text <> '' Then
     Begin
@@ -697,9 +749,9 @@ End;
 Function TTSTOXMLDataID.GetAddInStore() : Boolean;
 Begin
   If VarIsNull(AttributeNodes['AddInStore'].NodeValue) Then
-    Result := False
+    Result := True
   Else If VarIsStr(AttributeNodes['AddInStore'].NodeValue) Then
-    Result := StrToBoolDef(AttributeNodes['AddInStore'].NodeValue, False)
+    Result := StrToBoolDef(AttributeNodes['AddInStore'].NodeValue, True)
   Else If VarIsNumeric(AttributeNodes['AddInStore'].NodeValue) Then
     Result := AttributeNodes['AddInStore'].NodeValue <> 0
   Else
@@ -708,7 +760,8 @@ End;
 
 Procedure TTSTOXMLDataID.SetAddInStore(Const AAddInStore : Boolean);
 Begin
-  SetAttribute('AddInStore', AAddInStore);
+  If Not AAddInStore Then
+    SetAttribute('AddInStore', AAddInStore);
 
   If Not IsImplementorOf(DataIDImpl) Then
     DataIDImpl.AddInStore := AAddInStore;
@@ -717,9 +770,9 @@ End;
 Function TTSTOXMLDataID.GetOverRide() : Boolean;
 Begin
   If VarIsNull(AttributeNodes['OverRide'].NodeValue) Then
-    Result := False
+    Result := True
   Else If VarIsStr(AttributeNodes['OverRide'].NodeValue) Then
-    Result := StrToBoolDef(AttributeNodes['OverRide'].NodeValue, False)
+    Result := StrToBoolDef(AttributeNodes['OverRide'].NodeValue, True)
   Else If VarIsNumeric(AttributeNodes['OverRide'].NodeValue) Then
     Result := AttributeNodes['OverRide'].NodeValue <> 0
   Else
@@ -728,7 +781,8 @@ End;
 
 Procedure TTSTOXMLDataID.SetOverRide(Const AOverRide : Boolean);
 Begin
-  SetAttribute('OverRide', AOverRide);
+  If Not AOverRide Then
+    SetAttribute('OverRide', AOverRide);
 
   If Not IsImplementorOf(DataIDImpl) Then
     DataIDImpl.OverRide := AOverRide;
@@ -748,10 +802,63 @@ End;
 
 Procedure TTSTOXMLDataID.SetIsBadItem(Const AIsBadItem : Boolean);
 Begin
-  SetAttribute('IsBadItem', AIsBadItem);
+  If AIsBadItem Then
+    SetAttribute('IsBadItem', AIsBadItem);
 
   If Not IsImplementorOf(DataIDImpl) Then
     DataIDImpl.IsBadItem := AIsBadItem;
 End;
 
-End.  
+Function TTSTOXMLDataID.GetObjectType() : String;
+Begin
+  If VarIsNull(AttributeNodes['Type'].NodeValue) Then
+    Result := ''
+  Else
+    Result := AttributeNodes['Type'].NodeValue;
+End;
+
+Procedure TTSTOXMLDataID.SetObjectType(Const AObjectType : String);
+Begin
+  If AObjectType <> '' Then
+    SetAttribute('Type', AObjectType);
+
+  If Not IsImplementorOf(DataIDImpl) Then
+    DataIDImpl.ObjectType := AObjectType;
+End;
+
+Function TTSTOXMLDataID.GetNPCCharacter() : Boolean;
+Begin
+  If VarIsNull(AttributeNodes['NPCCharacter'].NodeValue) Then
+    Result := False
+  Else If VarIsStr(AttributeNodes['NPCCharacter'].NodeValue) Then
+    Result := StrToBoolDef(AttributeNodes['NPCCharacter'].NodeValue, False)
+  Else If VarIsNumeric(AttributeNodes['NPCCharacter'].NodeValue) Then
+    Result := AttributeNodes['NPCCharacter'].NodeValue <> 0
+  Else
+    Raise Exception.Create('Invalid data type ' + IntToStr(VarType(AttributeNodes['NPCCharacter'].NodeValue)) + '.');
+End;
+
+Procedure TTSTOXMLDataID.SetNPCCharacter(Const ANPCCharacter : Boolean);
+Begin
+  If ANPCCharacter Then
+    SetAttribute('NPCCharacter', ANPCCharacter);
+
+  If Not IsImplementorOf(DataIDImpl) Then
+    DataIDImpl.NPCCharacter := ANPCCharacter;
+End;
+
+Function TTSTOXMLDataID.GetSkinObject() : String;
+Begin
+  Result := AttributeNodes['SkinObject'].Text;
+End;
+
+Procedure TTSTOXMLDataID.SetSkinObject(Const ASkinObject : String);
+Begin
+  If ASkinObject <> '' Then
+    SetAttribute('SkinObject', ASkinObject);
+
+  If Not IsImplementorOf(DataIDImpl) Then
+    DataIDImpl.SkinObject := ASkinObject;
+End;
+
+End.

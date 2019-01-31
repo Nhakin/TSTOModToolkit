@@ -85,6 +85,8 @@ Type
     Procedure SaveToStream(ATarget : IStreamEx);
     Procedure SaveToFile(Const AFileName : String);
 
+    Procedure ForceChanged();
+
     Procedure CreateWsGroupProject(APath : String; Const AHackFileName : String);
     Procedure CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProjectIO);
     Procedure GenerateScripts(AProject : ITSTOWorkSpaceProjectIO);
@@ -239,6 +241,8 @@ Type
 
     Procedure SaveToStream(ATarget : IStreamEx);
     Procedure SaveToFile(Const AFileName : String);
+
+    Procedure ForceChanged();
 
     Procedure CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProjectIO);
     Procedure CreateWsGroupProject(APath : String; Const AHackFileName : String);
@@ -582,6 +586,11 @@ Begin
   Result := FModified;
 End;
 
+Procedure TTSTOWorkSpaceProjectGroupIOImpl.ForceChanged();
+Begin
+  DoOnChange(Self);
+End;
+
 Procedure TTSTOWorkSpaceProjectGroupIOImpl.DoOnChange(Sender : TObject);
 Begin
   If Assigned(FOnChange) Then
@@ -648,6 +657,7 @@ Procedure TTSTOWorkSpaceProjectGroupIOImpl.SaveToStream(ATarget : IStreamEx);
 Begin
   BinImpl.SaveToStream(ATarget);
   FBinImpl := Nil;
+  FModified := False;
 End;
 
 Procedure TTSTOWorkSpaceProjectGroupIOImpl.SaveToFile(Const AFileName : String);
@@ -677,6 +687,8 @@ Begin
 
   If Assigned(FHackSettings) Then
     FHackSettings.SaveToFile();
+
+  FModified := False;
 End;
 
 Procedure TTSTOWorkSpaceProjectGroupIOImpl.CreateWsProject(APath : String; AProject : ITSTOWorkSpaceProjectIO);

@@ -30,6 +30,8 @@ Type
   TBinTSTOHackMasterListImpl = Class(TTSTOHackMasterList, IBinTSTOHackMasterList)
   Private
     Procedure LoadFromStreamV001(AStream : IStreamEx);
+    Procedure LoadFromStreamV002(AStream : IStreamEx);
+    Procedure LoadFromStreamV003(AStream : IStreamEx);
 
   Protected
     Procedure LoadFromStream(AStream : IStreamEx);
@@ -62,13 +64,135 @@ End;
 (******************************************************************************)
 
 Const
-  cFileVersion = 1;
+  cFileVersion = 3;
 
   cCategoryEnabled = 1;
   cBuildStore = 2;
   cBadItem = 4;
+  cNPCCharacter = 8;
   cAddInStore = 1;
   cOverRide = 2;
+
+Procedure TBinTSTOHackMasterListImpl.LoadFromStreamV003(AStream : IStreamEx);
+Var X, Y, Z, W : Integer;
+    lItemFlags : Byte;
+Begin
+  X := AStream.ReadWord();
+  While X > 0 Do
+  Begin
+    With Add() Do
+    Begin
+      Name       := AStream.ReadAnsiString();
+      lItemFlags := AStream.ReadByte();
+      Enabled    := lItemFlags And cCategoryEnabled = cCategoryEnabled;
+      BuildStore := lItemFlags And cBuildStore = cBuildStore;
+
+      Y := AStream.ReadByte();
+      While Y > 0 Do
+      Begin
+        With Add() Do
+        Begin
+          PackageType := AStream.ReadAnsiString();
+          XmlFile     := AStream.ReadAnsiString();
+          Enabled     := AStream.ReadBoolean();
+
+          Z := AStream.ReadByte();
+          While Z > 0 Do
+          Begin
+            With Add() Do
+            Begin
+              Id           := AStream.ReadDWord();
+              Name         := AStream.ReadAnsiString();
+              lItemFlags   := AStream.ReadByte();
+              AddInStore   := lItemFlags And cAddInStore = cAddInStore;
+              OverRide     := lItemFlags And cOverRide = cOverRide;
+              IsBadItem    := lItemFlags And cBadItem = cBadItem;
+              NPCCharacter := lItemFlags And cNPCCharacter = cNPCCharacter;
+              ObjectType   := AStream.ReadAnsiString();
+              SkinObject   := AStream.ReadAnsiString();
+
+              W := AStream.ReadWord();
+              MiscData.Add('<MiscData>');
+              While W > 0 Do
+              Begin
+                MiscData.Add(AStream.ReadAnsiString());
+
+                Dec(W);
+              End;
+              MiscData.Add('</MiscData>');
+
+              Dec(Z);
+            End;
+          End;
+        End;
+
+        Dec(Y);
+      End;
+    End;
+
+    Dec(X);
+  End;
+End;
+
+Procedure TBinTSTOHackMasterListImpl.LoadFromStreamV002(AStream : IStreamEx);
+Var X, Y, Z, W : Integer;
+    lItemFlags : Byte;
+Begin
+  X := AStream.ReadWord();
+  While X > 0 Do
+  Begin
+    With Add() Do
+    Begin
+      Name       := AStream.ReadAnsiString();
+      lItemFlags := AStream.ReadByte();
+      Enabled    := lItemFlags And cCategoryEnabled = cCategoryEnabled;
+      BuildStore := lItemFlags And cBuildStore = cBuildStore;
+
+      Y := AStream.ReadByte();
+      While Y > 0 Do
+      Begin
+        With Add() Do
+        Begin
+          PackageType := AStream.ReadAnsiString();
+          XmlFile     := AStream.ReadAnsiString();
+          Enabled     := AStream.ReadBoolean();
+
+          Z := AStream.ReadByte();
+          While Z > 0 Do
+          Begin
+            With Add() Do
+            Begin
+              Id           := AStream.ReadDWord();
+              Name         := AStream.ReadAnsiString();
+              lItemFlags   := AStream.ReadByte();
+              AddInStore   := lItemFlags And cAddInStore = cAddInStore;
+              OverRide     := lItemFlags And cOverRide = cOverRide;
+              IsBadItem    := lItemFlags And cBadItem = cBadItem;
+              NPCCharacter := lItemFlags And cNPCCharacter = cNPCCharacter;
+              ObjectType   := AStream.ReadAnsiString();
+
+              W := AStream.ReadWord();
+              MiscData.Add('<MiscData>');
+              While W > 0 Do
+              Begin
+                MiscData.Add(AStream.ReadAnsiString());
+
+                Dec(W);
+              End;
+              MiscData.Add('</MiscData>');
+
+              Dec(Z);
+            End;
+          End;
+        End;
+
+        Dec(Y);
+      End;
+    End;
+
+    Dec(X);
+  End;
+End;
 
 Procedure TBinTSTOHackMasterListImpl.LoadFromStreamV001(AStream : IStreamEx);
 Var X, Y, Z, W : Integer;
@@ -132,6 +256,8 @@ Procedure TBinTSTOHackMasterListImpl.LoadFromStream(AStream : IStreamEx);
 Begin
   Case AStream.ReadByte() Of
     1 : LoadFromStreamV001(AStream);
+    2 : LoadFromStreamV002(AStream);
+    3 : LoadFromStreamV003(AStream);
 
     Else
       Raise Exception.Create('Invalid file version');
@@ -176,11 +302,15 @@ Begin
           lItemFlags := lItemFlags Or cOverRide;
         If Category[X][Y][Z].IsBadItem Then
           lItemFlags := lItemFlags Or cBadItem;
+        If Category[X][Y][Z].NPCCharacter Then
+          lItemFlags := lItemFlags Or cNPCCharacter;
+
         AStream.WriteByte(lItemFlags);
-//(AStream As IMemoryStreamEx).SaveToFile('00DebugHML.bin');
+        AStream.WriteAnsiString(Category[X][Y][Z].ObjectType);
+        AStream.WriteAnsiString(Category[X][Y][Z].SkinObject);
+
         AStream.WriteWord(Max(Category[X][Y][Z].MiscData.Count - 2, 0));
-//(AStream As IMemoryStreamEx).SaveToFile('01DebugHML.bin');
-//Abort;
+
         For W := 1 To Category[X][Y][Z].MiscData.Count - 2 Do
           AStream.WriteAnsiString(Category[X][Y][Z].MiscData[W]);
       End;
