@@ -828,7 +828,7 @@ Exit;
                 If lIdx > -1 Then
                 Begin
                   Category[X][Y][Z].NPCCharacter := lHML[lCIdx][lPIdx][lIdx].NPCCharacter;
-                  Category[X][Y][Z].Character    := lHML[lCIdx][lPIdx][lIdx].Character;
+                  Category[X][Y][Z].SkinObject   := lHML[lCIdx][lPIdx][lIdx].SkinObject;
                 End;
 
                 If Category[X][Y][Z].NPCCharacter Then

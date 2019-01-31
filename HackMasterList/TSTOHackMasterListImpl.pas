@@ -14,7 +14,7 @@ Type
     FIsBadItem    : Boolean;
     FObjectType   : String;
     FNPCCharacter : Boolean;
-    FCharacter    : String;
+    FSkinObject   : String;
     FMiscData     : IHsStringListEx;
 
   Protected
@@ -41,8 +41,8 @@ Type
     Function  GetNPCCharacter() : Boolean;
     Procedure SetNPCCharacter(Const ANPCCharacter : Boolean);
 
-    Function  GetCharacter() : String;
-    Procedure SetCharacter(Const ACharacter : String);
+    Function  GetSkinObject() : String;
+    Procedure SetSkinObject(Const ASkinObject : String);
 
     Function GetMiscData() : IHsStringListEx;
 
@@ -184,7 +184,7 @@ Begin
     FIsBadItem     := lSrc.IsBadItem;
     FObjectType    := lSrc.ObjectType;
     FNPCCharacter  := lSrc.NPCCharacter;
-    FCharacter     := lSrc.Character;
+    FSkinObject    := lSrc.SkinObject;
     FMiscData.Text := lSrc.MiscData.Text;
   End
   Else
@@ -261,14 +261,14 @@ Begin
   FNPCCharacter := ANPCCharacter;
 End;
 
-Function TTSTOHackMasterDataID.GetCharacter() : String;
+Function TTSTOHackMasterDataID.GetSkinObject() : String;
 Begin
-  Result := FCharacter;
+  Result := FSkinObject;
 End;
 
-Procedure TTSTOHackMasterDataID.SetCharacter(Const ACharacter : String);
+Procedure TTSTOHackMasterDataID.SetSkinObject(Const ASkinObject : String);
 Begin
-  FCharacter := ACharacter;
+  FSkinObject := ASkinObject;
 End;
 
 Function TTSTOHackMasterDataID.GetMiscData() : IHsStringListEx;

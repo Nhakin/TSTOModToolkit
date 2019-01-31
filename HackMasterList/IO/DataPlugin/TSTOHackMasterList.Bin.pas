@@ -109,7 +109,7 @@ Begin
               IsBadItem    := lItemFlags And cBadItem = cBadItem;
               NPCCharacter := lItemFlags And cNPCCharacter = cNPCCharacter;
               ObjectType   := AStream.ReadAnsiString();
-              Character    := AStream.ReadAnsiString();
+              SkinObject   := AStream.ReadAnsiString();
 
               W := AStream.ReadWord();
               MiscData.Add('<MiscData>');
@@ -307,7 +307,7 @@ Begin
 
         AStream.WriteByte(lItemFlags);
         AStream.WriteAnsiString(Category[X][Y][Z].ObjectType);
-        AStream.WriteAnsiString(Category[X][Y][Z].Character);
+        AStream.WriteAnsiString(Category[X][Y][Z].SkinObject);
 
         AStream.WriteWord(Max(Category[X][Y][Z].MiscData.Count - 2, 0));
 

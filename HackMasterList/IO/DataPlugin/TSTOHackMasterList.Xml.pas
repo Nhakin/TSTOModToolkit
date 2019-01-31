@@ -28,8 +28,8 @@ Type
     Function  GetNPCCharacter() : Boolean;
     Procedure SetNPCCharacter(Const ANPCCharacter : Boolean);
 
-    Function  GetCharacter() : String;
-    Procedure SetCharacter(Const ACharacter : String);
+    Function  GetSkinObject() : String;
+    Procedure SetSkinObject(Const ASkinObject : String);
 
     Function  GetMiscData() : IHsStringListEx;
 
@@ -42,7 +42,7 @@ Type
     Property IsBadItem    : Boolean         Read GetIsBadItem    Write SetIsBadItem;
     Property ObjectType   : String          Read GetObjectType   Write SetObjectType;
     Property NPCCharacter : Boolean         Read GetNPCCharacter Write SetNPCCharacter;
-    Property Character    : String          Read GetCharacter    Write SetCharacter;
+    Property SkinObject   : String          Read GetSkinObject   Write SetSkinObject;
     Property MiscData     : IHsStringListEx Read GetMiscData;
 
   End;
@@ -159,8 +159,8 @@ Type
     Function  GetNPCCharacter() : Boolean;
     Procedure SetNPCCharacter(Const ANPCCharacter : Boolean);
 
-    Function  GetCharacter() : String;
-    Procedure SetCharacter(Const ACharacter : String);
+    Function  GetSkinObject() : String;
+    Procedure SetSkinObject(Const ASkinObject : String);
 
     Function  GetMiscData() : IHsStringListEx; //All ChidNodes of <DataID/>
 
@@ -679,8 +679,8 @@ Begin
       SetObjectType(lXmlSrc.ObjectType);
     If lXmlSrc.NPCCharacter Then
       SetNPCCharacter(lXmlSrc.NPCCharacter);
-    If lXmlSrc.Character <> '' Then
-      SetCharacter(lXmlSrc.Character);
+    If lXmlSrc.SkinObject <> '' Then
+      SetSkinObject(lXmlSrc.SkinObject);
 
     If lXmlSrc.MiscData.Text <> '' Then
     Begin
@@ -704,8 +704,8 @@ Begin
       SetObjectType(lSrc.ObjectType);
     If lSrc.NPCCharacter Then
       SetNPCCharacter(lSrc.NPCCharacter);
-    If lSrc.Character <> '' Then
-      SetCharacter(lSrc.Character);
+    If lSrc.SkinObject <> '' Then
+      SetSkinObject(lSrc.SkinObject);
 
     If lSrc.MiscData.Text <> '' Then
     Begin
@@ -847,18 +847,18 @@ Begin
     DataIDImpl.NPCCharacter := ANPCCharacter;
 End;
 
-Function TTSTOXMLDataID.GetCharacter() : String;
+Function TTSTOXMLDataID.GetSkinObject() : String;
 Begin
-  Result := AttributeNodes['Character'].Text;
+  Result := AttributeNodes['SkinObject'].Text;
 End;
 
-Procedure TTSTOXMLDataID.SetCharacter(Const ACharacter : String);
+Procedure TTSTOXMLDataID.SetSkinObject(Const ASkinObject : String);
 Begin
-  If ACharacter <> '' Then
-    SetAttribute('Character', ACharacter);
+  If ASkinObject <> '' Then
+    SetAttribute('SkinObject', ASkinObject);
 
   If Not IsImplementorOf(DataIDImpl) Then
-    DataIDImpl.Character := ACharacter;
+    DataIDImpl.SkinObject := ASkinObject;
 End;
 
 End.

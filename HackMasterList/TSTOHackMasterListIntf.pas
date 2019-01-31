@@ -28,8 +28,8 @@ Type
     Function  GetNPCCharacter() : Boolean;
     Procedure SetNPCCharacter(Const ANPCCharacter : Boolean);
 
-    Function  GetCharacter() : String;
-    Procedure SetCharacter(Const ACharacter : String);
+    Function  GetSkinObject() : String;
+    Procedure SetSkinObject(Const ASkinObject : String);
 
     Function GetMiscData() : IHsStringListEx;
 
@@ -42,7 +42,7 @@ Type
     Property IsBadItem    : Boolean         Read GetIsBadItem    Write SetIsBadItem;
     Property ObjectType   : String          Read GetObjectType   Write SetObjectType;
     Property NPCCharacter : Boolean         Read GetNPCCharacter Write SetNPCCharacter;
-    Property Character    : String          Read GetCharacter    Write SetCharacter;
+    Property SkinObject   : String          Read GetSkinObject   Write SetSkinObject;
     Property MiscData     : IHsStringListEx Read GetMiscData;
 
   End;
