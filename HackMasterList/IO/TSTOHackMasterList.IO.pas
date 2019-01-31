@@ -2829,7 +2829,7 @@ Function TTSTOHackMasterListIOImpl.BuildCharacterSkins() : String;
         IsBadItem    := AItem.IsBadItem;
         ObjectType   := AItem.ObjectType;
         NPCCharacter := AItem.NPCCharacter;
-        Character    := AItem.Character;
+        SkinObject   := AItem.SkinObject;
       End;
     End;
   End;
