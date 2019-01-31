@@ -439,9 +439,6 @@ Begin
   End;
 End;
 
-<<<<<<< HEAD
-Destructor TTSTOWorkSpaceProjectGroupIOImpl.Destroy();
-=======
 Procedure TTSTOWorkSpaceProjectGroupIOImpl.AfterConstruction();
 Begin
   FModified := False;
@@ -450,7 +447,6 @@ Begin
 End;
 
 Procedure TTSTOWorkSpaceProjectGroupIOImpl.BeforeDestruction();
->>>>>>> refs/remotes/origin/DevVersion
 Begin
   FBinImpl := Nil;
   FXmlImpl := Nil;
