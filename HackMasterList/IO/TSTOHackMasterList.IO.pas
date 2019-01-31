@@ -110,6 +110,7 @@ Type
     Procedure BuildStoreRequirements(Const AFileName : String); OverLoad;
 
     Function  BuildCharacterSkins() : String;
+    Function  BuildBuildingSkins() : String;
 
     Procedure LoadFromStream(ASource : IStreamEx);
     Procedure LoadFromFile(Const AFileName : String);
@@ -242,7 +243,9 @@ Type
     Function  BuildStoreRequirements(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildStoreRequirements(Const AFileName : String); OverLoad;
 
+    Function  ListObjectType(ACategory : ITSTOHackMasterCategoryIO) : String;
     Function  BuildCharacterSkins() : String;
+    Function  BuildBuildingSkins() : String;
 
     Function  BuildFreeItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildFreeItems(Const AFileName : String); OverLoad;
@@ -938,9 +941,10 @@ Begin
                       lNodeML.Attributes['AddInStore'] := False;
                       lNodeML.Attributes['OverRide']   := False;
                     End
-                    Else If SameText(lNodeSrc.AttributeNodes['type'].Text, 'CharacterSkin') And
+                    Else If ( SameText(lNodeSrc.AttributeNodes['type'].Text, 'CharacterSkin') Or
+                              SameText(lNodeSrc.AttributeNodes['type'].Text, 'BuildingSkin') ) And
                             lNodeSrc.HasAttribute('object') Then
-                      lNodeML.Attributes['Character'] := lNodeSrc.AttributeNodes['object'].Text;
+                      lNodeML.Attributes['SkinObject'] := lNodeSrc.AttributeNodes['object'].Text;
                   End;
 
                   If SameText(Category[X][Y].PackageType, 'Character') Then
@@ -2786,37 +2790,24 @@ Begin
   End;
 End;
 
-Function TTSTOHackMasterListIOImpl.BuildCharacterSkins() : String;
+Function TTSTOHackMasterListIOImpl.ListObjectType(ACategory : ITSTOHackMasterCategoryIO) : String;
   Procedure InternalAddItem(ACategory : ITSTOHackMasterCategoryIO;
     APackage : ITSTOHackMasterPackageIO;
-    AItem : ITSTOHackMasterDataIDIO; AResult : ITSTOHackMasterListIO);
-  Var lIdx     : Integer;
-      lCurCat  : ITSTOHackMasterCategoryIO;
-      lCurPkg  : ITSTOHackMasterPackageIO;
+    AItem : ITSTOHackMasterDataIDIO);
+  Var lIdx    : Integer;
+      lCurPkg : ITSTOHackMasterPackageIO;
   Begin
-    lIdx := AResult.IndexOf('CharacterSkins');
+    lIdx := ACategory.IndexOf(APackage.PackageType, APackage.XmlFile);
     If lIdx = -1 Then
     Begin
-      lCurCat := AResult.Add();
-
-      lCurCat.Name       := 'CharacterSkins';
-      lCurCat.BuildStore := True;
-      lCurCat.Enabled    := True;
-    End
-    Else
-      lCurCat := AResult[lIdx];
-
-    lIdx := lCurCat.IndexOf(APackage.PackageType, APackage.XmlFile);
-    If lIdx = -1 Then
-    Begin
-      lCurPkg := lCurCat.Add();
+      lCurPkg := ACategory.Add();
 
       lCurPkg.PackageType := APackage.PackageType;
       lCurPkg.XmlFile     := APackage.XmlFile;
       lCurPkg.Enabled     := True;
     End
     Else
-      lCurPkg := lCurCat[lIdx];
+      lCurPkg := ACategory[lIdx];
 
     If lCurPkg.IndexOf(AItem.Id) = -1 Then
     Begin
@@ -2835,15 +2826,52 @@ Function TTSTOHackMasterListIOImpl.BuildCharacterSkins() : String;
   End;
 
 Var X, Y, Z : Integer;
-    lHML    : ITSTOHackMasterListIO;
+Begin
+  For X := 0 To Count - 1 Do
+    For Y := 0 To Category[X].Count - 1 Do
+      For Z := 0 To Category[X][Y].Count - 1 Do
+        If SameText(Category[X][Y][Z].ObjectType, ACategory.Name) Then
+          InternalAddItem(ACategory, Category[X][Y], Category[X][Y][Z]);
+End;
+
+Function TTSTOHackMasterListIOImpl.BuildCharacterSkins() : String;
+Var lHML    : ITSTOHackMasterListIO;
+    lCurCat : ITSTOHackMasterCategoryIO;
 Begin
   lHML := TTSTOHackMasterListIO.CreateHackMasterList();
   Try
-    For X := 0 To Count - 1 Do
-      For Y := 0 To Category[X].Count - 1 Do
-        For Z := 0 To Category[X][Y].Count - 1 Do
-          If SameText(Category[X][Y][Z].ObjectType, 'CharacterSkin') Then
-            InternalAddItem(Category[X], Category[X][Y], Category[X][Y][Z], lHML);
+    lCurCat := lHML.Add();
+    With lCurCat Do
+    Begin
+      Name       := 'CharacterSkin';
+      BuildStore := True;
+      Enabled    := True;
+    End;
+
+    ListObjectType(lCurCat);
+
+    Result := lHML.AsXml;
+
+    Finally
+      lHML := Nil;
+  End;
+End;
+
+Function TTSTOHackMasterListIOImpl.BuildBuildingSkins() : String;
+Var lHML    : ITSTOHackMasterListIO;
+    lCurCat : ITSTOHackMasterCategoryIO;
+Begin
+  lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+  Try
+    lCurCat := lHML.Add();
+    With lCurCat Do
+    Begin
+      Name       := 'BuildingSkin';
+      BuildStore := True;
+      Enabled    := True;
+    End;
+
+    ListObjectType(lCurCat);
 
     Result := lHML.AsXml;
 

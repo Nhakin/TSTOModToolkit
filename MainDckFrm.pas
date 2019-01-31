@@ -800,10 +800,7 @@ Var lStrStrm : IStringStreamEx;
     X, Y, Z : Integer;
     lCIdx, lPIdx, lIdx : Integer;
 begin
-  CreateXmlTab(FWorkSpace.HackSettings.HackMasterList.BuildCharacterSkins, 'CharacterSkinList.xml');
-Exit;
-
-  lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Q05J1Z865ELK\gamescripts-r446295-4OM0YFP9\HackMasterList - 20190130.xml';
+  lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Patch1_M2GH56LYT8SG\gamescripts-r446813-690QPXAE\HackMasterList - 20190131.xml';
   lHML := TTSTOHackMasterListIO.CreateHackMasterList();
   Try
     lHML.LoadFromFile(lFileName);
@@ -846,7 +843,7 @@ Exit;
       lHML := Nil;
   End;
 
-  FWorkSpace.HackSettings.HackMasterList.SaveToFile('Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Q05J1Z865ELK\gamescripts-r446295-4OM0YFP9\HackMasterListNew.xml');
+  FWorkSpace.HackSettings.HackMasterList.SaveToFile('Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Patch1_M2GH56LYT8SG\gamescripts-r446813-690QPXAE\HackMasterListNew.xml');
   ShowMessage('Done');
 end;
 
