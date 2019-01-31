@@ -676,10 +676,33 @@ Begin
 End;
 
 Function TTSTOHackMasterListIOImpl.GetDiff(AMasterList : ITSTOHackMasterListIO) : ITSTOHackMasterListIO;
+  Function IndexOfPackageCategory(ACategory : ITSTOHackMasterCategoryIO; APackage : ITSTOHackMasterPackageIO; Var Category : String) : Integer;
+  Var X : Integer;
+      lMovedItems : ITSTOHackMasterMovedItems;
+  Begin
+    Result := -1;
+    Category := ACategory.Name;
+
+    Result := ACategory.IndexOf(APackage.PackageType, APackage.XmlFile);
+    If Result = -1 Then
+    Begin
+      lMovedItems := GetMovedItems();
+      For X := 0 To lMovedItems.Count - 1 Do
+        If SameText(lMovedItems[X].XmlFileName, APackage.XmlFile) And
+           SameText(lMovedItems[X].OldCategory, ACategory.Name) Then
+        Begin
+          Result := IndexOf(lMovedItems[X].NewCategory);
+          Category := lMovedItems[X].NewCategory;
+          Break;
+        End;
+    End;
+  End;
+
 Var X, Y, Z : Integer;
     lCIdx, lPIdx, lIdx : Integer;
     lCurPkg : ITSTOHackMasterPackageIO;
     lCurCat : ITSTOHackMasterCategoryIO;
+    lCategoryName : String;
 Begin
   Result := TTSTOHackMasterListIO.CreateHackMasterList();
 
@@ -688,72 +711,76 @@ Begin
     lCIdx := IndexOf(AMasterList[X].Name);
 
     If lCIdx = -1 Then
-      Result.Add().Assign(AMasterList[X])
-    Else
     Begin
-      For Y := 0 To AMasterList[X].Count - 1 Do
-      Begin
-        lPIdx := Category[lCIdx].IndexOf(AMasterList[X][Y].PackageType, AMasterList[X][Y].XmlFile);
+      lCIdx := Result.Add(TTSTOHackMasterCategoryIO.Create());//.Assign(AMasterList[X])
+      Result[lCIdx].Name       := AMasterList[X].Name;
+      Result[lCIdx].Enabled    := AMasterList[X].Enabled;
+      Result[lCIdx].BuildStore := AMasterList[X].BuildStore;
+    End;
 
-        If lPIdx = -1 Then
+    For Y := 0 To AMasterList[X].Count - 1 Do
+    Begin
+      lPIdx := IndexOfPackageCategory(AMasterList[X], AMasterList[X][Y], lCategoryName);
+      //Category[lCIdx].IndexOf(AMasterList[X][Y].PackageType, AMasterList[X][Y].XmlFile);
+
+      If lPIdx = -1 Then
+      Begin
+        lIdx := Result.IndexOf(lCategoryName);
+
+        If lIdx = -1 Then
         Begin
-          lIdx := Result.IndexOf(AMasterList[X].Name);
+          lCurCat := Result.Add();
+
+          With lCurCat Do
+          Begin
+            Name       := AMasterList[X].Name;
+            Enabled    := AMasterList[X].Enabled;
+            BuildStore := AMasterList[X].BuildStore;
+          End;
+        End
+        Else
+          lCurCat := Result[lIdx];
+
+        lCurCat.Add().Assign(AMasterList[X][Y]);
+      End
+      Else
+      Begin
+        For Z := 0 To AMasterList[X][Y].Count - 1 Do
+        Begin
+          lIdx := Category[lCIdx][lPIdx].IndexOf(AMasterList[X][Y][Z].Id);
 
           If lIdx = -1 Then
           Begin
-            lCurCat := Result.Add();
-
-            With lCurCat Do
-            Begin
-              Name       := AMasterList[X].Name;
-              Enabled    := AMasterList[X].Enabled;
-              BuildStore := AMasterList[X].BuildStore;
-            End;
-          End
-          Else
-            lCurCat := Result[lIdx];
-
-          lCurCat.Add().Assign(AMasterList[X][Y]);
-        End
-        Else
-        Begin
-          For Z := 0 To AMasterList[X][Y].Count - 1 Do
-          Begin
-            lIdx := Category[lCIdx][lPIdx].IndexOf(AMasterList[X][Y][Z].Id);
+            lIdx := Result.IndexOf(AMasterList[X].Name);
 
             If lIdx = -1 Then
             Begin
-              lIdx := Result.IndexOf(AMasterList[X].Name);
+              lCurCat := Result.Add();
 
-              If lIdx = -1 Then
+              With lCurCat Do
               Begin
-                lCurCat := Result.Add();
+                Name       := AMasterList[X].Name;
+                Enabled    := AMasterList[X].Enabled;
+                BuildStore := AMasterList[X].BuildStore;
+              End;
+            End
+            Else
+              lCurCat := Result[lIdx];
 
-                With lCurCat Do
-                Begin
-                  Name       := AMasterList[X].Name;
-                  Enabled    := AMasterList[X].Enabled;
-                  BuildStore := AMasterList[X].BuildStore;
-                End;
-              End
-              Else
-                lCurCat := Result[lIdx];
+            lIdx := lCurCat.IndexOf(AMasterList[X][Y].PackageType, AMasterList[X][Y].XmlFile);
 
-              lIdx := lCurCat.IndexOf(AMasterList[X][Y].PackageType, AMasterList[X][Y].XmlFile);
+            If lIdx = -1 Then
+            Begin
+              lCurPkg := lCurCat.Add();
 
-              If lIdx = -1 Then
-              Begin
-                lCurPkg := lCurCat.Add();
+              lCurPkg.PackageType := AMasterList[X][Y].PackageType;
+              lCurPkg.XmlFile     := AMasterList[X][Y].XmlFile;
+              lCurPkg.Enabled     := AMasterList[X][Y].Enabled;
+            End
+            Else
+              lCurPkg := lCurCat[lIdx];
 
-                lCurPkg.PackageType := AMasterList[X][Y].PackageType;
-                lCurPkg.XmlFile     := AMasterList[X][Y].XmlFile;
-                lCurPkg.Enabled     := AMasterList[X][Y].Enabled;
-              End
-              Else
-                lCurPkg := lCurCat[lIdx];
-
-              lCurPkg.Add().Assign(AMasterList[X][Y][Z]);
-            End;
+            lCurPkg.Add().Assign(AMasterList[X][Y][Z]);
           End;
         End;
       End;
