@@ -523,7 +523,9 @@ Begin
       Else If SameText(lVars[X].VarFunc, 'hmBuildReqsItems') Then
         lVar.Text := AHackMasterList.BuildReqsItems(AProgress)
       Else If SameText(lVars[X].VarFunc, 'hmBuildNonSellableItems') Then
-        lVar.Text := AHackMasterList.BuildNonSellableItems(AProgress);
+        lVar.Text := AHackMasterList.BuildNonSellableItems(AProgress)
+      Else If SameText(lVars[X].VarFunc, 'hmBuildCharacterSkins') Then
+        lVar.Text := AHackMasterList.BuildCharacterSkins();
 
       lLst.Text := StringReplace(lLst.Text, lVars[X].Name, lVar.Text, [rfReplaceAll, rfIgnoreCase]);
     End;

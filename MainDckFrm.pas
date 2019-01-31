@@ -792,54 +792,6 @@ End;
 (******************************************************************************)
 
 procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
-  Procedure InternalAddItem(ACategory : ITSTOHackMasterCategoryIO;
-    APackage : ITSTOHackMasterPackageIO;
-    AItem : ITSTOHackMasterDataIDIO; AResult : ITSTOHackMasterListIO);
-  Var lIdx     : Integer;
-      lCurCat  : ITSTOHackMasterCategoryIO;
-      lCurPkg  : ITSTOHackMasterPackageIO;
-      lCurItem : ITSTOHackMasterDataIDIO;
-  Begin
-    lIdx := AResult.IndexOf('KahnCharacterSkin');
-    If lIdx = -1 Then
-    Begin
-      lCurCat := AResult.Add();
-
-      lCurCat.Name       := 'KahnCharacterSkin';
-      lCurCat.BuildStore := True;
-      lCurCat.Enabled    := True;
-    End
-    Else
-      lCurCat := AResult[lIdx];
-
-    lIdx := lCurCat.IndexOf(APackage.PackageType, APackage.XmlFile);
-    If lIdx = -1 Then
-    Begin
-      lCurPkg := lCurCat.Add();
-
-      lCurPkg.PackageType := APackage.PackageType;
-      lCurPkg.XmlFile     := APackage.XmlFile;
-      lCurPkg.Enabled     := APackage.Enabled;
-    End
-    Else
-      lCurPkg := lCurCat[lIdx];
-
-    lIdx := lCurPkg.IndexOf(AItem.Id);
-    If lIdx = -1 Then
-    Begin
-      With lCurPkg.Add() Do
-      Begin
-        Id           := AItem.Id;
-        Name         := AItem.Name;
-        AddInStore   := AItem.AddInStore;
-        OverRide     := AItem.OverRide;
-        IsBadItem    := AItem.IsBadItem;
-        ObjectType   := AItem.ObjectType;
-        NPCCharacter := AItem.NPCCharacter;
-      End;
-    End;
-  End;
-
 Var lStrStrm : IStringStreamEx;
     lMemStrm : IMemoryStreamEx;
     lSettings : ITSTOHackSettings;
@@ -848,21 +800,9 @@ Var lStrStrm : IStringStreamEx;
     X, Y, Z : Integer;
     lCIdx, lPIdx, lIdx : Integer;
 begin
-(*  lHML := TTSTOHackMasterListIO.CreateHackMasterList();
-  Try
-    With FWorkSpace.HackSettings.HackMasterList Do
-      For X := 0 To Count - 1 Do
-        For Y := 0 To Category[X].Count - 1 Do
-          For Z := 0 To Category[X][Y].Count - 1 Do
-            If SameText(Category[X][Y][Z].ObjectType, 'CharacterSkin') Then
-              InternalAddItem(Category[X], Category[X][Y], Category[X][Y][Z], lHML);
+  CreateXmlTab(FWorkSpace.HackSettings.HackMasterList.BuildCharacterSkins, 'CharacterSkinList.xml');
+Exit;
 
-    CreateXmlTab(lHML.AsXml, 'CharacterSkinList.xml');
-
-    Finally
-      lHML := Nil;
-  End;
-Exit;*)
   lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Q05J1Z865ELK\gamescripts-r446295-4OM0YFP9\HackMasterList - 20190130.xml';
   lHML := TTSTOHackMasterListIO.CreateHackMasterList();
   Try
@@ -908,56 +848,6 @@ Exit;*)
 
   FWorkSpace.HackSettings.HackMasterList.SaveToFile('Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Q05J1Z865ELK\gamescripts-r446295-4OM0YFP9\HackMasterListNew.xml');
   ShowMessage('Done');
-Exit;
-  Try
-    lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Q05J1Z865ELK\gamescripts-r446295-4OM0YFP9\HackMasterList - 20190129.xml';
-    lHML := TTSTOHackMasterListIO.CreateHackMasterList();
-    lHML.LoadFromFile(lFileName);
-    With FWorkSpace.HackSettings.HackMasterList.GetDiff(lHML) Do
-    Begin
-      lStrStrm := TStringStreamEx.Create(AsXml);
-      Try
-        lStrStrm.SaveToFile(ChangeFileExt(lFileName, 'Diff.xml'));
-
-        Finally
-          lStrStrm := Nil;
-      End;
-    End;
-
-    Finally
-      lHML := Nil
-  End;
-
-  ShowMessage('Done');
-Exit;
-  lSettings := TTSTOHackSettings.CreateHackSettings();
-  Try
-    lSettings.NewHackFile();
-    lSettings.SaveToFile('Z:\Temp\TSTO\Bin\Hack\ThaHack.zip');
-    ShowMessage('Done');
-
-    Finally
-      lSettings := Nil;
-  End;
-Exit;
-  lMemStrm := TMemoryStreamEx.Create();
-  lMemStrm.WriteDWord($504B0506, True);
-  lMemStrm.WriteDWord($0);
-  lMemStrm.WriteDWord($0);
-  lMemStrm.WriteDWord($0);
-  lMemStrm.WriteDWord($0);
-  lMemStrm.WriteWord($0);
-
-  lMemStrm.SaveToFile('00EmptyZip.zip');
-Exit;
-  lStrStrm := TStringStreamEx.Create(FWorkSpace.AsXml);
-  Try
-    lStrStrm.SaveToFile(ChangeFileExt(FWorkSpace.FileName, '.xml'));
-    ShowMessage('Done');
-
-    Finally
-      lStrStrm := Nil;
-  End;
 end;
 
 procedure TFrmDckMain.sptbxMainMenuMouseDown(Sender: TObject;

@@ -109,6 +109,8 @@ Type
     Function  BuildStoreRequirements(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildStoreRequirements(Const AFileName : String); OverLoad;
 
+    Function  BuildCharacterSkins() : String;
+
     Procedure LoadFromStream(ASource : IStreamEx);
     Procedure LoadFromFile(Const AFileName : String);
 
@@ -239,6 +241,8 @@ Type
 
     Function  BuildStoreRequirements(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildStoreRequirements(Const AFileName : String); OverLoad;
+
+    Function  BuildCharacterSkins() : String;
 
     Function  BuildFreeItems(AProgress : IRgbProgress = Nil) : String; OverLoad;
     Procedure BuildFreeItems(Const AFileName : String); OverLoad;
@@ -2782,5 +2786,70 @@ Begin
   End;
 End;
 
+Function TTSTOHackMasterListIOImpl.BuildCharacterSkins() : String;
+  Procedure InternalAddItem(ACategory : ITSTOHackMasterCategoryIO;
+    APackage : ITSTOHackMasterPackageIO;
+    AItem : ITSTOHackMasterDataIDIO; AResult : ITSTOHackMasterListIO);
+  Var lIdx     : Integer;
+      lCurCat  : ITSTOHackMasterCategoryIO;
+      lCurPkg  : ITSTOHackMasterPackageIO;
+  Begin
+    lIdx := AResult.IndexOf('CharacterSkins');
+    If lIdx = -1 Then
+    Begin
+      lCurCat := AResult.Add();
+
+      lCurCat.Name       := 'CharacterSkins';
+      lCurCat.BuildStore := True;
+      lCurCat.Enabled    := True;
+    End
+    Else
+      lCurCat := AResult[lIdx];
+
+    lIdx := lCurCat.IndexOf(APackage.PackageType, APackage.XmlFile);
+    If lIdx = -1 Then
+    Begin
+      lCurPkg := lCurCat.Add();
+
+      lCurPkg.PackageType := APackage.PackageType;
+      lCurPkg.XmlFile     := APackage.XmlFile;
+      lCurPkg.Enabled     := True;
+    End
+    Else
+      lCurPkg := lCurCat[lIdx];
+
+    If lCurPkg.IndexOf(AItem.Id) = -1 Then
+    Begin
+      With lCurPkg.Add() Do
+      Begin
+        Id           := AItem.Id;
+        Name         := AItem.Name;
+        AddInStore   := AItem.AddInStore;
+        OverRide     := AItem.OverRide;
+        IsBadItem    := AItem.IsBadItem;
+        ObjectType   := AItem.ObjectType;
+        NPCCharacter := AItem.NPCCharacter;
+        Character    := AItem.Character;
+      End;
+    End;
+  End;
+
+Var X, Y, Z : Integer;
+    lHML    : ITSTOHackMasterListIO;
+Begin
+  lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+  Try
+    For X := 0 To Count - 1 Do
+      For Y := 0 To Category[X].Count - 1 Do
+        For Z := 0 To Category[X][Y].Count - 1 Do
+          If SameText(Category[X][Y][Z].ObjectType, 'CharacterSkin') Then
+            InternalAddItem(Category[X], Category[X][Y], Category[X][Y][Z], lHML);
+
+    Result := lHML.AsXml;
+
+    Finally
+      lHML := Nil;
+  End;
+End;
 
 end.
