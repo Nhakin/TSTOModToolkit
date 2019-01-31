@@ -483,6 +483,25 @@ Begin
     FCustomScriptPath := IncludeTrailingBackSlash(ACustomScriptPath)
   Else
     FCustomScriptPath := '';
+<<<<<<< HEAD
+End;
+
+Function TTSTOWorkSpaceProject.GetCustomModPath() : AnsiString;
+Begin
+  If FCustomModPath <> '' Then
+    Result := IncludeTrailingBackSlash(FCustomModPath)
+  Else
+    Result := '';
+End;
+
+Procedure TTSTOWorkSpaceProject.SetCustomModPath(Const ACustomModPath : AnsiString);
+Begin
+  If ACustomModPath <> '' Then
+    FCustomModPath := IncludeTrailingBackSlash(ACustomModPath)
+  Else
+    FCustomModPath := '';
+=======
+>>>>>>> refs/remotes/origin/DevVersion
 End;
 
 Function TTSTOWorkSpaceProject.GetCustomModPath() : AnsiString;
