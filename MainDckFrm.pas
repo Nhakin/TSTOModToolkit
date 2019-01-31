@@ -353,7 +353,7 @@ Uses RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
   HsCheckSumEx, HsStringListEx, SciSupport, System.Character,
   SettingsFrm, CustomPatchFrm, SptbFrm, RgbExtractProgress,
   TSTORgb, TSTOModToolKit, TSTODownloader, TSTOFunctions,
-  TSTOCustomPatches.IO,
+  TSTOCustomPatches.IO, TSTOHackMasterList.Xml,
   TSTOZero.Bin, TSTOSbtp.IO, TSTOProjectWorkSpaceIntf,
   TSTOProjectWorkSpace.Xml, TSTOProjectWorkSpace.Types,
   RemoveFileFromProjectFrm, ProjectSettingFrm, ProjectGroupSettingFrm;
@@ -799,7 +799,78 @@ Var lStrStrm : IStringStreamEx;
     lFileName : String;
     X, Y, Z : Integer;
     lCIdx, lPIdx, lIdx : Integer;
+    lXmlHML : IXmlTSTOHackMasterList;
 begin
+  lXmlHML := TXmlTSTOHackMasterList.CreateMasterList();
+  Try
+    With lXmlHML.MovedItems.Add() Do
+    Begin
+      XmlFileName := 'XmlFile1.xml';
+      OldCategory := 'ThaCategory';
+      NewCategory := 'MyCategory';
+    End;
+
+    With lXmlHML.MovedItems.Add() Do
+    Begin
+      XmlFileName := 'XmlFile2.xml';
+      OldCategory := 'Kahn';
+      NewCategory := 'Nhakin';
+    End;
+
+    With lXmlHML.Add() Do
+    Begin
+      Name := 'ThaCategory';
+
+      With Add() Do
+      Begin
+        Name := 'ThaPackage';
+
+        With Add() Do
+        Begin
+          Id := 1;
+          Name := 'Item#1';
+        End;
+
+        With Add() Do
+        Begin
+          Id := 2;
+          Name := 'Item#2';
+        End;
+
+        With Add() Do
+        Begin
+          Id := 3;
+          Name := 'Item#3';
+        End;
+      End;
+    End;
+
+    ShowMessage(FormatXmlData(lXmlHML.Xml));
+
+    lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+    Try
+      lHML.Assign(lXmlHML);
+      lMemStrm := TMemoryStreamEx.Create();
+      Try
+        lHML.SaveToStream(lMemStrm);
+        lMemStrm.SaveToFile('00NewMasterList');
+
+        Finally
+          lMemStrm := Nil;
+      End;
+//      ShowMessage(lHML.AsXml);
+//      ShowMessage(IntToStr(lHML.MovedItems.Count));
+
+      Finally
+        lHML := Nil;
+    End;
+
+    Finally
+      lXmlHML := Nil;
+  End;
+
+  ShowMessage('Done');
+Exit;
   lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Patch1_M2GH56LYT8SG\gamescripts-r446813-690QPXAE\HackMasterList - 20190131.xml';
   lHML := TTSTOHackMasterListIO.CreateHackMasterList();
   Try
