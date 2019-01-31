@@ -6,7 +6,8 @@ Type
   TScriptTemplateFunction = ( stfCustom, stfBuildStoreMenu, stfBuildInventoryMenu,
                               stfBuildStoreReqs, stfBuildStoreItems, stfBuildDeleteBadItems,
                               stfBuildFreeItems, stfBuildUniqueItems, stfBuildReqsItems,
-                              stfBuildNonSellableItems, stfBuildCharacterSkins, stfBuildBuildingSkins );
+                              stfBuildNonSellableItems, stfBuildCharacterSkins, stfBuildBuildingSkins,
+                              stfBuildNPCCharacters );
  TScriptTemplateFunctions = Set Of TScriptTemplateFunction;
 
 implementation

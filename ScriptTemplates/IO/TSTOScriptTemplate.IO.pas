@@ -527,7 +527,9 @@ Begin
       Else If SameText(lVars[X].VarFunc, 'hmBuildCharacterSkins') Then
         lVar.Text := AHackMasterList.BuildCharacterSkins()
       Else If SameText(lVars[X].VarFunc, 'hmBuildBuildingSkins') Then
-        lVar.Text := AHackMasterList.BuildBuildingSkins();
+        lVar.Text := AHackMasterList.BuildBuildingSkins()
+      Else If SameText(lVars[X].VarFunc, 'hmBuildNPCCharacters') Then
+        lVar.Text := AHackMasterList.BuildNPCCharacters();
 
       lLst.Text := StringReplace(lLst.Text, lVars[X].Name, lVar.Text, [rfReplaceAll, rfIgnoreCase]);
     End;
