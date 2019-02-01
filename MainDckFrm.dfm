@@ -141,6 +141,7 @@ object FrmDckMain: TFrmDckMain
         end
         object SpTBXItem3: TSpTBXItem
           ImageIndex = 35
+          Visible = False
           OnClick = SpTBXItem3Click
         end
       end

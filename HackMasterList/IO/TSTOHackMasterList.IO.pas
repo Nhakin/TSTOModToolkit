@@ -676,116 +676,93 @@ Begin
 End;
 
 Function TTSTOHackMasterListIOImpl.GetDiff(AMasterList : ITSTOHackMasterListIO) : ITSTOHackMasterListIO;
-  Function IndexOfPackageCategory(ACategory : ITSTOHackMasterCategoryIO; APackage : ITSTOHackMasterPackageIO; Var Category : String) : Integer;
+  Function IndexOfPackage(Const AXmlFile : String) : Integer;
   Var X : Integer;
       lMovedItems : ITSTOHackMasterMovedItems;
   Begin
     Result := -1;
-    Category := ACategory.Name;
 
-    Result := ACategory.IndexOf(APackage.PackageType, APackage.XmlFile);
-    If Result = -1 Then
+    lMovedItems := GetMovedItems();
+
+    For X := 0 To lMovedItems.Count - 1 Do
+      If SameText(lMovedItems[X].XmlFileName, AXmlFile) Then
+      Begin
+        Result := X;
+        Break;
+      End;
+  End;
+
+  Procedure ProcessCurrentItem(ACategoryName : String; APackage : ITSTOHackMasterPackageIO; AItem : ITSTOHackMasterDataIDIO);
+  Var lCurPkg : ITSTOHackMasterPackageIO;
+      lCurCat : ITSTOHackMasterCategoryIO;
+      lCIdx   ,
+      lPIdx   : Integer;
+  Begin
+    lCIdx := Result.IndexOf(ACategoryName);
+    If lCIdx = -1 Then
     Begin
-      lMovedItems := GetMovedItems();
-      For X := 0 To lMovedItems.Count - 1 Do
-        If SameText(lMovedItems[X].XmlFileName, APackage.XmlFile) And
-           SameText(lMovedItems[X].OldCategory, ACategory.Name) Then
-        Begin
-          Result := IndexOf(lMovedItems[X].NewCategory);
-          Category := lMovedItems[X].NewCategory;
-          Break;
-        End;
-    End;
+      lCurCat := Result.Add();
+      lCurCat.Name       := ACategoryName;
+      lCurCat.Enabled    := True;
+      lCurCat.BuildStore := True;
+    End
+    Else
+      lCurCat := Result[lCIdx];
+
+    lPIdx := lCurCat.IndexOf(APackage.PackageType, APackage.XmlFile);
+    If lPIdx = -1 Then
+    Begin
+      lCurPkg := lCurCat.Add();
+      lCurPkg.PackageType := APackage.PackageType;
+      lCurPkg.Enabled     := APackage.Enabled;
+      lCurPkg.XmlFile     := APackage.XmlFile;
+    End
+    Else
+      lCurPkg := lCurCat[lPIdx];
+
+    If lCurPkg.IndexOf(AItem.Id) = -1 Then
+      With lCurPkg.Add() Do
+      Begin
+        Id            := AItem.Id;
+        Name          := AItem.Name;
+        AddInStore    := AItem.AddInStore;
+        OverRide      := AItem.OverRide;
+        IsBadItem     := AItem.IsBadItem;
+        ObjectType    := AItem.ObjectType;
+        NPCCharacter  := AItem.NPCCharacter;
+        SkinObject    := AItem.SkinObject;
+        MiscData.Text := AItem.MiscData.Text;
+      End;
   End;
 
 Var X, Y, Z : Integer;
-    lCIdx, lPIdx, lIdx : Integer;
-    lCurPkg : ITSTOHackMasterPackageIO;
-    lCurCat : ITSTOHackMasterCategoryIO;
-    lCategoryName : String;
+    lCIdx, lPIdx : Integer;
+    lNewCat : String;
 Begin
   Result := TTSTOHackMasterListIO.CreateHackMasterList();
 
   For X := 0 To AMasterList.Count - 1 Do
-  Begin
-    lCIdx := IndexOf(AMasterList[X].Name);
-
-    If lCIdx = -1 Then
-    Begin
-      lCIdx := Result.Add(TTSTOHackMasterCategoryIO.Create());//.Assign(AMasterList[X])
-      Result[lCIdx].Name       := AMasterList[X].Name;
-      Result[lCIdx].Enabled    := AMasterList[X].Enabled;
-      Result[lCIdx].BuildStore := AMasterList[X].BuildStore;
-    End;
-
     For Y := 0 To AMasterList[X].Count - 1 Do
-    Begin
-      lPIdx := IndexOfPackageCategory(AMasterList[X], AMasterList[X][Y], lCategoryName);
-      //Category[lCIdx].IndexOf(AMasterList[X][Y].PackageType, AMasterList[X][Y].XmlFile);
-
-      If lPIdx = -1 Then
+      For Z := 0 To AMasterList[X][Y].Count - 1 Do
       Begin
-        lIdx := Result.IndexOf(lCategoryName);
-
-        If lIdx = -1 Then
-        Begin
-          lCurCat := Result.Add();
-
-          With lCurCat Do
-          Begin
-            Name       := AMasterList[X].Name;
-            Enabled    := AMasterList[X].Enabled;
-            BuildStore := AMasterList[X].BuildStore;
-          End;
-        End
+        lCIdx := IndexOfPackage(AMasterList[X][Y].XmlFile);
+        If lCIdx > -1 Then
+          lNewCat := GetMovedItems()[lCIdx].NewCategory
         Else
-          lCurCat := Result[lIdx];
+          lNewCat := AMasterList[X].Name;
 
-        lCurCat.Add().Assign(AMasterList[X][Y]);
-      End
-      Else
-      Begin
-        For Z := 0 To AMasterList[X][Y].Count - 1 Do
+        lCIdx := IndexOf(lNewCat);
+        If lCIdx = -1 Then
+          ProcessCurrentItem(lNewCat, AMasterList[X][Y], AMasterList[X][Y][Z])
+        Else
         Begin
-          lIdx := Category[lCIdx][lPIdx].IndexOf(AMasterList[X][Y][Z].Id);
-
-          If lIdx = -1 Then
-          Begin
-            lIdx := Result.IndexOf(AMasterList[X].Name);
-
-            If lIdx = -1 Then
-            Begin
-              lCurCat := Result.Add();
-
-              With lCurCat Do
-              Begin
-                Name       := AMasterList[X].Name;
-                Enabled    := AMasterList[X].Enabled;
-                BuildStore := AMasterList[X].BuildStore;
-              End;
-            End
-            Else
-              lCurCat := Result[lIdx];
-
-            lIdx := lCurCat.IndexOf(AMasterList[X][Y].PackageType, AMasterList[X][Y].XmlFile);
-
-            If lIdx = -1 Then
-            Begin
-              lCurPkg := lCurCat.Add();
-
-              lCurPkg.PackageType := AMasterList[X][Y].PackageType;
-              lCurPkg.XmlFile     := AMasterList[X][Y].XmlFile;
-              lCurPkg.Enabled     := AMasterList[X][Y].Enabled;
-            End
-            Else
-              lCurPkg := lCurCat[lIdx];
-
-            lCurPkg.Add().Assign(AMasterList[X][Y][Z]);
-          End;
+          lPIdx := Category[lCIdx].IndexOf(AMasterList[X][Y].PackageType, AMasterList[X][Y].XmlFile);
+          If lPIdx = -1 Then
+            ProcessCurrentItem(lNewCat, AMasterList[X][Y], AMasterList[X][Y][Z])
+          Else If Category[lCIdx][lPIdx].IndexOf(AMasterList[X][Y][Z].Id) = -1 Then
+            ProcessCurrentItem(lNewCat, AMasterList[X][Y], AMasterList[X][Y][Z]);
         End;
       End;
-    End;
-  End;
 End;
 
 Procedure TTSTOHackMasterListIOImpl.BuildMasterList(AProject : ITSTOXMLProject);
@@ -1542,8 +1519,8 @@ Begin
 End;
 
 Function TTSTOHackMasterListIOImpl.BuildStoreMenu(ASettings : ITSTOScriptTemplateSettings; AProgress : IRgbProgress = Nil) : String;
-Var X, Y, Z : Integer;
-    lLst : IHsStringListEx;
+Var X       : Integer;
+    lLst    : IHsStringListEx;
     lNbItem : Integer;
 Begin
   With ASettings Do
