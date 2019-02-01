@@ -353,7 +353,7 @@ Uses RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
   HsCheckSumEx, HsStringListEx, SciSupport, System.Character,
   SettingsFrm, CustomPatchFrm, SptbFrm, RgbExtractProgress,
   TSTORgb, TSTOModToolKit, TSTODownloader, TSTOFunctions,
-  TSTOCustomPatches.IO,
+  TSTOCustomPatches.IO, TSTOHackMasterList.Xml,
   TSTOZero.Bin, TSTOSbtp.IO, TSTOProjectWorkSpaceIntf,
   TSTOProjectWorkSpace.Xml, TSTOProjectWorkSpace.Types,
   RemoveFileFromProjectFrm, ProjectSettingFrm, ProjectGroupSettingFrm;
@@ -792,59 +792,8 @@ End;
 (******************************************************************************)
 
 procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
-Var lStrStrm : IStringStreamEx;
-    lMemStrm : IMemoryStreamEx;
-    lSettings : ITSTOHackSettings;
-    lHML      : ITSTOHackMasterListIO;
-    lFileName : String;
-    X, Y, Z : Integer;
-    lCIdx, lPIdx, lIdx : Integer;
 begin
-  lFileName := 'Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Patch1_M2GH56LYT8SG\gamescripts-r446813-690QPXAE\HackMasterList - 20190131.xml';
-  lHML := TTSTOHackMasterListIO.CreateHackMasterList();
-  Try
-    lHML.LoadFromFile(lFileName);
-
-    With FWorkSpace.HackSettings.HackMasterList Do
-      For X := 0 To Count - 1 Do
-      Begin
-        lCIdx := lHML.IndexOf(Category[X].Name);
-
-        If lCIdx > -1 Then
-        Begin
-          For Y := 0 To Category[X].Count - 1 Do
-          Begin
-            lPIdx := lHML[lCIdx].IndexOf(Category[X][Y].PackageType, Category[X][Y].XmlFile);
-
-            If lPIdx > -1 Then
-            Begin
-              For Z := 0 To Category[X][Y].Count - 1 Do
-              Begin
-                lIdx := lHML[lCIdx][lPIdx].IndexOf(Category[X][Y][Z].Id);
-
-                If lIdx > -1 Then
-                Begin
-                  Category[X][Y][Z].NPCCharacter := lHML[lCIdx][lPIdx][lIdx].NPCCharacter;
-                  Category[X][Y][Z].SkinObject   := lHML[lCIdx][lPIdx][lIdx].SkinObject;
-                End;
-
-                If Category[X][Y][Z].NPCCharacter Then
-                Begin
-                  Category[X][Y][Z].AddInStore := False;
-                  Category[X][Y][Z].OverRide   := False;
-                End;
-              End;
-            End;
-          End;
-        End;
-      End;
-
-    Finally
-      lHML := Nil;
-  End;
-
-  FWorkSpace.HackSettings.HackMasterList.SaveToFile('Z:\Temp\TSTO\Bin\Hack\KahnHack\4_37_Valentines2019_Patch1_M2GH56LYT8SG\gamescripts-r446813-690QPXAE\HackMasterListNew.xml');
-  ShowMessage('Done');
+//
 end;
 
 procedure TFrmDckMain.sptbxMainMenuMouseDown(Sender: TObject;

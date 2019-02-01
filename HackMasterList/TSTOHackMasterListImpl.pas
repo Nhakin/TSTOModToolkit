@@ -5,6 +5,39 @@ interface
 Uses HsInterfaceEx, HsStringListEx, TSTOHackMasterListIntf;
 
 Type
+  TTSTOHackMasterMovedItem = Class(TInterfacedObjectEx, ITSTOHackMasterMovedItem)
+  Private
+    FXmlFileName : String;
+    FOldCategory : String;
+    FNewCategory : String;
+
+  Protected
+    Function  GetXmlFileName() : String; Virtual;
+    Procedure SetXmlFileName(Const AXmlFileName : String); Virtual;
+
+    Function  GetOldCategory() : String; Virtual;
+    Procedure SetOldCategory(Const AOldCategory : String); Virtual;
+
+    Function  GetNewCategory() : String; Virtual;
+    Procedure SetNewCategory(Const ANewCategory : String); Virtual;
+
+    Procedure Assign(ASource : IInterface);
+
+  End;
+
+  TTSTOHackMasterMovedItems = Class(TInterfaceListEx, ITSTOHackMasterMovedItems)
+  Protected
+    Function GetItemClass() : TInterfacedObjectExClass; OverRide;
+    Function  Get(Index : Integer) : ITSTOHackMasterMovedItem; OverLoad;
+    Procedure Put(Index : Integer; Const Item : ITSTOHackMasterMovedItem); OverLoad;
+
+    Function Add() : ITSTOHackMasterMovedItem; OverLoad;
+    Function Add(Const AItem : ITSTOHackMasterMovedItem) : Integer; OverLoad;
+
+    Procedure Assign(ASource : IInterface);
+
+  End;
+
   TTSTOHackMasterDataID = Class(TInterfacedObjectEx, ITSTOHackMasterDataID)
   Private
     FId           : Integer;
@@ -129,12 +162,16 @@ Type
 
   TTSTOHackMasterList = Class(TInterfaceListEx, ITSTOHackMasterList)
   Private
+    FMovedItems : ITSTOHackMasterMovedItems;
+
     Function InternalSort(Item1, Item2 : IInterfaceEx) : Integer;
 
   Protected
     Function GetItemClass() : TInterfacedObjectExClass; OverRide;
 
     Function Get(Index : Integer) : ITSTOHackMasterCategory; OverLoad;
+
+    Function GetMovedItems() : ITSTOHackMasterMovedItems;
 
     Function Add() : ITSTOHackMasterCategory; ReIntroduce; OverLoad;
     Function Add(Const AItem : ITSTOHackMasterCategory) : Integer; ReIntroduce; OverLoad;
@@ -144,11 +181,96 @@ Type
 
     Property Category[Index : Integer] : ITSTOHackMasterCategory Read Get; Default;
 
+  Public
+    Procedure AfterConstruction(); OverRide;
+    Procedure BeforeDestruction(); OverRide;
+
   End;
 
 implementation
 
 Uses SysUtils, RtlConsts;
+
+Procedure TTSTOHackMasterMovedItem.Assign(ASource : IInterface);
+Var lSrc : ITSTOHackMasterMovedItem;
+Begin
+  If Supports(ASource, ITSTOHackMasterMovedItem, lSrc) Then
+  Begin
+    FXmlFileName := lSrc.XmlFileName;
+    FOldCategory := lSrc.OldCategory;
+    FNewCategory := lSrc.NewCategory;
+  End
+  Else
+    Raise EConvertError.CreateResFmt(@SAssignError, [GetInterfaceName(ASource), ClassName]);
+End;
+
+Function TTSTOHackMasterMovedItem.GetXmlFileName() : String;
+Begin
+  Result := FXmlFileName;
+End;
+
+Procedure TTSTOHackMasterMovedItem.SetXmlFileName(Const AXmlFileName : String);
+Begin
+  FXmlFileName := AXmlFileName;
+End;
+
+Function TTSTOHackMasterMovedItem.GetOldCategory() : String;
+Begin
+  Result := FOldCategory;
+End;
+
+Procedure TTSTOHackMasterMovedItem.SetOldCategory(Const AOldCategory : String);
+Begin
+  FOldCategory := AOldCategory;
+End;
+
+Function TTSTOHackMasterMovedItem.GetNewCategory() : String;
+Begin
+  Result := FNewCategory;
+End;
+
+Procedure TTSTOHackMasterMovedItem.SetNewCategory(Const ANewCategory : String);
+Begin
+  FNewCategory := ANewCategory;
+End;
+
+Function TTSTOHackMasterMovedItems.GetItemClass() : TInterfacedObjectExClass;
+Begin
+  Result := TTSTOHackMasterMovedItem;
+End;
+
+Procedure TTSTOHackMasterMovedItems.Assign(ASource : IInterface);
+Var lSrc : ITSTOHackMasterMovedItems;
+    X    : Integer;
+Begin
+  If Supports(ASource, ITSTOHackMasterMovedItems, lSrc) Then
+  Begin
+    For X := 0 To lSrc.Count - 1 Do
+      Add().Assign(lSrc[X]);
+  End
+  Else
+    Raise EConvertError.CreateResFmt(@SAssignError, [GetInterfaceName(ASource), ClassName]);
+End;
+
+Function TTSTOHackMasterMovedItems.Get(Index : Integer) : ITSTOHackMasterMovedItem;
+Begin
+  Result := InHerited Items[Index] As ITSTOHackMasterMovedItem;
+End;
+
+Procedure TTSTOHackMasterMovedItems.Put(Index : Integer; Const Item : ITSTOHackMasterMovedItem);
+Begin
+  InHerited Items[Index] := Item;
+End;
+
+Function TTSTOHackMasterMovedItems.Add() : ITSTOHackMasterMovedItem;
+Begin
+  Result := InHerited Add() As ITSTOHackMasterMovedItem;
+End;
+
+Function TTSTOHackMasterMovedItems.Add(Const AItem : ITSTOHackMasterMovedItem) : Integer;
+Begin
+  Result := InHerited Add(AItem);
+End;
 
 Procedure TTSTOHackMasterDataID.Created();
 Begin
@@ -469,6 +591,20 @@ Begin
   Result := InHerited Add(AItem);
 End;
 
+Procedure TTSTOHackMasterList.AfterConstruction();
+Begin
+  InHerited AfterConstruction();
+
+  FMovedItems := TTSTOHackMasterMovedItems.Create();
+End;
+
+Procedure TTSTOHackMasterList.BeforeDestruction();
+Begin
+  FMovedItems := Nil;
+
+  InHerited BeforeDestruction();
+End;
+
 Function TTSTOHackMasterList.GetItemClass() : TInterfacedObjectExClass;
 Begin
   Result := TTSTOHackMasterCategory;
@@ -477,6 +613,11 @@ End;
 Function TTSTOHackMasterList.Get(Index : Integer) : ITSTOHackMasterCategory;
 Begin
   Result := InHerited Items[Index] As ITSTOHackMasterCategory;
+End;
+
+Function TTSTOHackMasterList.GetMovedItems() : ITSTOHackMasterMovedItems;
+Begin
+  Result := FMovedItems;
 End;
 
 Function TTSTOHackMasterList.Add() : ITSTOHackMasterCategory;
@@ -515,6 +656,7 @@ Begin
   Begin
     Clear();
 
+    GetMovedItems().Assign(lSrc.MovedItems);
     For X := 0 To lSrc.Count - 1 Do
       Add().Assign(lSrc[X]);
   End

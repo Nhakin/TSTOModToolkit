@@ -1825,13 +1825,10 @@ object FrmDckMain: TFrmDckMain
       object popTvWSApplyMod: TSpTBXItem
         Caption = 'Apply Mod'
         OnClick = popTvWSApplyModClick
-<<<<<<< HEAD
-=======
       end
       object popTvWSBuildMod: TSpTBXItem
         Caption = 'Build Mod'
         OnClick = popTvWSBuildModClick
->>>>>>> refs/remotes/origin/DevVersion
       end
       object popTvWSPackMod: TSpTBXItem
         Caption = 'Pack Mod'

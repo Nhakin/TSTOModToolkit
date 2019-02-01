@@ -5,6 +5,37 @@ Interface
 Uses HsXmlDocEx, HsStringListEx;
 
 Type
+  IXmlTSTOHackMasterMovedItem = Interface(IXMLNodeEx)
+    ['{4B61686E-29A0-2112-8006-24D2F211E42A}']
+    Function  GetXmlFileName() : String;
+    Procedure SetXmlFileName(Const Value: String);
+
+    Function  GetOldCategory() : String;
+    Procedure SetOldCategory(Const Value: String);
+
+    Function  GetNewCategory() : String;
+    Procedure SetNewCategory(Const Value: String);
+
+    Procedure Assign(ASource : IInterface);
+
+    Property XmlFileName : String Read GetXmlFileName Write SetXmlFileName;
+    Property OldCategory : String Read GetOldCategory Write SetOldCategory;
+    Property NewCategory : String Read GetNewCategory Write SetNewCategory;
+
+  End;
+
+  IXmlTSTOHackMasterMovedItems = Interface(IXMLNodeCollectionEx)
+    ['{4B61686E-29A0-2112-BEA0-D12EE1CA568D}']
+    Function GetMovedPackage(Index: Integer): IXmlTSTOHackMasterMovedItem;
+    Function Add() : IXmlTSTOHackMasterMovedItem;
+    Function Insert(Const Index: Integer): IXmlTSTOHackMasterMovedItem;
+
+    Procedure Assign(ASource : IInterface);
+
+    Property Items[Index : Integer] : IXmlTSTOHackMasterMovedItem Read GetMovedPackage; Default;
+
+  End;
+
   IXmlTSTOHackMasterDataID = Interface(IXMLNodeEx)
     ['{3B70CF15-242C-438B-B2B0-CF6D4C60808B}']
     Function  GetId() : Integer;
@@ -102,6 +133,7 @@ Type
   IXmlTSTOHackMasterList = Interface(IXmlNodeCollectionEx)
     ['{8685D965-C38D-436A-9B36-B919FA738878}']
     Function GetCategory(Index: Integer): IXmlTSTOHackMasterCategory;
+    Function GetMovedItems() : IXmlTSTOHackMasterMovedItems;
 
     Function Add: IXmlTSTOHackMasterCategory;
     Function Insert(Const Index: Integer): IXmlTSTOHackMasterCategory;
@@ -109,6 +141,8 @@ Type
     Procedure Assign(ASource : IInterface);
 
     Property Category[Index: Integer]: IXmlTSTOHackMasterCategory Read GetCategory; Default;
+
+    Property MovedItems : IXmlTSTOHackMasterMovedItems Read GetMovedItems;
 
   End;
 
@@ -130,6 +164,51 @@ Uses
   TSTOHackMasterListIntf, TSTOHackMasterListImpl, XMLIntf;
 
 Type
+  TXmlTSTOHackMasterMovedItem = Class(TXMLNodeEx, ITSTOHackMasterMovedItem, IXmlTSTOHackMasterMovedItem)
+  Private
+    FMovedItemImpl : Pointer;
+
+    Function GetImplementor() : ITSTOHackMasterMovedItem;
+
+  Protected
+    Property MovedItemImpl : ITSTOHackMasterMovedItem Read GetImplementor;
+
+    Function  GetXmlFileName() : String;
+    Procedure SetXmlFileName(Const Value: String);
+
+    Function  GetOldCategory() : String;
+    Procedure SetOldCategory(Const Value: String);
+
+    Function  GetNewCategory() : String;
+    Procedure SetNewCategory(Const Value: String);
+
+    Procedure Assign(ASource : IInterface);
+
+  Public
+    Procedure AfterConstruction(); Override;
+
+  End;
+
+  TXmlTSTOHackMasterMovedItems = Class(TXMLNodeCollectionEx, ITSTOHackMasterMovedItems, IXmlTSTOHackMasterMovedItems)
+  Private
+    FMovedItemsImpl : ITSTOHackMasterMovedItems;
+
+    Function GetImplementor() : ITSTOHackMasterMovedItems;
+
+  Protected
+    Property MovedItemsImpl : ITSTOHackMasterMovedItems Read GetImplementor Implements ITSTOHackMasterMovedItems;
+
+  Protected
+    Function GetMovedPackage(Index: Integer): IXmlTSTOHackMasterMovedItem;
+    Function Add: IXmlTSTOHackMasterMovedItem;
+    Function Insert(Const Index: Integer): IXmlTSTOHackMasterMovedItem;
+    Procedure Assign(ASource : IInterface);
+
+  Public
+    Procedure AfterConstruction; Override;
+
+  End;
+
   TTSTOXMLDataID = Class(TXmlNodeEx, ITSTOHackMasterDataID, IXmlTSTOHackMasterDataID)
   Private
     FDataIDImpl : Pointer;
@@ -243,6 +322,8 @@ Type
     Property CategoryImpl : ITSTOHackMasterList Read GetImplementor Implements ITSTOHackMasterList;
 
     Function GetCategory(Index: Integer): IXmlTSTOHackMasterCategory;
+    Function GetMovedItems() : IXmlTSTOHackMasterMovedItems;
+
     Function Add: IXmlTSTOHackMasterCategory;
     Function Insert(Const Index: Integer): IXmlTSTOHackMasterCategory;
 
@@ -292,6 +373,8 @@ End;
 
 Procedure TTSTOXMLMasterListImpl.AfterConstruction;
 Begin
+  RegisterChildNode('MovedPackages', TXmlTSTOHackMasterMovedItems);
+
   RegisterChildNode('Category', TTSTOXMLCategory);
   ItemTag := 'Category';
   ItemInterface := IXmlTSTOHackMasterCategory;
@@ -311,11 +394,16 @@ Procedure TTSTOXMLMasterListImpl.Assign(ASource : IInterface);
 Var lXmlSrc : IXmlTSTOHackMasterList;
     lSrc : ITSTOHackMasterList;
     X : Integer;
+
 Begin
   If Supports(ASource, IXMLNodeCollectionEx) And
      Supports(ASource, IXmlTSTOHackMasterList, lXmlSrc) Then
   Begin
     Clear();
+    GetMovedItems().Clear();
+
+    For X := 0 To lXmlSrc.MovedItems.Count - 1 Do
+      GetMovedItems().Add().Assign(lXmlSrc.MovedItems[X]);
 
     For X := 0 To lXmlSrc.Count - 1 Do
       Add().Assign(lXmlSrc[X]);
@@ -323,6 +411,10 @@ Begin
   Else If Supports(ASource, ITSTOHackMasterList, lSrc) Then
   Begin
     Clear();
+    GetMovedItems().Clear();
+
+    For X := 0 To lSrc.MovedItems.Count - 1 Do
+      GetMovedItems().Add().Assign(lSrc.MovedItems[X]);
 
     For X := 0 To lSrc.Count - 1 Do
       Add().Assign(lSrc[X]);
@@ -335,8 +427,14 @@ End;
 
 Procedure TTSTOXMLMasterListImpl.AssignTo(ATarget : ITSTOHackMasterList);
 Var X : Integer;
+    lMovedItems : IXmlTSTOHackMasterMovedItems;
 Begin
   ATarget.Clear();
+  ATarget.MovedItems.Clear();
+
+  lMovedItems := GetMovedItems();
+  For X := 0 To lMovedItems.Count - 1 Do
+    ATarget.MovedItems.Add().Assign(lMovedItems[X]);
 
   For X := 0 To List.Count - 1 Do
     ATarget.Add().Assign(List[X]);
@@ -345,6 +443,11 @@ End;
 Function TTSTOXMLMasterListImpl.GetCategory(Index: Integer): IXmlTSTOHackMasterCategory;
 Begin
   Result := List[Index] As IXmlTSTOHackMasterCategory;
+End;
+
+Function TTSTOXMLMasterListImpl.GetMovedItems() : IXmlTSTOHackMasterMovedItems;
+Begin
+  Result := ChildNodes['MovedPackages'] As IXmlTSTOHackMasterMovedItems;
 End;
 
 Function TTSTOXMLMasterListImpl.Add: IXmlTSTOHackMasterCategory;
@@ -357,7 +460,138 @@ Begin
   Result := AddItem(Index) As IXmlTSTOHackMasterCategory;
 End;
 
-{ TTSTOXMLCategoryType }
+Procedure TXmlTSTOHackMasterMovedItem.AfterConstruction();
+Begin
+  InHerited AfterConstruction();
+
+  FMovedItemImpl := Pointer(ITSTOHackMasterMovedItem(Self));
+End;
+
+Function TXmlTSTOHackMasterMovedItem.GetImplementor() : ITSTOHackMasterMovedItem;
+Begin
+  Result := ITSTOHackMasterMovedItem(FMovedItemImpl);
+End;
+
+Procedure TXmlTSTOHackMasterMovedItem.Assign(ASource : IInterface);
+Var lXmlSrc : IXmlTSTOHackMasterMovedItem;
+    lSrc : ITSTOHackMasterMovedItem;
+Begin
+  If Supports(ASource, IXmlNodeEx) And
+     Supports(ASource, IXmlTSTOHackMasterMovedItem, lXmlSrc) Then
+  Begin
+    SetXmlFileName(lXmlSrc.XmlFileName);
+    SetOldCategory(lXmlSrc.OldCategory);
+    SetNewCategory(lXmlSrc.NewCategory);
+  End
+  Else If Supports(ASource, ITSTOHackMasterMovedItem, lSrc) Then
+  Begin
+    SetXmlFileName(lSrc.XmlFileName);
+    SetOldCategory(lSrc.OldCategory);
+    SetNewCategory(lSrc.NewCategory);
+
+    FMovedItemImpl := Pointer(lSrc);
+  End
+  Else
+    Raise EConvertError.CreateResFmt(@SAssignError, [GetInterfaceName(ASource), ClassName]);
+End;
+
+Function TXmlTSTOHackMasterMovedItem.GetXmlFileName() : String;
+Begin
+  Result := AttributeNodes['XmlFileName'].Text;
+End;
+
+Procedure TXmlTSTOHackMasterMovedItem.SetXmlFileName(Const Value: String);
+Begin
+  SetAttribute('XmlFileName', Value);
+
+  If Not IsImplementorOf(MovedItemImpl) Then
+    MovedItemImpl.XmlFileName := Value;
+End;
+
+Function TXmlTSTOHackMasterMovedItem.GetOldCategory: String;
+Begin
+  Result := AttributeNodes['OldCategory'].Text;
+End;
+
+Procedure TXmlTSTOHackMasterMovedItem.SetOldCategory(Const Value: UnicodeString);
+Begin
+  SetAttribute('OldCategory', Value);
+
+  If Not IsImplementorOf(MovedItemImpl) Then
+    MovedItemImpl.OldCategory := Value;
+End;
+
+Function TXmlTSTOHackMasterMovedItem.GetNewCategory: UnicodeString;
+Begin
+  Result := AttributeNodes['NewCategory'].Text;
+End;
+
+Procedure TXmlTSTOHackMasterMovedItem.SetNewCategory(Const Value: UnicodeString);
+Begin
+  SetAttribute('NewCategory', Value);
+
+  If Not IsImplementorOf(MovedItemImpl) Then
+    MovedItemImpl.NewCategory := Value;
+End;
+
+Procedure TXmlTSTOHackMasterMovedItems.AfterConstruction;
+Begin
+  RegisterChildNode('MovedPackage', TXmlTSTOHackMasterMovedItem);
+  ItemTag := 'MovedPackage';
+  ItemInterface := IXmlTSTOHackMasterMovedItem;
+  Inherited;
+End;
+
+Function TXmlTSTOHackMasterMovedItems.GetImplementor() : ITSTOHackMasterMovedItems;
+Var X : Integer;
+Begin
+  If Not Assigned(FMovedItemsImpl) Then
+    FMovedItemsImpl := TTSTOHackMasterMovedItems.Create();
+  Result := FMovedItemsImpl;
+
+  FMovedItemsImpl.Clear();
+  For X := 0 To List.Count - 1 Do
+    Result.Add().Assign(List[X]);
+End;
+
+Procedure TXmlTSTOHackMasterMovedItems.Assign(ASource : IInterface);
+Var lXmlSrc : IXmlTSTOHackMasterMovedItems;
+    lSrc : ITSTOHackMasterMovedItems;
+    X : Integer;
+Begin
+  If Supports(ASource, IXMLNodeCollectionEx) And
+     Supports(ASource, IXmlTSTOHackMasterMovedItems, lXmlSrc) Then
+  Begin
+    Clear();
+    For X := 0 To lXmlSrc.Count - 1 Do
+      Add().Assign(lXmlSrc[X]);
+  End
+  Else If Supports(ASource, ITSTOHackMasterMovedItems, lSrc) Then
+  Begin
+    Clear();
+    For X := 0 To lSrc.Count - 1 Do
+      Add().Assign(lSrc[X]);
+
+    FMovedItemsImpl := lSrc;
+  End
+  Else
+    Raise EConvertError.CreateResFmt(@SAssignError, [GetInterfaceName(ASource), ClassName]);
+End;
+
+Function TXmlTSTOHackMasterMovedItems.GetMovedPackage(Index: Integer): IXmlTSTOHackMasterMovedItem;
+Begin
+  Result := List[Index] As IXmlTSTOHackMasterMovedItem;
+End;
+
+Function TXmlTSTOHackMasterMovedItems.Add() : IXmlTSTOHackMasterMovedItem;
+Begin
+  Result := AddItem(-1) As IXmlTSTOHackMasterMovedItem;
+End;
+
+Function TXmlTSTOHackMasterMovedItems.Insert(Const Index: Integer): IXmlTSTOHackMasterMovedItem;
+Begin
+  Result := AddItem(Index) As IXmlTSTOHackMasterMovedItem;
+End;
 
 Procedure TTSTOXMLCategory.AfterConstruction;
 Begin
