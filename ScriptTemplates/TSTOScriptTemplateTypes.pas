@@ -8,7 +8,8 @@ Type
                               stfBuildFreeItems, stfBuildUniqueItems, stfBuildReqsItems,
                               stfBuildNonSellableItems, stfBuildCharacterSkins, stfBuildBuildingSkins,
                               stfBuildNPCCharacters );
- TScriptTemplateFunctions = Set Of TScriptTemplateFunction;
+
+  TScriptTemplateFunctions = Set Of TScriptTemplateFunction;
 
 implementation
 
