@@ -13,10 +13,10 @@ object FrmSbtp: TFrmSbtp
   KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyPress = FormKeyPress
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object PanInfo: TPanel
@@ -29,53 +29,6 @@ object FrmSbtp: TFrmSbtp
     TabOrder = 0
     ExplicitLeft = 203
     ExplicitWidth = 390
-    object vstSbtpData: TVirtualStringTree
-      AlignWithMargins = True
-      Left = 3
-      Top = 99
-      Width = 382
-      Height = 231
-      Version = '6.2.5.918'
-      Align = alClient
-      Header.AutoSizeIndex = 2
-      Header.Font.Charset = DEFAULT_CHARSET
-      Header.Font.Color = clWindowText
-      Header.Font.Height = -11
-      Header.Font.Name = 'Tahoma'
-      Header.Font.Style = []
-      Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
-      TabOrder = 0
-      TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
-      TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowRoot, toShowVertGridLines, toThemeAware, toUseBlendedImages]
-      TreeOptions.SelectionOptions = [toExtendedFocus]
-      OnEditing = vstSbtpDataEditing
-      OnFocusChanged = vstSbtpDataFocusChanged
-      OnGetText = vstSbtpDataGetText
-      OnInitChildren = vstSbtpDataInitChildren
-      OnInitNode = vstSbtpDataInitNode
-      OnNewText = vstSbtpDataNewText
-      ExplicitWidth = 384
-      Columns = <
-        item
-          Position = 0
-          Width = 86
-          WideText = 'Variable Prefix'
-        end
-        item
-          Position = 1
-          Width = 95
-          WideText = 'Variable Suffix'
-        end
-        item
-          Position = 2
-          Width = 197
-          WideText = 'Value'
-        end
-        item
-          Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coAllowFocus, coEditable]
-          Position = 3
-        end>
-    end
     object gbPatchInfoV2: TSpTBXGroupBox
       AlignWithMargins = True
       Left = 3
@@ -91,7 +44,8 @@ object FrmSbtp: TFrmSbtp
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
-      TabOrder = 1
+      TabOrder = 0
+      Visible = False
       ExplicitWidth = 384
       DesignSize = (
         382
@@ -162,11 +116,11 @@ object FrmSbtp: TFrmSbtp
       Columns = <
         item
           Position = 0
-          Width = 99
+          Width = 180
         end
         item
           Position = 1
-          Width = 91
+          Width = 10
         end>
     end
   end
@@ -193,12 +147,8 @@ object FrmSbtp: TFrmSbtp
       Caption = 'sptbxtbMain'
       Customizable = False
       MenuBar = True
-      object tbMainServer: TSpTBXTBGroupItem
-      end
       object tbMainPopup: TSpTBXTBGroupItem
         LinkSubitems = tbPopupMenuItems
-      end
-      object tbMainMisc: TSpTBXTBGroupItem
       end
       object SpTBXItem3: TSpTBXItem
         ImageIndex = 35
@@ -230,23 +180,24 @@ object FrmSbtp: TFrmSbtp
     Left = 56
     Top = 296
     object tbPopupMenuItems: TSpTBXSubmenuItem
-      object tbCreateMasterList: TSpTBXSubmenuItem
+      object tbSave: TSpTBXSubmenuItem
         Caption = 'Save'
+        Enabled = False
         ImageIndex = 2
         Images = DataModuleImage.imgToolBar
         OnClick = tbSaveClick
         DropdownCombo = True
         HideEmptyPopup = True
-        object popNewHackMasterList: TSpTBXItem
+        object tbSave2: TSpTBXItem
           Caption = 'Save'
           OnClick = tbSaveClick
         end
-        object popDiffHackMasterList: TSpTBXItem
+        object tbSaveAsXml: TSpTBXItem
           Caption = 'Save As Xml'
           OnClick = SaveAsXml1Click
         end
       end
-      object tbSaveWorkSpace: TSpTBXItem
+      object tbOpenFile: TSpTBXItem
         Caption = 'Open File'
         ImageIndex = 1
         Images = DataModuleImage.imgToolBar

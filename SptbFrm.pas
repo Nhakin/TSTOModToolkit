@@ -17,18 +17,15 @@ type
     popSave: TPopupMenu;
     Save1: TMenuItem;
     SaveAsXml1: TMenuItem;
-    vstSbtpData: TVirtualStringTree;
     SpTBXBItemContainer1: TSpTBXBItemContainer;
     tbPopupMenuItems: TSpTBXSubmenuItem;
-    tbSaveWorkSpace: TSpTBXItem;
-    tbCreateMasterList: TSpTBXSubmenuItem;
-    popNewHackMasterList: TSpTBXItem;
-    popDiffHackMasterList: TSpTBXItem;
+    tbOpenFile: TSpTBXItem;
+    tbSave: TSpTBXSubmenuItem;
+    tbSave2: TSpTBXItem;
+    tbSaveAsXml: TSpTBXItem;
     sptbxDckMain: TSpTBXDock;
     sptbxtbMain: TSpTBXToolbar;
-    tbMainServer: TSpTBXTBGroupItem;
     tbMainPopup: TSpTBXTBGroupItem;
-    tbMainMisc: TSpTBXTBGroupItem;
     SpTBXItem3: TSpTBXItem;
     gbPatchInfoV2: TSpTBXGroupBox;
     Label5: TLabel;
@@ -36,8 +33,6 @@ type
     EditVariableValue: TEdit;
     EditVariableName: TEdit;
     SpTBXSplitter1: TSpTBXSplitter;
-
-    procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
 
@@ -69,6 +64,7 @@ type
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
     procedure vstSbtpDataNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; NewText: string);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 
   Private
     FHackSettings : ITSTOHackSettings;
@@ -77,12 +73,16 @@ type
     FTvVarData    : ISbtpVariable;
     FTvSbtpData   : TTSTOSbtpFileTreeView;
 
+    Procedure SetHackSettings(AHackSettings : ITSTOHackSettings);
+    Procedure DoOnChanged(Sender : TObject);
+
     Procedure SetNodeData(ANode : PVirtualNode; ANodeData : IInterface);
     Function  GetNodeData(ANode : PVirtualNode; AId : TGUID; Var ANodeData) : Boolean; OverLoad;
     Function  GetNodeData(ANode : PVirtualNode; AId : TGUID) : Boolean; OverLoad;
 
+
   Published
-    Property HackSettings : ITSTOHackSettings Read FHackSettings Write FHackSettings;
+    Property HackSettings : ITSTOHackSettings Read FHackSettings Write SetHackSettings;
 
   end;
 
@@ -92,12 +92,29 @@ Uses HsZipUtils, HsStreamEx, HsInterfaceEx;
 
 {$R *.dfm}
 
+procedure TFrmSbtp.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := True;
+
+  If FTvData.Modified Then
+    Case MessageDlg('Save changes to Textpool patches ?', mtInformation, [mbYes, mbNo, mbCancel], 0) Of
+      mrYes : tbSaveClick(Self);
+      mrCancel : CanClose := False;
+    End;
+end;
+
 procedure TFrmSbtp.FormCreate(Sender: TObject);
 begin
   FTvSbtpData := TTSTOSbtpFileTreeView.Create(Self);
   FTvSbtpData.Parent := PanInfo;
   FTvSbtpData.Align  := alClient;
   FTvSbtpData.NodeDataSize := SizeOf(IInterface);
+  FTvSbtpData.OnEditing := vstSbtpDataEditing;
+  FTvSbtpData.OnFocusChanged := vstSbtpDataFocusChanged;
+  FTvSbtpData.OnGetText := vstSbtpDataGetText;
+  FTvSbtpData.OnInitChildren := vstSbtpDataInitChildren;
+  FTvSbtpData.OnInitNode := vstSbtpDataInitNode;
+  FTvSbtpData.OnNewText := vstSbtpDataNewText;
 
   If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
   Begin
@@ -123,11 +140,13 @@ begin
   End;
 end;
 
-procedure TFrmSbtp.FormShow(Sender: TObject);
+Procedure TFrmSbtp.SetHackSettings(AHackSettings : ITSTOHackSettings);
 Var X : Integer;
     lMemStrm : IMemoryStreamEx;
-begin
+Begin
   FPrevNode := Nil;
+
+  FHackSettings := AHackSettings;
 
   FTvData := TSbtpFilesIO.CreateSbtpFiles();
   lMemStrm := TMemoryStreamEx.Create();
@@ -140,7 +159,14 @@ begin
   End;
 
   vstSbtpFile.RootNodeCount := FTvData.Count;
-end;
+  FTvData.OnChange := DoOnChanged;
+End;
+
+Procedure TFrmSbtp.DoOnChanged(Sender : TObject);
+Begin
+  tbSave.Enabled := True;
+  tbSave2.Enabled := True;
+End;
 
 procedure TFrmSbtp.SaveAsXml1Click(Sender: TObject);
 begin
