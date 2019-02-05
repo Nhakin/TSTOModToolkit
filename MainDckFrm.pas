@@ -2047,8 +2047,13 @@ Begin
           Begin
             lMem.Clear();
             lBsvAnimation.Frames[X].SaveRgbToStream(lMem);
-            LoadImageFromMemory(lMem.Memory, lMem.Size, lImageData);
-            lMultImage.AddImage(lImageData);
+            Try
+              LoadImageFromMemory(lMem.Memory, lMem.Size, lImageData);
+              lMultImage.AddImage(lImageData);
+
+              Finally
+                FreeImage(lImageData);
+            End;
           End;
 
           lMultImage.Height     := lMultImage[0].Height;
