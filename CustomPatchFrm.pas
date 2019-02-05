@@ -66,11 +66,14 @@ type
     procedure vstCustomPacthesGetText(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
       var CellText: string);
+    procedure FormActivate(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 
   Private
     FProject       : ITSTOXMLProject;
     FHackSettings  : ITSTOHackSettings;
     FCustomPatches : ITSTOCustomPatchesIO;
+    FFormSettings : ITSTOXMLFormSetting;
 
     FPrevPatch     : PVirtualNode;
     FPrevPatchData : PVirtualNode;
@@ -91,10 +94,56 @@ type
 
 implementation
 
-Uses SpTBXSkins, TypInfo, XmlDoc, HsXmlDocEx, HsStreamEx, VTEditors, VTCombos,
+Uses SpTBXSkins, RTTI, TypInfo, XmlDoc, HsXmlDocEx, HsStreamEx, VTEditors, VTCombos,
   TSTOPatches;
 
 {$R *.dfm}
+
+procedure TFrmCustomPatches.FormActivate(Sender: TObject);
+Var X : Integer;
+begin
+  WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
+  Left        := FFormSettings.X;
+  Top         := FFormSettings.Y;
+  Height      := FFormSettings.H;
+  Width       := FFormSettings.W;
+
+  For X := 0 To FFormSettings.Count - 1 Do
+    If SameText(FFormSettings[X].SettingName, 'SplitTvsLeft') Then
+      PanTreeView.Width := FFormSettings[X].SettingValue;
+end;
+
+procedure TFrmCustomPatches.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+Var lSetting : ITSTOXmlCustomFormSetting;
+    X      : Integer;
+begin
+  CanClose := True;
+
+  If CanClose Then
+  Begin
+    FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+    If WindowState <> wsMaximized Then
+    Begin
+      FFormSettings.X := Left;
+      FFormSettings.Y := Top;
+      FFormSettings.H := Height;
+      FFormSettings.W := Width;
+    End;
+
+    lSetting := Nil;
+    For X := 0 To FFormSettings.Count - 1 Do
+      If SameText(FFormSettings[X].SettingName, 'SplitTvsLeft') Then
+      Begin
+        lSetting := FFormSettings[X];
+      End;
+
+    If Not Assigned(lSetting) Then
+      lSetting := FFormSettings.Add();
+
+    lSetting.SettingName := 'SplitTvsLeft';
+    lSetting.SettingValue := PanTreeView.Width;
+  End;
+end;
 
 procedure TFrmCustomPatches.FormCreate(Sender: TObject);
 Var lTop, lLeft : Integer;
@@ -144,10 +193,37 @@ end;
 
 Procedure TFrmCustomPatches.SetProject(AProject : ITSTOXMLProject);
 Var lXml : IXmlDocumentEx;
+    X    : Integer;
 Begin
   lXml := LoadXmlData(AProject.OwnerDocument.Xml.Text);
   Try
     FProject := TTSTOXmlTSTOProject.GetTSTOProject(lXml);
+
+    For X := 0 To AProject.Settings.FormPos.Count - 1 Do
+      If SameText(AProject.Settings.FormPos[X].Name, Self.ClassName) Then
+      Begin
+        FFormSettings := AProject.Settings.FormPos[X];
+        Break;
+      End;
+
+    If Not Assigned(FFormSettings) Then
+    Begin
+      FFormSettings := AProject.Settings.FormPos.Add();
+
+      FFormSettings.Name := Self.ClassName;
+      FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+      FFormSettings.X := Left;
+      FFormSettings.Y := Top;
+      FFormSettings.H := Height;
+      FFormSettings.W := Width;
+
+      With FFormSettings.Add() Do
+      Begin
+        SettingName  := 'SplitTvsLeft';
+        SettingValue := PanTreeView.Width;
+      End;
+    End;
+
   //  vstCustomPacthes.RootNodeCount := FProject.CustomPatches.Patches.Count;
 
     Finally

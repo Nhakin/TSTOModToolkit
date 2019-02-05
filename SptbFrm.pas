@@ -5,29 +5,36 @@ interface
 uses
   dmImage, TSTOProject.Xml, TSTOSbtpIntf, TSTOSbtp.IO, TSTOHackSettings,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ToolWin, ComCtrls, ExtCtrls, VirtualTrees, StdCtrls, Menus;
+  Dialogs, ToolWin, ComCtrls, ExtCtrls, VirtualTrees, StdCtrls, Menus, TB2Item,
+  SpTBXItem, TB2Dock, TB2Toolbar, SpTBXControls, SpTBXExControls, SpTbxSkins,
+  SpTBXDkPanels, TSTOTreeViews;
 
 type
   TFrmSbtp = class(TForm)
-    Splitter1: TSplitter;
     PanInfo: TPanel;
-    panToolBar: TPanel;
-    tbMain: TToolBar;
-    tbSave: TToolButton;
     PanTreeView: TPanel;
-    vstSbtpFile: TVirtualStringTree;
-    GroupBox1: TGroupBox;
-    Label1: TLabel;
-    Label5: TLabel;
-    EditVariableName: TEdit;
-    EditVariableValue: TEdit;
+    vstSbtpFile: TSpTBXVirtualStringTree;
     popSave: TPopupMenu;
     Save1: TMenuItem;
     SaveAsXml1: TMenuItem;
-    tbLoadXml: TToolButton;
-    vstSbtpData: TVirtualStringTree;
+    SpTBXBItemContainer1: TSpTBXBItemContainer;
+    tbPopupMenuItems: TSpTBXSubmenuItem;
+    tbOpenFile: TSpTBXItem;
+    tbSave: TSpTBXSubmenuItem;
+    tbSave2: TSpTBXItem;
+    tbSaveAsXml: TSpTBXItem;
+    sptbxDckMain: TSpTBXDock;
+    sptbxtbMain: TSpTBXToolbar;
+    tbMainPopup: TSpTBXTBGroupItem;
+    SpTBXItem3: TSpTBXItem;
+    gbPatchInfoV2: TSpTBXGroupBox;
+    Label5: TLabel;
+    Label1: TLabel;
+    EditVariableValue: TEdit;
+    EditVariableName: TEdit;
+    SplitTvs: TSpTBXSplitter;
 
-    procedure FormShow(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
 
     procedure vstSbtpFileInitNode(Sender: TBaseVirtualTree; ParentNode,
@@ -58,27 +65,116 @@ type
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
     procedure vstSbtpDataNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; NewText: string);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormActivate(Sender: TObject);
 
   Private
     FHackSettings : ITSTOHackSettings;
+    FAppSettings  : ITSTOXMLSettings;
+    FFormSettings : ITSTOXMLFormSetting;
     FTvData       : ISbtpFilesIO;
     FPrevNode     : PVirtualNode;
     FTvVarData    : ISbtpVariable;
+    FTvSbtpData   : TTSTOSbtpFileTreeView;
+
+    Procedure SetHackSettings(AHackSettings : ITSTOHackSettings);
+    Procedure SetAppSettings(AAppSettings  : ITSTOXMLSettings);
+
+    Procedure DoOnChanged(Sender : TObject);
 
     Procedure SetNodeData(ANode : PVirtualNode; ANodeData : IInterface);
     Function  GetNodeData(ANode : PVirtualNode; AId : TGUID; Var ANodeData) : Boolean; OverLoad;
     Function  GetNodeData(ANode : PVirtualNode; AId : TGUID) : Boolean; OverLoad;
 
-  Published
-    Property HackSettings : ITSTOHackSettings Read FHackSettings Write FHackSettings;
 
+  Published
+    Property HackSettings : ITSTOHackSettings Read FHackSettings Write SetHackSettings;
+    Property AppSettings  : ITSTOXMLSettings  Read FAppSettings  Write SetAppSettings;
   end;
 
 implementation
 
-Uses HsZipUtils, HsStreamEx;
+Uses RTTI, HsZipUtils, HsStreamEx, HsInterfaceEx;
 
 {$R *.dfm}
+
+procedure TFrmSbtp.FormActivate(Sender: TObject);
+Var X : Integer;
+begin
+  WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
+  Left        := FFormSettings.X;
+  Top         := FFormSettings.Y;
+  Height      := FFormSettings.H;
+  Width       := FFormSettings.W;
+
+  For X := 0 To FFormSettings.Count - 1 Do
+    If SameText(FFormSettings[X].SettingName, 'SplitTvsLeft') Then
+      PanTreeView.Width := FFormSettings[X].SettingValue;
+end;
+
+procedure TFrmSbtp.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+Var lSetting : ITSTOXmlCustomFormSetting;
+    X      : Integer;
+begin
+  CanClose := True;
+
+  If FTvData.Modified Then
+    Case MessageDlg('Save changes to Textpool patches ?', mtInformation, [mbYes, mbNo, mbCancel], 0) Of
+      mrYes : tbSaveClick(Self);
+      mrCancel : CanClose := False;
+    End;
+
+  If CanClose Then
+  Begin
+    FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+    If WindowState <> wsMaximized Then
+    Begin
+      FFormSettings.X := Left;
+      FFormSettings.Y := Top;
+      FFormSettings.H := Height;
+      FFormSettings.W := Width;
+
+      lSetting := Nil;
+      For X := 0 To FFormSettings.Count - 1 Do
+        If SameText(FFormSettings[X].SettingName, 'SplitTvsLeft') Then
+        Begin
+          lSetting := FFormSettings[X];
+        End;
+
+      If Not Assigned(lSetting) Then
+        lSetting := FFormSettings.Add();
+
+      lSetting.SettingName := 'SplitTvsLeft';
+      lSetting.SettingValue := PanTreeView.Width;
+    End;
+  End;
+end;
+
+procedure TFrmSbtp.FormCreate(Sender: TObject);
+Var lProject : ITSTOXMLProject;
+    X, Y     : Integer;
+begin
+  FTvSbtpData := TTSTOSbtpFileTreeView.Create(Self);
+  FTvSbtpData.Parent := PanInfo;
+  FTvSbtpData.Align  := alClient;
+  FTvSbtpData.NodeDataSize := SizeOf(IInterface);
+
+  FTvSbtpData.OnEditing      := vstSbtpDataEditing;
+  FTvSbtpData.OnFocusChanged := vstSbtpDataFocusChanged;
+  FTvSbtpData.OnGetText      := vstSbtpDataGetText;
+  FTvSbtpData.OnInitChildren := vstSbtpDataInitChildren;
+  FTvSbtpData.OnInitNode     := vstSbtpDataInitNode;
+  FTvSbtpData.OnNewText      := vstSbtpDataNewText;
+
+  If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
+  Begin
+    vstSbtpFile.Color := $00262525;
+    FTvSbtpData.Color :=  $00262525;
+
+    With SkinManager.CurrentSkin Do
+      Options(skncListItem, sknsNormal).TextColor := $00F1F1F1;
+  End;
+end;
 
 procedure TFrmSbtp.FormDestroy(Sender: TObject);
 begin
@@ -94,11 +190,13 @@ begin
   End;
 end;
 
-procedure TFrmSbtp.FormShow(Sender: TObject);
+Procedure TFrmSbtp.SetHackSettings(AHackSettings : ITSTOHackSettings);
 Var X : Integer;
     lMemStrm : IMemoryStreamEx;
-begin
+Begin
   FPrevNode := Nil;
+
+  FHackSettings := AHackSettings;
 
   FTvData := TSbtpFilesIO.CreateSbtpFiles();
   lMemStrm := TMemoryStreamEx.Create();
@@ -111,7 +209,45 @@ begin
   End;
 
   vstSbtpFile.RootNodeCount := FTvData.Count;
-end;
+  FTvData.OnChange := DoOnChanged;
+End;
+
+Procedure TFrmSbtp.SetAppSettings(AAppSettings  : ITSTOXMLSettings);
+Var X : Integer;
+Begin
+  FAppSettings := AAppSettings;
+
+  For X := 0 To FAppSettings.FormPos.Count - 1 Do
+    If SameText(FAppSettings.FormPos[X].Name, Self.ClassName) Then
+    Begin
+      FFormSettings := FAppSettings.FormPos[X];
+      Break;
+    End;
+
+  If Not Assigned(FFormSettings) Then
+  Begin
+    FFormSettings := FAppSettings.FormPos.Add();
+
+    FFormSettings.Name        := Self.ClassName;
+    FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+    FFormSettings.X := Left;
+    FFormSettings.Y := Top;
+    FFormSettings.H := Height;
+    FFormSettings.W := Width;
+
+    With FFormSettings.Add() Do
+    Begin
+      SettingName  := 'SplitTvsLeft';
+      SettingValue := PanTreeView.Width;
+    End;
+  End;
+End;
+
+Procedure TFrmSbtp.DoOnChanged(Sender : TObject);
+Begin
+  tbSave.Enabled := True;
+  tbSave2.Enabled := True;
+End;
 
 procedure TFrmSbtp.SaveAsXml1Click(Sender: TObject);
 begin
@@ -217,8 +353,8 @@ End;
 procedure TFrmSbtp.vstSbtpDataEditing(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
 begin
-  Allowed := (GetNodeData(Node, ISbtpVariable) And (Column = 0)) Or
-             (GetNodeData(Node, ISbtpSubVariable) And (Column In [1, 2]));
+  Allowed := ({FTvSbtpData.}GetNodeData(Node, ISbtpVariable) And (Column = 0)) Or
+             ({FTvSbtpData.}GetNodeData(Node, ISbtpSubVariable) And (Column In [1, 2]));
 end;
 
 procedure TFrmSbtp.vstSbtpDataFocusChanged(Sender: TBaseVirtualTree;
@@ -238,7 +374,7 @@ Var lVarPref : ISbtpVariable;
     lSubVar  : ISbtpSubVariable;
 begin
   CellText := '';
-  If GetNodeData(Node, ISbtpVariable, lVarPref) Then
+  If {FTvSbtpData.}GetNodeData(Node, ISbtpVariable, lVarPref) Then
   Begin
     If Column = 0 Then
     Begin
@@ -247,7 +383,7 @@ begin
         CellText := '<None>';
     End;
   End
-  Else If GetNodeData(Node, ISbtpSubVariable, lSubVar) Then
+  Else If {FTvSbtpData.}GetNodeData(Node, ISbtpSubVariable, lSubVar) Then
   Begin
     If Column = 1 Then
       CellText := lSubVar.VariableName
@@ -260,22 +396,21 @@ procedure TFrmSbtp.vstSbtpDataInitChildren(Sender: TBaseVirtualTree;
   Node: PVirtualNode; var ChildCount: Cardinal);
 Var lData : ISbtpVariable;
 begin
-  If GetNodeData(Node, ISbtpVariable, lData) Then
+  If {FTvSbtpData.}GetNodeData(Node, ISbtpVariable, lData) Then
     ChildCount := lData.SubItem.Count;
 end;
 
 procedure TFrmSbtp.vstSbtpDataInitNode(Sender: TBaseVirtualTree; ParentNode,
   Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
-//
   If Not Assigned(ParentNode) Then
   Begin
-    SetNodeData(Node, FTvVarData);
+    {FTvSbtpData.}SetNodeData(Node, FTvVarData);
     If FTvVarData.SubItem.Count > 0 Then
       InitialStates := InitialStates + [ivsHasChildren];
   End
   Else
-    SetNodeData(Node, FTvVarData.SubItem[Node.Index]);
+    {FTvSbtpData.}SetNodeData(Node, FTvVarData.SubItem[Node.Index]);
 end;
 
 procedure TFrmSbtp.vstSbtpDataNewText(Sender: TBaseVirtualTree;
@@ -283,12 +418,12 @@ procedure TFrmSbtp.vstSbtpDataNewText(Sender: TBaseVirtualTree;
 Var lVarPref : ISbtpVariable;
     lSubVar  : ISbtpSubVariable;
 begin
-  If GetNodeData(Node, ISbtpVariable, lVarPref) Then
+  If {FTvSbtpData.}GetNodeData(Node, ISbtpVariable, lVarPref) Then
   Begin
     If Column = 0 Then
       lVarPref.VariableType := NewText;
   End
-  Else If GetNodeData(Node, ISbtpSubVariable, lSubVar) Then
+  Else If {FTvSbtpData.}GetNodeData(Node, ISbtpSubVariable, lSubVar) Then
   Begin
     If Column = 1 Then
       lSubVar.VariableName := NewText
@@ -299,8 +434,29 @@ end;
 
 procedure TFrmSbtp.vstSbtpFileFocusChanged(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex);
-Var lVarPref : ISbtpVariable;
+//Var lVarPref : ISbtpVariable;
+Var lFile : ISbtpFileIO;
 begin
+//(*
+  With FTvSbtpData Do
+  Begin
+    If GetNodeData(Node, ISbtpFileIO, lFile) Or
+       GetNodeData(Node.Parent, ISbtpFileIO, lFile) Then
+    Begin
+      If IsEditing Then
+        EndEditNode();
+
+      BeginUpdate();
+      Try
+        FTvSbtpData.TvData := lFile;
+
+        Finally
+          EndUpdate();
+      End;
+    End;
+  End;
+//*)
+(*
   If Assigned(FPrevNode) Then
   Begin
 
@@ -310,7 +466,7 @@ begin
   Begin
     If vstSbtpData.IsEditing Then
       vstSbtpData.EndEditNode();
-      
+
     FPrevNode := Node;
     FTvVarData := lVarPref;
     vstSbtpData.BeginUpdate();
@@ -322,30 +478,6 @@ begin
         vstSbtpData.EndUpdate();
     End;
   End;
-
-(*
-  If Assigned(FPrevNode) Then
-  Begin
-    If GetNodeData(FPrevNode, ITSTOSbtpVariable, lVariable) Then
-    Try
-      lVariable.VariableName := EditVariableName.Text;
-      lVariable.DataAsString := EditVariableValue.Text;
-
-      Finally
-        lVariable := Nil;
-    End;
-  End;
-
-  FPrevNode := Node;
-
-  If GetNodeData(FPrevNode, ITSTOSbtpVariable, lVariable) Then
-  Try
-    EditVariableName.Text  := lVariable.VariableName;
-    EditVariableValue.Text := lVariable.DataAsString;
-
-    Finally
-      lVariable := Nil;
-  End;
 *)
 end;
 
@@ -354,6 +486,7 @@ procedure TFrmSbtp.vstSbtpFileGetText(Sender: TBaseVirtualTree;
   var CellText: string);
 Var lPatch : ISbtpFileIO;
     lVarPref : ISbtpVariable;
+    lVarData : ^IInterface;
 begin
   CellText := '';
   Case Column Of
@@ -366,6 +499,15 @@ begin
         CellText := lVarPref.VariableType;
         If CellText = '' Then
           CellText := '<None>';
+      End;
+    End;
+
+    1 :
+    Begin
+      If hoVisible In Sender.Header.Options Then
+      Begin
+        lVarData := Sender.GetNodeData(Node);
+        CellText := GetInterfaceName(lVarData^)
       End;
     End;
   End;

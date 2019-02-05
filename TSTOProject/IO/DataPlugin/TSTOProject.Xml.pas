@@ -31,6 +31,57 @@ Type
 
   end;
 
+  ITSTOXmlCustomFormSetting = interface(IXMLNodeEx)
+    ['{C90E57EE-8F67-4127-BB78-CC84AFBCDED6}']
+    function GetSettingName: WideString;
+    procedure SetSettingName(Value: WideString);
+    function GetSettingValue() : Variant;
+    procedure SetSettingValue(Value: Variant);
+
+    property SettingName  : WideString read GetSettingName  write SetSettingName;
+    property SettingValue : Variant    read GetSettingValue write SetSettingValue;
+
+  end;
+
+  ITSTOXMLFormSetting = interface(IXMLNodeCollectionEx)
+    ['{27BFA632-E78C-45F7-8493-7BEC25A94303}']
+    function GetName: WideString;
+    procedure SetName(Value: WideString);
+    function GetWindowState: WideString;
+    procedure SetWindowState(Value: WideString);
+    function GetX: Integer;
+    procedure SetX(Value: Integer);
+    function GetY: Integer;
+    procedure SetY(Value: Integer);
+    function GetW: Integer;
+    procedure SetW(Value: Integer);
+    function GetH: Integer;
+    procedure SetH(Value: Integer);
+    function GetComponent(Index: Integer): ITSTOXmlCustomFormSetting;
+
+    function Add: ITSTOXmlCustomFormSetting;
+    function Insert(const Index: Integer): ITSTOXmlCustomFormSetting;
+
+    property Name: WideString read GetName write SetName;
+    property WindowState: WideString read GetWindowState write SetWindowState;
+    property X: Integer read GetX write SetX;
+    property Y: Integer read GetY write SetY;
+    property W: Integer read GetW write SetW;
+    property H: Integer read GetH write SetH;
+    property Component[Index: Integer]: ITSTOXmlCustomFormSetting read GetComponent; default;
+
+  end;
+
+  ITSTOXMLFormPos = interface(IXMLNodeCollectionEx)
+    ['{8FB14669-6120-4D9D-BCD4-3A95FC6141FF}']
+    Function Get_Form(Index: Integer): ITSTOXMLFormSetting;
+
+    Function Add: ITSTOXMLFormSetting;
+    Function Insert(const Index: Integer): ITSTOXMLFormSetting;
+    Property Form[Index: Integer]: ITSTOXMLFormSetting read Get_Form; default;
+
+  end;
+
   ITSTOXMLSettings = Interface(IXmlNodeEx)
     ['{1A094087-BF7A-46AD-B6E2-D80959D75DC6}']
     Function  GetAllFreeItems() : Boolean;
@@ -73,6 +124,7 @@ Type
     Function  GetResourcePath() : AnsiString;
     Procedure SetResourcePath(Value : AnsiString);
 
+    Function GetFormPos() : ITSTOXMLFormPos;
     Function GetMasterFiles: ITSTOXmlMasterFiles;
 
     Property AllFreeItems     : Boolean Read GetAllFreeItems     Write SetAllFreeItems;
@@ -95,6 +147,7 @@ Type
     Property HackFileTemplate    : AnsiString Read GetHackFileTemplate    Write SetHackFileTemplate;
     Property HackMasterList      : AnsiString Read GetHackMasterList      Write SetHackMasterList;
     Property ResourcePath        : AnsiString Read GetResourcePath        Write SetResourcePath;
+    Property FormPos             : ITSTOXMLFormPos Read GetFormPos;
 
     Property MasterFiles : ITSTOXmlMasterFiles Read GetMasterFiles;
 
@@ -208,6 +261,49 @@ Type
 
   end;
 
+  TTSTOXmlCustomFormSetting = class(TXMLNodeEx, ITSTOXmlCustomFormSetting)
+  protected
+    function GetSettingName: WideString;
+    procedure SetSettingName(Value: WideString);
+    function GetSettingValue() : Variant;
+    procedure SetSettingValue(Value: Variant);
+
+  end;
+
+  TTSTOXMLFormSetting = class(TXMLNodeCollectionEx, ITSTOXMLFormSetting)
+  protected
+    function GetName: WideString;
+    function GetWindowState: WideString;
+    function GetX: Integer;
+    function GetY: Integer;
+    function GetW: Integer;
+    function GetH: Integer;
+    function GetComponent(Index: Integer): ITSTOXmlCustomFormSetting;
+    procedure SetName(Value: WideString);
+    procedure SetWindowState(Value: WideString);
+    procedure SetX(Value: Integer);
+    procedure SetY(Value: Integer);
+    procedure SetW(Value: Integer);
+    procedure SetH(Value: Integer);
+    function Add: ITSTOXmlCustomFormSetting;
+    function Insert(const Index: Integer): ITSTOXmlCustomFormSetting;
+
+  public
+    procedure AfterConstruction; override;
+
+  end;
+
+  TTSTOXMLFormPos = class(TXMLNodeCollectionEx, ITSTOXMLFormPos)
+  protected
+    function Get_Form(Index: Integer): ITSTOXMLFormSetting;
+    function Add: ITSTOXMLFormSetting;
+    function Insert(const Index: Integer): ITSTOXMLFormSetting;
+
+  public
+    procedure AfterConstruction; override;
+
+  end;
+
   TTSTOXmlSettings = Class(TXmlNodeEx, ITSTOXMLSettings)
   Protected
     Function  GetAllFreeItems() : Boolean;
@@ -251,6 +347,7 @@ Type
     Procedure SetHackMasterList(Const AHackMasterList : AnsiString);
 
     Function  GetMasterFiles() : ITSTOXmlMasterFiles;
+    Function  GetFormPos() : ITSTOXMLFormPos;
 
   Public
     Procedure AfterConstruction(); OverRide;
@@ -414,9 +511,137 @@ begin
   Result := AddItem(Index) as ITSTOXmlMasterFile;
 end;
 
+
+function TTSTOXmlCustomFormSetting.GetSettingName: WideString;
+Begin
+  Result := AttributeNodes['SettingName'].Text;
+End;
+
+procedure TTSTOXmlCustomFormSetting.SetSettingName(Value: WideString);
+Begin
+  SetAttribute('SettingName', Value);
+End;
+
+function TTSTOXmlCustomFormSetting.GetSettingValue() : Variant;
+Begin
+  Result := AttributeNodes['SettingValue'].NodeValue;
+End;
+
+procedure TTSTOXmlCustomFormSetting.SetSettingValue(Value: Variant);
+Begin
+  SetAttribute('SettingValue', Value);
+End;
+
+procedure TTSTOXMLFormPos.AfterConstruction;
+begin
+  RegisterChildNode('Form', TTSTOXMLFormSetting);
+  ItemTag := 'Form';
+  ItemInterface := ITSTOXMLFormSetting;
+  inherited;
+end;
+
+function TTSTOXMLFormPos.Get_Form(Index: Integer): ITSTOXMLFormSetting;
+begin
+  Result := List[Index] as ITSTOXMLFormSetting;
+end;
+
+function TTSTOXMLFormPos.Add: ITSTOXMLFormSetting;
+begin
+  Result := AddItem(-1) as ITSTOXMLFormSetting;
+end;
+
+function TTSTOXMLFormPos.Insert(const Index: Integer): ITSTOXMLFormSetting;
+begin
+  Result := AddItem(Index) as ITSTOXMLFormSetting;
+end;
+
+procedure TTSTOXMLFormSetting.AfterConstruction;
+begin
+  RegisterChildNode('Component', TTSTOXmlCustomFormSetting);
+  ItemTag := 'Component';
+  ItemInterface := ITSTOXmlCustomFormSetting;
+  inherited;
+end;
+
+function TTSTOXMLFormSetting.GetName: WideString;
+begin
+  Result := AttributeNodes['Name'].Text;
+end;
+
+procedure TTSTOXMLFormSetting.SetName(Value: WideString);
+begin
+  SetAttribute('Name', Value);
+end;
+
+function TTSTOXMLFormSetting.GetWindowState: WideString;
+begin
+  Result := AttributeNodes['WindowState'].Text;
+end;
+
+procedure TTSTOXMLFormSetting.SetWindowState(Value: WideString);
+begin
+  SetAttribute('WindowState', Value);
+end;
+
+function TTSTOXMLFormSetting.GetX: Integer;
+begin
+  Result := AttributeNodes[WideString('X')].NodeValue;
+end;
+
+procedure TTSTOXMLFormSetting.SetX(Value: Integer);
+begin
+  SetAttribute(WideString('X'), Value);
+end;
+
+function TTSTOXMLFormSetting.GetY: Integer;
+begin
+  Result := AttributeNodes[WideString('Y')].NodeValue;
+end;
+
+procedure TTSTOXMLFormSetting.SetY(Value: Integer);
+begin
+  SetAttribute(WideString('Y'), Value);
+end;
+
+function TTSTOXMLFormSetting.GetW: Integer;
+begin
+  Result := AttributeNodes[WideString('W')].NodeValue;
+end;
+
+procedure TTSTOXMLFormSetting.SetW(Value: Integer);
+begin
+  SetAttribute(WideString('W'), Value);
+end;
+
+function TTSTOXMLFormSetting.GetH: Integer;
+begin
+  Result := AttributeNodes[WideString('H')].NodeValue;
+end;
+
+procedure TTSTOXMLFormSetting.SetH(Value: Integer);
+begin
+  SetAttribute(WideString('H'), Value);
+end;
+
+function TTSTOXMLFormSetting.GetComponent(Index: Integer): ITSTOXmlCustomFormSetting;
+begin
+  Result := List[Index] as ITSTOXmlCustomFormSetting;
+end;
+
+function TTSTOXMLFormSetting.Add: ITSTOXmlCustomFormSetting;
+begin
+  Result := AddItem(-1) as ITSTOXmlCustomFormSetting;
+end;
+
+function TTSTOXMLFormSetting.Insert(const Index: Integer): ITSTOXmlCustomFormSetting;
+begin
+  Result := AddItem(Index) as ITSTOXmlCustomFormSetting;
+end;
+
 Procedure TTSTOXmlSettings.AfterConstruction();
 Begin
   RegisterChildNode('MasterFiles', TTSTOXmlMasterFiles);
+  RegisterChildNode('FormPos', TTSTOXMLFormPos);
 
   InHerited AfterConstruction;
 End;
@@ -614,6 +839,11 @@ End;
 Function TTSTOXmlSettings.GetMasterFiles() : ITSTOXmlMasterFiles;
 Begin
   Result := ChildNodes['MasterFiles'] as ITSTOXmlMasterFiles;
+End;
+
+Function TTSTOXmlSettings.GetFormPos() : ITSTOXMLFormPos;
+Begin
+  Result := ChildNodes['FormPos'] As ITSTOXMLFormPos;
 End;
 
 Procedure TTSTOXmlProjectFiles.AfterConstruction;

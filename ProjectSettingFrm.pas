@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  TSTOProjectWorkSpaceIntf, dmImage,
+  TSTOProjectWorkSpaceIntf, TSTOProject.Xml, dmImage,
   SpTBXItem, SpTBXControls, SpTBXExPanel, TB2Item, TB2Dock, TB2Toolbar,
   Vcl.StdCtrls, SpTBXEditors, VirtualTrees, SpTBXExControls;
 
@@ -35,16 +35,24 @@ type
     procedure rgProjectTypeClick(Sender: TObject);
     procedure EditCustomScriptPathSubEditButton0Click(Sender: TObject);
     procedure EditCustomModPathSubEditButton0Click(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 
   private
     FWorkSpaceProject : ITSTOWorkSpaceProject;
+    FAppSettings : ITSTOXMLSettings;
+    FFormSettings : ITSTOXMLFormSetting;
+
 
   Protected
     Function  GetWorkSpaceProject() : ITSTOWorkSpaceProject;
     Procedure SetWorkSpaceProject(AWorkSpaceProject : ITSTOWorkSpaceProject);
 
+    Procedure SetAppSettings(AAppSettings : ITSTOXMLSettings);
+
   public
     Property WorkSpaceProject : ITSTOWorkSpaceProject Read GetWorkSpaceProject Write SetWorkSpaceProject;
+    Property AppSettings      : ITSTOXMLSettings      Read FAppSettings        Write SetAppSettings;
 
     Procedure AfterConstruction(); OverRide;
 
@@ -52,7 +60,7 @@ type
 
 implementation
 
-Uses Vcl.ImgList, uSelectDirectoryEx, TSTOProjectWorkSpace.Types;
+Uses RTTI, Vcl.ImgList, uSelectDirectoryEx, TSTOProjectWorkSpace.Types;
 
 {$R *.dfm}
 
@@ -79,6 +87,34 @@ Begin
     lSelDir, True, False, False) Then
     EditOutputPath.Text := lSelDir;
 End;
+
+procedure TFrmProjectSettings.FormActivate(Sender: TObject);
+begin
+  WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
+  Left        := FFormSettings.X;
+  Top         := FFormSettings.Y;
+  Height      := FFormSettings.H;
+  Width       := FFormSettings.W;
+
+end;
+
+procedure TFrmProjectSettings.FormCloseQuery(Sender: TObject;
+  var CanClose: Boolean);
+begin
+  CanClose := True;
+
+  If CanClose Then
+  Begin
+    FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+    If WindowState <> wsMaximized Then
+    Begin
+      FFormSettings.X := Left;
+      FFormSettings.Y := Top;
+      FFormSettings.H := Height;
+      FFormSettings.W := Width;
+    End;
+  End;
+end;
 
 procedure TFrmProjectSettings.FormCreate(Sender: TObject);
 Var lBmp : TBitMap;
@@ -145,6 +181,31 @@ Begin
   EditOutputPath.Text       := FWorkSpaceProject.OutputPath;
   EditCustomScriptPath.Text := FWorkSpaceProject.CustomScriptPath;
   EditCustomModPath.Text    := FWorkSpaceProject.CustomModPath;
+End;
+
+Procedure TFrmProjectSettings.SetAppSettings(AAppSettings : ITSTOXMLSettings);
+Var X : Integer;
+Begin
+  FAppSettings := AAppSettings;
+
+  For X := 0 To FAppSettings.FormPos.Count - 1 Do
+    If SameText(FAppSettings.FormPos[X].Name, Self.ClassName) Then
+    Begin
+      FFormSettings := FAppSettings.FormPos[X];
+      Break;
+    End;
+
+  If Not Assigned(FFormSettings) Then
+  Begin
+    FFormSettings := FAppSettings.FormPos.Add();
+
+    FFormSettings.Name        := Self.ClassName;
+    FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+    FFormSettings.X := Left;
+    FFormSettings.Y := Top;
+    FFormSettings.H := Height;
+    FFormSettings.W := Width;
+  End;
 End;
 
 procedure TFrmProjectSettings.SpTbxSaveClick(Sender: TObject);
