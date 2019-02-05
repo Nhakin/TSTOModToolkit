@@ -32,7 +32,8 @@ type
     Label1: TLabel;
     EditVariableValue: TEdit;
     EditVariableName: TEdit;
-    SpTBXSplitter1: TSpTBXSplitter;
+    SplitTvs: TSpTBXSplitter;
+
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
 
@@ -65,15 +66,20 @@ type
     procedure vstSbtpDataNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; NewText: string);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormActivate(Sender: TObject);
 
   Private
     FHackSettings : ITSTOHackSettings;
+    FAppSettings  : ITSTOXMLSettings;
+    FFormSettings : ITSTOXMLFormSetting;
     FTvData       : ISbtpFilesIO;
     FPrevNode     : PVirtualNode;
     FTvVarData    : ISbtpVariable;
     FTvSbtpData   : TTSTOSbtpFileTreeView;
 
     Procedure SetHackSettings(AHackSettings : ITSTOHackSettings);
+    Procedure SetAppSettings(AAppSettings  : ITSTOXMLSettings);
+
     Procedure DoOnChanged(Sender : TObject);
 
     Procedure SetNodeData(ANode : PVirtualNode; ANodeData : IInterface);
@@ -83,16 +89,32 @@ type
 
   Published
     Property HackSettings : ITSTOHackSettings Read FHackSettings Write SetHackSettings;
-
+    Property AppSettings  : ITSTOXMLSettings  Read FAppSettings  Write SetAppSettings;
   end;
 
 implementation
 
-Uses HsZipUtils, HsStreamEx, HsInterfaceEx;
+Uses RTTI, HsZipUtils, HsStreamEx, HsInterfaceEx;
 
 {$R *.dfm}
 
+procedure TFrmSbtp.FormActivate(Sender: TObject);
+Var X : Integer;
+begin
+  WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
+  Left        := FFormSettings.X;
+  Top         := FFormSettings.Y;
+  Height      := FFormSettings.H;
+  Width       := FFormSettings.W;
+
+  For X := 0 To FFormSettings.Count - 1 Do
+    If SameText(FFormSettings[X].SettingName, 'SplitTvsLeft') Then
+      PanTreeView.Width := FFormSettings[X].SettingValue;
+end;
+
 procedure TFrmSbtp.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+Var lSetting : ITSTOXmlCustomFormSetting;
+    X      : Integer;
 begin
   CanClose := True;
 
@@ -101,20 +123,48 @@ begin
       mrYes : tbSaveClick(Self);
       mrCancel : CanClose := False;
     End;
+
+  If CanClose Then
+  Begin
+    FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+    If WindowState <> wsMaximized Then
+    Begin
+      FFormSettings.X := Left;
+      FFormSettings.Y := Top;
+      FFormSettings.H := Height;
+      FFormSettings.W := Width;
+
+      lSetting := Nil;
+      For X := 0 To FFormSettings.Count - 1 Do
+        If SameText(FFormSettings[X].SettingName, 'SplitTvsLeft') Then
+        Begin
+          lSetting := FFormSettings[X];
+        End;
+
+      If Not Assigned(lSetting) Then
+        lSetting := FFormSettings.Add();
+
+      lSetting.SettingName := 'SplitTvsLeft';
+      lSetting.SettingValue := PanTreeView.Width;
+    End;
+  End;
 end;
 
 procedure TFrmSbtp.FormCreate(Sender: TObject);
+Var lProject : ITSTOXMLProject;
+    X, Y     : Integer;
 begin
   FTvSbtpData := TTSTOSbtpFileTreeView.Create(Self);
   FTvSbtpData.Parent := PanInfo;
   FTvSbtpData.Align  := alClient;
   FTvSbtpData.NodeDataSize := SizeOf(IInterface);
-  FTvSbtpData.OnEditing := vstSbtpDataEditing;
+
+  FTvSbtpData.OnEditing      := vstSbtpDataEditing;
   FTvSbtpData.OnFocusChanged := vstSbtpDataFocusChanged;
-  FTvSbtpData.OnGetText := vstSbtpDataGetText;
+  FTvSbtpData.OnGetText      := vstSbtpDataGetText;
   FTvSbtpData.OnInitChildren := vstSbtpDataInitChildren;
-  FTvSbtpData.OnInitNode := vstSbtpDataInitNode;
-  FTvSbtpData.OnNewText := vstSbtpDataNewText;
+  FTvSbtpData.OnInitNode     := vstSbtpDataInitNode;
+  FTvSbtpData.OnNewText      := vstSbtpDataNewText;
 
   If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
   Begin
@@ -160,6 +210,37 @@ Begin
 
   vstSbtpFile.RootNodeCount := FTvData.Count;
   FTvData.OnChange := DoOnChanged;
+End;
+
+Procedure TFrmSbtp.SetAppSettings(AAppSettings  : ITSTOXMLSettings);
+Var X : Integer;
+Begin
+  FAppSettings := AAppSettings;
+
+  For X := 0 To FAppSettings.FormPos.Count - 1 Do
+    If SameText(FAppSettings.FormPos[X].Name, Self.ClassName) Then
+    Begin
+      FFormSettings := FAppSettings.FormPos[X];
+      Break;
+    End;
+
+  If Not Assigned(FFormSettings) Then
+  Begin
+    FFormSettings := FAppSettings.FormPos.Add();
+
+    FFormSettings.Name        := Self.ClassName;
+    FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+    FFormSettings.X := Left;
+    FFormSettings.Y := Top;
+    FFormSettings.H := Height;
+    FFormSettings.W := Width;
+
+    With FFormSettings.Add() Do
+    Begin
+      SettingName  := 'SplitTvsLeft';
+      SettingValue := PanTreeView.Width;
+    End;
+  End;
 End;
 
 Procedure TFrmSbtp.DoOnChanged(Sender : TObject);

@@ -12,6 +12,8 @@ object FrmCustomPatches: TFrmCustomPatches
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
+  OnActivate = FormActivate
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   PixelsPerInch = 96
@@ -26,10 +28,6 @@ object FrmCustomPatches: TFrmCustomPatches
     Color = 2499877
     ParentBackground = False
     TabOrder = 0
-    ExplicitLeft = 208
-    ExplicitTop = 56
-    ExplicitWidth = 545
-    ExplicitHeight = 438
     object EditXml: TSynEdit
       Left = 0
       Top = 227
@@ -50,9 +48,6 @@ object FrmCustomPatches: TFrmCustomPatches
       Highlighter = SynXMLSyn1
       ReadOnly = True
       FontSmoothing = fsmNone
-      ExplicitTop = 347
-      ExplicitWidth = 545
-      ExplicitHeight = 36
     end
     object vstPatchData: TSpTBXVirtualStringTree
       AlignWithMargins = True
@@ -79,8 +74,6 @@ object FrmCustomPatches: TFrmCustomPatches
       OnGetText = vstPatchDataGetText
       OnInitNode = vstPatchDataInitNode
       OnKeyAction = vstPatchDataKeyAction
-      ExplicitTop = 244
-      ExplicitWidth = 539
       Columns = <
         item
           Position = 0
@@ -114,8 +107,6 @@ object FrmCustomPatches: TFrmCustomPatches
       Font.Style = []
       ParentFont = False
       TabOrder = 2
-      ExplicitTop = 123
-      ExplicitWidth = 539
       DesignSize = (
         542
         115)
@@ -174,8 +165,6 @@ object FrmCustomPatches: TFrmCustomPatches
       ActiveTabIndex = 0
       TabPosition = ttpBottom
       OnActiveTabChange = tsXmlV2ActiveTabChange
-      ExplicitTop = 410
-      ExplicitWidth = 545
       HiddenItems = <>
       object tsInput: TSpTBXTabItem
         Caption = 'Input'
@@ -199,8 +188,6 @@ object FrmCustomPatches: TFrmCustomPatches
     Color = 2499877
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 56
-    ExplicitHeight = 438
     object vstCustomPacthes: TSpTBXVirtualStringTree
       AlignWithMargins = True
       Left = 3
@@ -223,7 +210,6 @@ object FrmCustomPatches: TFrmCustomPatches
       OnFocusChanged = vstCustomPacthesFocusChanged
       OnGetText = vstCustomPacthesGetText
       OnInitNode = vstCustomPacthesInitNode
-      ExplicitHeight = 432
       Columns = <>
     end
   end
@@ -233,7 +219,6 @@ object FrmCustomPatches: TFrmCustomPatches
     Width = 753
     Height = 26
     AllowDrag = False
-    ExplicitTop = 30
     object tbMainV2: TSpTBXToolbar
       Left = 0
       Top = 0
@@ -257,8 +242,6 @@ object FrmCustomPatches: TFrmCustomPatches
     Top = 26
     Height = 468
     Cursor = crSizeWE
-    ExplicitTop = 56
-    ExplicitHeight = 438
   end
   object popVSTCustomPatches: TPopupMenu
     Left = 64

@@ -180,7 +180,7 @@ Type
     popSelectMissingFiles: TSpTBXItem;
     tbSaveWorkSpace: TSpTBXItem;
     PanHackTemplateMaster: TLMDDockPanel;
-    LMDDockSite1: TLMDDockSite;
+    dckScriptTemplate: TLMDDockSite;
     PanTvHackTemplate: TLMDDockPanel;
     PanHackTemplate: TLMDDockPanel;
     EditScriptTemplate: TScintillaNPP;
@@ -1115,6 +1115,7 @@ begin
   With TFrmSbtp.Create(Self) Do
   Try
     HackSettings := FWorkSpace.HackSettings;
+    AppSettings  := FPrj.Settings;
     ShowModal();
     
     Finally
@@ -1711,6 +1712,8 @@ begin
     With TFrmProjectSettings.Create(Self) Do
     Try
       WorkSpaceProject := lWsProject;
+      AppSettings      := FPrj.Settings;
+
       If ShowModal() = mrOk Then
         tbSaveWorkSpace.Enabled := True;
 
@@ -1726,6 +1729,7 @@ begin
     With TFrmProjectGroupSettings.Create(Self) Do
     Try
       WorkSpaceProject := lWsProjectGroup;
+      AppSettings      := FPrj.Settings;
       ShowModal();
 
       Finally

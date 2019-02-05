@@ -14,6 +14,8 @@ object FrmProjectGroupSettings: TFrmProjectGroupSettings
   KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnActivate = FormActivate
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   PixelsPerInch = 96

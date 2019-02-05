@@ -14,6 +14,8 @@ object FrmProjectSettings: TFrmProjectSettings
   KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnActivate = FormActivate
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   PixelsPerInch = 96
@@ -28,7 +30,6 @@ object FrmProjectSettings: TFrmProjectSettings
     TabOrder = 1
     Borders = False
     TBXStyleBackground = True
-    ExplicitHeight = 188
     DesignSize = (
       364
       209)
@@ -185,7 +186,6 @@ object FrmProjectSettings: TFrmProjectSettings
     Top = 235
     Width = 364
     Height = 26
-    ExplicitTop = 214
   end
   object SpTBXDock1: TSpTBXDock
     Left = 0

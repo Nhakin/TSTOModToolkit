@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  TSTOProjectWorkSpaceIntf, dmImage,
+  TSTOProjectWorkSpaceIntf, dmImage, TSTOProject.Xml,
   SpTBXItem, SpTBXControls, SpTBXExPanel, TB2Item, TB2Dock, TB2Toolbar,
   Vcl.StdCtrls, SpTBXEditors, VirtualTrees, SpTBXExControls;
 
@@ -30,24 +30,30 @@ type
     procedure SpTbxSaveClick(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure EditHackFileNameSubEditButton0Click(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 
   private
     FWorkSpaceProjectGroup : ITSTOWorkSpaceProjectGroup;
+    FAppSettings : ITSTOXMLSettings;
+    FFormSettings : ITSTOXMLFormSetting;
 
   Protected
     Function  GetWorkSpaceProject() : ITSTOWorkSpaceProjectGroup;
     Procedure SetWorkSpaceProject(AWorkSpaceProjectGroup : ITSTOWorkSpaceProjectGroup);
 
+    Procedure SetAppSettings(AAppSettings : ITSTOXMLSettings);
+
   public
     Property WorkSpaceProject : ITSTOWorkSpaceProjectGroup Read GetWorkSpaceProject Write SetWorkSpaceProject;
-
+    Property AppSettings      : ITSTOXMLSettings           Read FAppSettings        Write SetAppSettings;
     Procedure AfterConstruction(); OverRide;
 
   end;
 
 implementation
 
-Uses Vcl.ImgList, uSelectDirectoryEx, TSTOProjectWorkSpace.Types;
+Uses RTTI, Vcl.ImgList, uSelectDirectoryEx, TSTOProjectWorkSpace.Types;
 
 {$R *.dfm}
 
@@ -71,6 +77,33 @@ begin
 
     Finally
       Free();
+  End;
+end;
+
+procedure TFrmProjectGroupSettings.FormActivate(Sender: TObject);
+begin
+  WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
+  Left        := FFormSettings.X;
+  Top         := FFormSettings.Y;
+  Height      := FFormSettings.H;
+  Width       := FFormSettings.W;
+end;
+
+procedure TFrmProjectGroupSettings.FormCloseQuery(Sender: TObject;
+  var CanClose: Boolean);
+begin
+  CanClose := True;
+
+  If CanClose Then
+  Begin
+    FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+    If WindowState <> wsMaximized Then
+    Begin
+      FFormSettings.X := Left;
+      FFormSettings.Y := Top;
+      FFormSettings.H := Height;
+      FFormSettings.W := Width;
+    End;
   End;
 end;
 
@@ -128,6 +161,31 @@ Begin
   EditHackFileName.Text := FWorkSpaceProjectGroup.HackFileName;
   chkPackOutput.Checked := FWorkSpaceProjectGroup.PackOutput;
   EditOutputPath.Text   := FWorkSpaceProjectGroup.OutputPath;
+End;
+
+Procedure TFrmProjectGroupSettings.SetAppSettings(AAppSettings : ITSTOXMLSettings);
+Var X : Integer;
+Begin
+  FAppSettings := AAppSettings;
+
+  For X := 0 To FAppSettings.FormPos.Count - 1 Do
+    If SameText(FAppSettings.FormPos[X].Name, Self.ClassName) Then
+    Begin
+      FFormSettings := FAppSettings.FormPos[X];
+      Break;
+    End;
+
+  If Not Assigned(FFormSettings) Then
+  Begin
+    FFormSettings := FAppSettings.FormPos.Add();
+
+    FFormSettings.Name        := Self.ClassName;
+    FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+    FFormSettings.X := Left;
+    FFormSettings.Y := Top;
+    FFormSettings.H := Height;
+    FFormSettings.W := Width;
+  End;
 End;
 
 procedure TFrmProjectGroupSettings.SpTbxSaveClick(Sender: TObject);

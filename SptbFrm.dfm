@@ -13,6 +13,7 @@ object FrmSbtp: TFrmSbtp
   KeyPreview = True
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  OnActivate = FormActivate
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -156,7 +157,7 @@ object FrmSbtp: TFrmSbtp
       end
     end
   end
-  object SpTBXSplitter1: TSpTBXSplitter
+  object SplitTvs: TSpTBXSplitter
     Left = 200
     Top = 26
     Height = 333
