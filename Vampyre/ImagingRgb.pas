@@ -521,6 +521,10 @@ Begin
 End;
 
 Procedure TImagingAnimation.DoOnTimer(Sender : TObject);
+Var lCvsSrc ,
+    lCvsTrg : TFastARGB32Canvas;
+    lImgTrg : TImageData;
+    lImgSrc : TImageData;
 Begin
   If Assigned(FAnimation) Then
   Begin
@@ -531,7 +535,30 @@ Begin
         FAnimation.ActiveImage := 0;
 
     If Assigned(FPaintBox) Then
-      FPaintBox.Repaint();
+      FPaintBox.Repaint()
+    Else If Assigned(FImage) Then
+    Begin
+      NewImage(FAnimation[FAnimation.ActiveImage].Width, FAnimation[FAnimation.ActiveImage].Height, ifA8R8G8B8, lImgTrg);
+      lImgSrc := FAnimation[FAnimation.ActiveImage];
+      lCvsSrc := TFastARGB32Canvas.CreateForData(@lImgSrc);
+      lCvsTrg := TFastARGB32Canvas.CreateForData(@lImgTrg);
+      Try
+        lCvsTrg.FillColor32 := FBackColor;
+        lCvsTrg.Clear();
+
+        lCvsSrc.DrawAlpha(Rect(0, 0, lImgTrg.Width, lImgTrg.Height), lCvsTrg, 0, 0);
+        With FImage.Picture.Bitmap Do
+          DisplayImageData( Canvas, Rect(0, 0, Width, Height), lImgTrg,
+            Rect(0, 0, lImgTrg.Width, lImgTrg.Height)
+          );
+        FImage.Invalidate();
+
+        Finally
+          lCvsTrg.Free();
+          lCvsSrc.Free();
+          FreeImage(lImgTrg);
+      End;
+    End;
   End;
 End;
 

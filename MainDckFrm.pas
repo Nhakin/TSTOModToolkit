@@ -13,7 +13,7 @@ uses
   LMDDckSite, LMDDckStyleElems, SciLanguageManager, SciScintillaBase,
   SciScintillaMemo, SciScintilla, SciScintillaNPP, SciActions, TB2Item, TB2Dock,
   TB2Toolbar, SpTBXItem, SpTBXSkins, SpTBXAdditionalSkins, SpTBXControls,
-  SpTBXEditors, Mask, System.Actions, SpTBXExPanel, SpTBXDkPanels, SpTBXTabs;
+  SpTBXEditors, Mask, System.Actions, SpTBXExPanel, SpTBXDkPanels, SpTBXTabs, ImagingRgb;
 
 Type
   TTSTOCurrentDataType = (dtUnknown, dtXml, dtZeroIndex, dtText, dtRbg, dtBCell, dtBsv3);
@@ -291,6 +291,7 @@ Type
     FTvScriptTemplate : TTSTOScriptTemplateTreeView;
     FTvSTSettings     : TTSTOScriptTemplateSettingsTreeView;
     FTvSTVariables    : TTSTOScriptTemplateVariablesTreeView;
+    FBsvAnim          : TImagingAnimation;
 
     FWorkSpace    : ITSTOWorkSpaceProjectGroupIO;
     FResources    : ITSTOResourcePaths;
@@ -351,9 +352,9 @@ Uses RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
   Imaging, ImagingTypes, HsBase64Ex,
   HsJSonFormatterEx, HsXmlDocEx, HsZipUtils, HsFunctionsEx,
   HsCheckSumEx, HsStringListEx, SciSupport, System.Character,
-  SettingsFrm, CustomPatchFrm, SptbFrm, RgbExtractProgress,
+  SettingsFrm, CustomPatchFrm, SptbFrm, RgbExtractProgress, ImagingClasses,
   TSTORgb, TSTOModToolKit, TSTODownloader, TSTOFunctions,
-  TSTOCustomPatches.IO, TSTOHackMasterList.Xml,
+  TSTOCustomPatches.IO, TSTOHackMasterList.Xml, TSTOBsv.IO,
   TSTOZero.Bin, TSTOSbtp.IO, TSTOProjectWorkSpaceIntf,
   TSTOProjectWorkSpace.Xml, TSTOProjectWorkSpace.Types,
   RemoveFileFromProjectFrm, ProjectSettingFrm, ProjectGroupSettingFrm;
@@ -763,6 +764,9 @@ begin
   FPrj       := Nil;
   FBCell     := Nil;
   FDefLayout := Nil;
+
+  If Assigned(FBsvAnim) Then
+    FreeAndNil(FBsvAnim);
 end;
 
 procedure TFrmDckMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -1899,6 +1903,13 @@ Var lPkg     : ITSTOPackageNode;
     lMem  : IMemoryStreamEx;
     lImg  : ITSTORgbFile;
     lXmlStr : String;
+    lBsvAnimation : IBsvAnimationIO;
+
+    X : Integer;
+    lMultAnim  : TImagingAnimation;
+    lMultImage : TMultiImage;
+    lBaseImage : TBaseImage;
+    lImageData : TImageData;
 Begin
   tbPackMod.Enabled     := False;
   tbUnpackMod.Enabled   := False;
@@ -1907,6 +1918,9 @@ Begin
 
   ImgResource.Picture := Nil;
   EditImageSize.Text  := '';
+
+  If Assigned(FBsvAnim) Then
+    FreeAndNil(FBsvAnim);
 
 //  PanHexEdit.Visible  := False;
 //  PanXml.Visible      := False;
@@ -2024,6 +2038,45 @@ Begin
           End;
         End;
       End
+      Else If GetNodeData(ANode, IBsvAnimationIO, lBsvAnimation) Then
+      Begin
+        lMultImage := TMultiImage.Create();
+        lMem := TStringStreamEx.Create();
+        Try
+          For X := 0 To lBsvAnimation.Frames.Count - 1 Do
+          Begin
+            lMem.Clear();
+            lBsvAnimation.Frames[X].SaveRgbToStream(lMem);
+            LoadImageFromMemory(lMem.Memory, lMem.Size, lImageData);
+            lMultImage.AddImage(lImageData);
+          End;
+
+          lMultImage.Height     := lMultImage[0].Height;
+          lMultImage.Width      := lMultImage[0].Width;
+          lMultImage.ImageCount := lBsvAnimation.Frames.Count;
+          lMultImage.Format     := lMultImage[0].Format;
+          FBsvAnim := TImagingAnimation.Create(ImgResource, lMultImage);
+
+          Finally
+            lMultImage.Free();
+            lMem := Nil;
+        End;
+      End
+      Else If GetNodeData(ANode, ITSTORgbFile, lImg) Then
+      Begin
+        lMem := TMemoryStreamEx.Create();
+        Try
+          lImg.SaveRgbToStream(lMem);
+
+          FCurData := TTSTOCurrentData.Create();
+          FCurData.DataType := dtRbg;
+          FCurData.DataStream.CopyFrom(TStream(lMem.InterfaceObject), 0);
+          InitPanels();
+
+          Finally
+            lMem := Nil;
+        End;
+      End
       Else If GetNodeData(ANode.Parent, ITSTOWorkSpaceProjectSrcFolder, lWSSrcFolder) Then
       Begin
         lFileName := IncludeTrailingBackSlash(lWSSrcFolder.SrcPath) + lWSSrcFolder[ANode.Index].FileName;
@@ -2065,26 +2118,26 @@ Begin
         End
         Else If SameText(ExtractFileExt(lFileName), '.bcell') Then
         Begin
-  //        lZip := THsMemoryZipper.Create();
-  //        lMem := TStringStreamEx.Create();
-  //        Try
-  //          lZip.ShowProgress := False;
-  //
-  //          lZip.LoadFromFile(FPrj.Settings.DLCPath + lPkg.FileName);
-  //          lZip.ExtractToStream(lArchive.FileName, lMem);
-  //
-  //          lMem.Position := 0;
-  //          lZip.LoadFromStream(lMem);
-  //
-  //          FBCell := TTSTOBCellFile.CreateBCellAnimation(ImgResource);
-  //          FBCell.LoadFromZip(lFile.FileName1, lZip);
-  //
-  ////          PanImage.Visible := True;
-  //
-  //          Finally
-  //            lMem := Nil;
-  //            lZip := Nil;
-  //        End;
+          lZip := THsMemoryZipper.Create();
+          lMem := TStringStreamEx.Create();
+          Try
+            lZip.ShowProgress := False;
+
+            lZip.LoadFromFile(FPrj.Settings.DLCPath + lPkg.FileName);
+            lZip.ExtractToStream(lArchive.FileName, lMem);
+
+            lMem.Position := 0;
+            lZip.LoadFromStream(lMem);
+
+            FBCell := TTSTOBCellFile.CreateBCellAnimation(ImgResource);
+            FBCell.LoadFromZip(lFile.FileName1, lZip);
+
+  //          PanImage.Visible := True;
+
+            Finally
+              lMem := Nil;
+              lZip := Nil;
+          End;
         End;
       End
       Else If GetNodeData(ANode, ITSTORgbFile, lImg) Then
