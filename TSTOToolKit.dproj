@@ -588,6 +588,9 @@
             <Form>DataModuleImage</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
+        <DCCReference Include="HackMasterListFrm.pas">
+            <Form>FrmHackMasterList</Form>
+        </DCCReference>
         <DCCReference Include="HsUnits\HsAlarmEx.pas"/>
         <DCCReference Include="HsUnits\HsBase64Ex.pas">
             <Form>,

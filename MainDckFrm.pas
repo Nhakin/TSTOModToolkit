@@ -209,6 +209,7 @@ Type
     EditImageSize: TEdit;
     ScrlImage: TScrollBox;
     ImgResource: TImage;
+    mnuHackMasterList: TSpTBXItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -280,6 +281,7 @@ Type
     procedure popCompareHackMasterListClick(Sender: TObject);
     procedure popDiffHackMasterListClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure mnuHackMasterListClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -360,7 +362,7 @@ Uses RTTI, RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
   TSTOCustomPatches.IO, TSTOHackMasterList.Xml, TSTOBsv.IO,
   TSTOZero.Bin, TSTOSbtp.IO, TSTOProjectWorkSpaceIntf,
   TSTOProjectWorkSpace.Xml, TSTOProjectWorkSpace.Types,
-  RemoveFileFromProjectFrm, ProjectSettingFrm, ProjectGroupSettingFrm;
+  RemoveFileFromProjectFrm, ProjectSettingFrm, ProjectGroupSettingFrm, HackMasterListFrm;
 
 {$R *.dfm}
 
@@ -738,6 +740,17 @@ begin
     FFormSettings.W := Width;
   End;
 
+  If SameText(SkinManager.CurrentSkinName, 'WMP11') Then
+  Begin
+    FTvDlcServer.Font.Color      := $00F1F1F1;
+    FTvWorkSpace.Font.Color      := $00F1F1F1;
+    FTvSbtpFile.Font.Color       := $00F1F1F1;
+    FTvCustomPatches.Font.Color  := $00F1F1F1;
+    FTvResources.Font.Color      := $00F1F1F1;
+    FTvScriptTemplate.Font.Color := $00F1F1F1;
+    FTvSTSettings.Font.Color     := $00F1F1F1;
+    FTvSTVariables.Font.Color    := $00F1F1F1;
+  End;
   FLoaded := False;
 end;
 
@@ -836,6 +849,20 @@ Begin
 End;
 
 (******************************************************************************)
+
+procedure TFrmDckMain.mnuHackMasterListClick(Sender: TObject);
+begin
+  With TFrmHackMasterList.Create(Self) Do
+  Try
+    MasterList  := FWorkSpace.HackSettings.HackMasterList;
+    LangMgr     := SciLangMgr;
+    AppSettings := FPrj.Settings;
+    ShowModal();
+
+    Finally
+      Release();
+  End;
+end;
 
 procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
 begin
