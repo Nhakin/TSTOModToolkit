@@ -137,7 +137,14 @@ object FrmCustomPatches: TFrmCustomPatches
         Width = 460
         Height = 21
         Anchors = [akLeft, akTop, akRight]
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 0
+        OnExit = EditPatchNameExit
       end
       object EditPatchDesc: TEdit
         Left = 71
@@ -145,7 +152,14 @@ object FrmCustomPatches: TFrmCustomPatches
         Width = 460
         Height = 21
         Anchors = [akLeft, akTop, akRight]
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 1
+        OnExit = EditPatchDescExit
       end
       object EditPatchFileName: TEdit
         Left = 71
@@ -153,7 +167,14 @@ object FrmCustomPatches: TFrmCustomPatches
         Width = 460
         Height = 21
         Anchors = [akLeft, akTop, akRight]
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 2
+        OnExit = EditPatchFileNameExit
       end
     end
     object tsXmlV2: TSpTBXTabSet
@@ -223,6 +244,7 @@ object FrmCustomPatches: TFrmCustomPatches
       Left = 0
       Top = 0
       CloseButton = False
+      DockPos = 0
       FullSize = True
       Images = DataModuleImage.imgToolBar
       ProcessShortCuts = True
@@ -232,6 +254,7 @@ object FrmCustomPatches: TFrmCustomPatches
       Customizable = False
       MenuBar = True
       object tbSave: TSpTBXItem
+        Enabled = False
         ImageIndex = 2
         OnClick = tbSaveOldClick
       end
