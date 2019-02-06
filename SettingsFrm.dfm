@@ -3,7 +3,7 @@ object FrmSettings: TFrmSettings
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'Settings'
-  ClientHeight = 221
+  ClientHeight = 200
   ClientWidth = 447
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -43,17 +43,17 @@ object FrmSettings: TFrmSettings
   end
   object SbMainV2: TSpTBXStatusBar
     Left = 0
-    Top = 195
+    Top = 174
     Width = 447
     Height = 26
     Enabled = False
-    ExplicitTop = 220
+    ExplicitTop = 195
   end
   object PanData: TSpTBXExPanel
     Left = 0
     Top = 26
     Width = 447
-    Height = 169
+    Height = 148
     Color = clBtnFace
     Align = alClient
     UseDockManager = True
@@ -65,10 +65,24 @@ object FrmSettings: TFrmSettings
     ParentFont = False
     TabOrder = 0
     ShowCaption = True
-    ExplicitHeight = 170
+    ExplicitHeight = 169
     DesignSize = (
       447
-      169)
+      148)
+    object LblResourcePath: TLabel
+      Left = 11
+      Top = 116
+      Width = 70
+      Height = 13
+      Caption = 'Resource Path'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+    end
     object LblDLCServer: TLabel
       Left = 11
       Top = 9
@@ -142,7 +156,7 @@ object FrmSettings: TFrmSettings
     end
     object LblTargetPath: TLabel
       Left = 11
-      Top = 143
+      Top = 116
       Width = 57
       Height = 13
       Caption = 'Target Path'
@@ -154,20 +168,6 @@ object FrmSettings: TFrmSettings
       ParentFont = False
       Transparent = True
       Visible = False
-    end
-    object LblResourcePath: TLabel
-      Left = 11
-      Top = 116
-      Width = 70
-      Height = 13
-      Caption = 'Resource Path'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -11
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentFont = False
-      Transparent = True
     end
     object EditDLCServer: TEdit
       Left = 105
@@ -212,7 +212,7 @@ object FrmSettings: TFrmSettings
     end
     object EditTargetPath: TEdit
       Left = 105
-      Top = 140
+      Top = 113
       Width = 332
       Height = 21
       Anchors = [akLeft, akTop, akRight]

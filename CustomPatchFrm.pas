@@ -68,12 +68,15 @@ type
       var CellText: string);
     procedure FormActivate(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure EditPatchNameExit(Sender: TObject);
+    procedure EditPatchDescExit(Sender: TObject);
+    procedure EditPatchFileNameExit(Sender: TObject);
 
   Private
     FProject       : ITSTOXMLProject;
     FHackSettings  : ITSTOHackSettings;
     FCustomPatches : ITSTOCustomPatchesIO;
-    FFormSettings : ITSTOXMLFormSetting;
+    FFormSettings  : ITSTOXMLFormSetting;
 
     FPrevPatch     : PVirtualNode;
     FPrevPatchData : PVirtualNode;
@@ -85,6 +88,8 @@ type
     Function  GetNodeData(ANode : PVirtualNode; AId : TGUID; Var ANodeData) : Boolean; OverLoad;
 
     Procedure DisplayXml(APatch : ITSTOCustomPatchIO; AIndex : Integer = -1);
+
+    Procedure DoOnPatchesChanged(Sender : TObject);
 
   Published
     Property ProjectFile  : ITSTOXMLProject   Read FProject      Write SetProject;
@@ -118,6 +123,12 @@ Var lSetting : ITSTOXmlCustomFormSetting;
     X      : Integer;
 begin
   CanClose := True;
+
+  If FCustomPatches.Modified Then
+    Case MessageDlg('Save changes to Custom patches ?', mtInformation, [mbYes, mbNo, mbCancel], 0) Of
+      mrYes : tbSaveOldClick(Self);
+      mrCancel : CanClose := False;
+    End;
 
   If CanClose Then
   Begin
@@ -239,10 +250,37 @@ Begin
   Begin
     FCustomPatches := TTSTOCustomPatchesIO.CreateCustomPatchIO();
     FCustomPatches.Assign(FHackSettings.CustomPatches);
+    FCustomPatches.OnChange := DoOnPatchesChanged;
 
     vstCustomPacthes.RootNodeCount := FCustomPatches.Patches.Count;
   End;
 End;
+
+Procedure TFrmCustomPatches.DoOnPatchesChanged(Sender : TObject);
+Begin
+  tbSave.Enabled := FCustomPatches.Modified;
+End;
+
+procedure TFrmCustomPatches.EditPatchDescExit(Sender: TObject);
+Var lPatch : ITSTOCustomPatchIO;
+begin
+  If GetNodeData(FPrevPatch, ITSTOCustomPatchIO, lPatch) Then
+    lPatch.PatchDesc := EditPatchDesc.Text;
+end;
+
+procedure TFrmCustomPatches.EditPatchFileNameExit(Sender: TObject);
+Var lPatch : ITSTOCustomPatchIO;
+begin
+  If GetNodeData(FPrevPatch, ITSTOCustomPatchIO, lPatch) Then
+    lPatch.FileName := EditPatchFileName.Text;
+end;
+
+procedure TFrmCustomPatches.EditPatchNameExit(Sender: TObject);
+Var lPatch : ITSTOCustomPatchIO;
+begin
+  If GetNodeData(FPrevPatch, ITSTOCustomPatchIO, lPatch) Then
+    lPatch.PatchName := EditPatchName.Text;
+end;
 
 procedure TFrmCustomPatches.tbSaveOldClick(Sender: TObject);
 Var lStrStream : IStringStreamEx;

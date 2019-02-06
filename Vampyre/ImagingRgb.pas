@@ -2,7 +2,7 @@ unit ImagingRgb;
 
 interface
 
-Uses Windows, ExtCtrls, Graphics,
+Uses Windows, ExtCtrls, Graphics, HsInterfaceEx,
   Imaging, ImagingTypes, ImagingClasses;
 
 Type
@@ -37,7 +37,19 @@ Type
 
   End;
 
-  TImagingAnimation = Class(TObject)
+  IImagingAnimation = Interface(IInterfaceEx)
+    ['{4B61686E-29A0-2112-9D1D-BE321C9FB6E7}']
+    Function  GetInterval() : Integer;
+    Procedure SetInterval(Const AInterval : Integer);
+
+    Procedure Play();
+    Procedure Stop();
+
+    Property Interval : Integer Read GetInterval Write SetInterval;
+
+  End;
+
+  TImagingAnimation = Class(TInterfacedObjectEx, IImagingAnimation)
   Private
     FTimer     : TTimer;
     FAnimation : TMultiImage;
@@ -51,9 +63,16 @@ Type
     Procedure DoOnTimer(Sender : TObject);
     Procedure DoOnPaintBoxPaint(Sender : TObject);
 
+  Protected
+    Function  GetInterval() : Integer;
+    Procedure SetInterval(Const AInterval : Integer);
+
+    Procedure Play();
+    Procedure Stop();
+
   Public
     Constructor Create(APaintBox : TPaintBox; AAnimation : TMultiImage); ReIntroduce; OverLoad;
-    Constructor Create(AImage : TImage; AAnimation : TMultiImage); ReIntroduce; OverLoad;
+    Constructor Create(AImage : TImage; AAnimation : TMultiImage; ABackColor : TColor32); ReIntroduce; OverLoad;
     Destructor Destroy(); OverRide;
 
   End;
@@ -467,7 +486,7 @@ Begin
   FCanvas := FPaintBox.Canvas;
 End;
 
-Constructor TImagingAnimation.Create(AImage : TImage; AAnimation : TMultiImage);
+Constructor TImagingAnimation.Create(AImage : TImage; AAnimation : TMultiImage; ABackColor : TColor32);
 Begin
   InHerited Create();
 
@@ -483,6 +502,7 @@ Begin
   FImage.Picture.Bitmap.Height := FAnimation.Height;
 
   FCanvas := FImage.Picture.Bitmap.Canvas;
+  FBackColor := ABackColor;
 End;
 
 Destructor TImagingAnimation.Destroy();
@@ -491,6 +511,26 @@ Begin
   FAnimation.Free();
 
   InHerited Destroy();
+End;
+
+Function TImagingAnimation.GetInterval() : Integer;
+Begin
+  Result := FTimer.Interval;
+End;
+
+Procedure TImagingAnimation.SetInterval(Const AInterval : Integer);
+Begin
+  FTimer.Interval := AInterval;
+End;
+
+Procedure TImagingAnimation.Play();
+Begin
+  FTimer.Enabled := True;
+End;
+
+Procedure TImagingAnimation.Stop();
+Begin
+  FTimer.Enabled := False;
 End;
 
 Procedure TImagingAnimation.InitAnimation(Const AAnimation : TMultiImage);
@@ -521,6 +561,10 @@ Begin
 End;
 
 Procedure TImagingAnimation.DoOnTimer(Sender : TObject);
+Var lCvsSrc ,
+    lCvsTrg : TFastARGB32Canvas;
+    lImgTrg : TImageData;
+    lImgSrc : TImageData;
 Begin
   If Assigned(FAnimation) Then
   Begin
@@ -531,7 +575,30 @@ Begin
         FAnimation.ActiveImage := 0;
 
     If Assigned(FPaintBox) Then
-      FPaintBox.Repaint();
+      FPaintBox.Repaint()
+    Else If Assigned(FImage) Then
+    Begin
+      NewImage(FAnimation[FAnimation.ActiveImage].Width, FAnimation[FAnimation.ActiveImage].Height, ifA8R8G8B8, lImgTrg);
+      lImgSrc := FAnimation[FAnimation.ActiveImage];
+      lCvsSrc := TFastARGB32Canvas.CreateForData(@lImgSrc);
+      lCvsTrg := TFastARGB32Canvas.CreateForData(@lImgTrg);
+      Try
+        lCvsTrg.FillColor32 := FBackColor;
+        lCvsTrg.Clear();
+
+        lCvsSrc.DrawAlpha(Rect(0, 0, lImgTrg.Width, lImgTrg.Height), lCvsTrg, 0, 0);
+        With FImage.Picture.Bitmap Do
+          DisplayImageData( Canvas, Rect(0, 0, Width, Height), lImgTrg,
+            Rect(0, 0, lImgTrg.Width, lImgTrg.Height)
+          );
+        FImage.Invalidate();
+
+        Finally
+          lCvsTrg.Free();
+          lCvsSrc.Free();
+          FreeImage(lImgTrg);
+      End;
+    End;
   End;
 End;
 

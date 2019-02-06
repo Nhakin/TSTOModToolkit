@@ -84,8 +84,8 @@ Var lImgList : TImageList;
 Var X, Y : Integer;
     lBmp : TBitMap;
 begin
-  Constraints.MinHeight := 290;
-  Constraints.MaxHeight := 290;
+  Constraints.MinHeight := 240;
+  Constraints.MaxHeight := 240;
 
   If SameText(CurrentSkin.SkinName, 'WMP11') Then
   Begin

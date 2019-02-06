@@ -1176,4 +1176,7 @@ Begin
   lResult.Free();
 End;
 
+Initialization
+  RegisterInterface('ITSTORgbFile', ITSTORgbFile);
+
 end.
