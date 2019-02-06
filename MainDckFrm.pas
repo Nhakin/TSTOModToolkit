@@ -718,7 +718,6 @@ begin
 
   SkinManager.SetSkin(FPrj.Settings.SkinName);
 
-
   For X := 0 To FPrj.Settings.FormPos.Count - 1 Do
     If SameText(FPrj.Settings.FormPos[X].Name, Self.ClassName) Then
     Begin
