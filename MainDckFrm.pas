@@ -278,10 +278,12 @@ Type
     procedure PackAllModFromHereClick(Sender: TObject);
     procedure popCompareHackMasterListClick(Sender: TObject);
     procedure popDiffHackMasterListClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
     FEditFilterRes : THsVTButtonEdit;
+    FFormSettings  : ITSTOXMLFormSetting;
 
     FTvDlcServer      : TTSTODlcServerTreeView;
     FTvWorkSpace      : TTSTOWorkSpaceTreeView;
@@ -348,7 +350,7 @@ var
 
 implementation
 
-Uses RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
+Uses RTTI, RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
   Imaging, ImagingTypes, HsBase64Ex,
   HsJSonFormatterEx, HsXmlDocEx, HsZipUtils, HsFunctionsEx,
   HsCheckSumEx, HsStringListEx, SciSupport, System.Character,
@@ -716,6 +718,26 @@ begin
 
   SkinManager.SetSkin(FPrj.Settings.SkinName);
 
+
+  For X := 0 To FPrj.Settings.FormPos.Count - 1 Do
+    If SameText(FPrj.Settings.FormPos[X].Name, Self.ClassName) Then
+    Begin
+      FFormSettings := FPrj.Settings.FormPos[X];
+      Break;
+    End;
+
+  If Not Assigned(FFormSettings) Then
+  Begin
+    FFormSettings := FPrj.Settings.FormPos.Add();
+
+    FFormSettings.Name        := Self.ClassName;
+    FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+    FFormSettings.X := Left;
+    FFormSettings.Y := Top;
+    FFormSettings.H := Height;
+    FFormSettings.W := Width;
+  End;
+
   FLoaded := False;
 end;
 
@@ -768,6 +790,15 @@ begin
   FBsvAnim := Nil;
 end;
 
+procedure TFrmDckMain.FormActivate(Sender: TObject);
+begin
+  WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
+  Left        := FFormSettings.X;
+  Top         := FFormSettings.Y;
+  Height      := FFormSettings.H;
+  Width       := FFormSettings.W;
+end;
+
 procedure TFrmDckMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   CanClose := True;
@@ -777,6 +808,18 @@ begin
       mrYes : FWorkSpace.SaveToFile(FWorkSpace.FileName);
       mrCancel : CanClose := False;
     End;
+
+  If CanClose Then
+  Begin
+    FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
+    If WindowState <> wsMaximized Then
+    Begin
+      FFormSettings.X := Left;
+      FFormSettings.Y := Top;
+      FFormSettings.H := Height;
+      FFormSettings.W := Width;
+    End;
+  End;
 end;
 
 Procedure TFrmDckMain.ShowPanelClick(Sender: TObject);
