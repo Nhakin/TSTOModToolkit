@@ -160,76 +160,252 @@ object FrmDckMain: TFrmDckMain
       EFBBBF3C3F786D6C2076657273696F6E3D22312E302220656E636F64696E673D
       227574662D38223F3E0D0A3C736974656C6973743E0D0A093C73697465206964
       3D2253454C465F53495445223E0D0A09093C7A6F6E65206B696E643D22484F52
-      5A223E0D0A0909093C7A6F6E65206B696E643D22544142532220616374697665
-      7461623D2230222073697A653D2231353022206473697A653D22302E32313339
-      38303032383533303637223E0D0A090909093C7A6F6E65206B696E643D225041
-      4E454C222069643D2250616E5472656556696577222076697369626C653D2231
-      222F3E0D0A090909093C7A6F6E65206B696E643D2250414E454C222069643D22
-      50616E50726F6A656374222076697369626C653D2231222F3E0D0A090909093C
-      7A6F6E65206B696E643D2250414E454C222069643D2250616E5265736F757263
-      6573222076697369626C653D2231222F3E0D0A0909093C2F7A6F6E653E0D0A09
-      09093C7A6F6E65206B696E643D225441425322206163746976657461623D2230
-      222073697A653D2235353122206473697A653D22302E37383630313939373134
-      363933332220697373706163653D2231223E0D0A090909093C7A6F6E65206B69
-      6E643D2250414E454C222069643D2250616E496E666F222076697369626C653D
-      2231222F3E0D0A090909093C7A6F6E65206B696E643D2250414E454C22206964
-      3D2250616E53627470222076697369626C653D2231222F3E0D0A090909093C7A
-      6F6E65206B696E643D2250414E454C222069643D2250616E4865784564697422
-      2076697369626C653D2231222F3E0D0A090909093C7A6F6E65206B696E643D22
-      50414E454C222069643D2250616E4861636B54656D706C6174654D6173746572
-      222076697369626C653D2231222F3E0D0A0909093C2F7A6F6E653E0D0A09093C
-      2F7A6F6E653E0D0A093C2F736974653E0D0A3C2F736974656C6973743E}
+      5A223E0D0A0909093C7A6F6E65206B696E643D2250414E454C222069643D2250
+      616E5472656556696577222076697369626C653D2231222073697A653D223135
+      3022206473697A653D22302E323135383237333338313239343936222F3E0D0A
+      0909093C7A6F6E65206B696E643D2256455254222073697A653D223337382220
+      6473697A653D22302E353433383834383932303836333331223E0D0A09090909
+      3C7A6F6E65206B696E643D2250414E454C222069643D2250616E46696C65496E
+      666F222076697369626C653D2231222073697A653D2231323022206473697A65
+      3D22302E313836333335343033373236373038222F3E0D0A090909093C7A6F6E
+      65206B696E643D225441425322206163746976657461623D2230222073697A65
+      3D2235323422206473697A653D22302E38313336363435393632373332393222
+      20697373706163653D2231223E0D0A09090909093C7A6F6E65206B696E643D22
+      50414E454C222069643D2250616E496E666F222076697369626C653D2231222F
+      3E0D0A09090909093C7A6F6E65206B696E643D2250414E454C222069643D2250
+      616E496D616765222076697369626C653D2231222F3E0D0A09090909093C7A6F
+      6E65206B696E643D2250414E454C222069643D2250616E536274702220766973
+      69626C653D2231222F3E0D0A09090909093C7A6F6E65206B696E643D2250414E
+      454C222069643D2250616E48657845646974222076697369626C653D2231222F
+      3E0D0A09090909093C7A6F6E65206B696E643D2250414E454C222069643D2250
+      616E4861636B54656D706C6174654D6173746572222076697369626C653D2231
+      222F3E0D0A090909093C2F7A6F6E653E0D0A0909093C2F7A6F6E653E0D0A0909
+      093C7A6F6E65206B696E643D2256455254222073697A653D2231363722206473
+      697A653D22302E323430323837373639373834313733223E0D0A090909093C7A
+      6F6E65206B696E643D225441425322206163746976657461623D223022207369
+      7A653D2233323522206473697A653D22302E3530343635383338353039333136
+      38223E0D0A09090909093C7A6F6E65206B696E643D2250414E454C222069643D
+      2250616E50726F6A656374222076697369626C653D2231222F3E0D0A09090909
+      093C7A6F6E65206B696E643D2250414E454C222069643D2250616E5265736F75
+      72636573222076697369626C653D2231222F3E0D0A090909093C2F7A6F6E653E
+      0D0A090909093C7A6F6E65206B696E643D225441425322206163746976657461
+      623D2230222073697A653D2233313922206473697A653D22302E343935333431
+      363134393036383332223E0D0A09090909093C7A6F6E65206B696E643D225041
+      4E454C222069643D2250616E4D6F644F7074696F6E73222076697369626C653D
+      2231222F3E0D0A09090909093C7A6F6E65206B696E643D2250414E454C222069
+      643D2250616E437573746F6D4D6F64222076697369626C653D2231222F3E0D0A
+      090909093C2F7A6F6E653E0D0A0909093C2F7A6F6E653E0D0A09093C2F7A6F6E
+      653E0D0A093C2F736974653E0D0A3C2F736974656C6973743E}
+    object PanCustomMod: TLMDDockPanel
+      Left = 546
+      Top = 337
+      Width = 167
+      Height = 299
+      Buttons = [pbPin, pbMaximize, pbClose]
+      ParentBackground = False
+      TabOrder = 11
+      Caption = 'Custom Mod'
+    end
+    object PanFileInfo: TLMDDockPanel
+      Left = 162
+      Top = 6
+      Width = 378
+      Height = 120
+      Buttons = [pbPin, pbMaximize, pbClose]
+      ParentBackground = False
+      TabOrder = 13
+      Caption = 'File Info'
+      DesignSize = (
+        378
+        120)
+      object Label6: TLabel
+        Left = 225
+        Top = 83
+        Width = 47
+        Height = 13
+        Caption = 'Language'
+      end
+      object Label4: TLabel
+        Left = 137
+        Top = 83
+        Width = 35
+        Height = 13
+        Caption = 'Version'
+      end
+      object Label2: TLabel
+        Left = 137
+        Top = 60
+        Width = 18
+        Height = 13
+        Caption = 'Tier'
+      end
+      object Label3: TLabel
+        Left = 13
+        Top = 83
+        Width = 54
+        Height = 13
+        Caption = 'Min Version'
+      end
+      object Label1: TLabel
+        Left = 12
+        Top = 60
+        Width = 40
+        Height = 13
+        Caption = 'Platform'
+      end
+      object Label5: TLabel
+        Left = 12
+        Top = 33
+        Width = 43
+        Height = 13
+        Caption = 'FileName'
+      end
+      object EditLanguage: TEdit
+        Left = 282
+        Top = 79
+        Width = 34
+        Height = 21
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        ReadOnly = True
+        TabOrder = 0
+      end
+      object EditVersion: TEdit
+        Left = 181
+        Top = 79
+        Width = 34
+        Height = 21
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        ReadOnly = True
+        TabOrder = 1
+      end
+      object EditTier: TEdit
+        Left = 181
+        Top = 54
+        Width = 57
+        Height = 21
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        ReadOnly = True
+        TabOrder = 2
+      end
+      object EditMinVersion: TEdit
+        Left = 70
+        Top = 79
+        Width = 57
+        Height = 21
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        ReadOnly = True
+        TabOrder = 3
+      end
+      object EditPlatform: TEdit
+        Left = 70
+        Top = 54
+        Width = 57
+        Height = 21
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        ReadOnly = True
+        TabOrder = 4
+      end
+      object EditFileName: TEdit
+        Left = 70
+        Top = 29
+        Width = 284
+        Height = 21
+        Anchors = [akLeft, akTop, akRight]
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        ReadOnly = True
+        TabOrder = 5
+        ExplicitWidth = 457
+      end
+    end
     object PanHackTemplateMaster: TLMDDockPanel
       Left = 162
-      Top = 27
-      Width = 551
-      Height = 629
+      Top = 153
+      Width = 378
+      Height = 503
       ParentBackground = False
       TabOrder = 10
       Caption = 'Script Template'
       object dckScriptTemplate: TLMDDockSite
         Left = 0
         Top = 0
-        Width = 551
-        Height = 629
+        Width = 378
+        Height = 503
         Manager = dckMgr
         Align = alClient
         TabOrder = 0
+        ExplicitWidth = 389
+        ExplicitHeight = 629
         Layout = {
           EFBBBF3C3F786D6C2076657273696F6E3D22312E302220656E636F64696E673D
           227574662D38223F3E0D0A3C736974656C6973743E0D0A093C73697465206964
-          3D2253454C465F53495445223E0D0A09093C7A6F6E65206B696E643D22484F52
-          5A223E0D0A0909093C7A6F6E65206B696E643D2256455254222073697A653D22
-          32303722206473697A653D22302E333838333637373239383331313434223E0D
+          3D2253454C465F53495445223E0D0A09093C7A6F6E65206B696E643D22564552
+          54223E0D0A0909093C7A6F6E65206B696E643D22484F525A222073697A653D22
+          31323722206473697A653D22302E323631383535363730313033303933223E0D
           0A090909093C7A6F6E65206B696E643D2250414E454C222069643D2250616E54
           764861636B54656D706C617465222076697369626C653D2231222073697A653D
-          2233303322206473697A653D22302E343935393038333436393732313737222F
+          2231373522206473697A653D22302E343836363331303136303432373831222F
           3E0D0A090909093C7A6F6E65206B696E643D2254414253222061637469766574
-          61623D2231222073697A653D2233303822206473697A653D22302E3530343039
-          31363533303237383233223E0D0A09090909093C7A6F6E65206B696E643D2250
-          414E454C222069643D2250616E535453657474696E6773222076697369626C65
-          3D2231222F3E0D0A09090909093C7A6F6E65206B696E643D2250414E454C2220
-          69643D2250616E53545661726961626C6573222076697369626C653D2231222F
+          61623D2230222073697A653D2231383522206473697A653D22302E3531333336
+          38393833393537323139223E0D0A09090909093C7A6F6E65206B696E643D2250
+          414E454C222069643D2250616E53545661726961626C6573222076697369626C
+          653D2231222F3E0D0A09090909093C7A6F6E65206B696E643D2250414E454C22
+          2069643D2250616E535453657474696E6773222076697369626C653D2231222F
           3E0D0A090909093C2F7A6F6E653E0D0A0909093C2F7A6F6E653E0D0A0909093C
           7A6F6E65206B696E643D225441425322206163746976657461623D2230222073
-          697A653D2233323622206473697A653D22302E36313136333232373031363838
-          35362220697373706163653D2231223E0D0A090909093C7A6F6E65206B696E64
+          697A653D2233353822206473697A653D22302E37333831343433323938393639
+          30372220697373706163653D2231223E0D0A090909093C7A6F6E65206B696E64
           3D2250414E454C222069643D2250616E4861636B54656D706C61746522207669
           7369626C653D2231222F3E0D0A0909093C2F7A6F6E653E0D0A09093C2F7A6F6E
           653E0D0A093C2F736974653E0D0A3C2F736974656C6973743E}
         object PanHackTemplate: TLMDDockPanel
-          Left = 219
-          Top = 27
-          Width = 326
-          Height = 596
+          Left = 6
+          Top = 160
+          Width = 366
+          Height = 337
           ParentBackground = False
           TabOrder = 5
           Caption = 'Template Source'
           object EditScriptTemplate: TScintillaNPP
             Left = 0
             Top = 0
-            Width = 326
-            Height = 568
+            Width = 366
+            Height = 309
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
             Font.Height = -13
@@ -653,13 +829,15 @@ object FrmDckMain: TFrmDckMain
           end
           object tsScriptTemplate: TSpTBXTabSet
             Left = 0
-            Top = 568
-            Width = 326
+            Top = 309
+            Width = 366
             Height = 28
             Align = alBottom
             ActiveTabIndex = 0
             TabPosition = ttpBottom
             OnActiveTabChange = tsScriptTemplateActiveTabChange
+            ExplicitTop = 568
+            ExplicitWidth = 164
             HiddenItems = <>
             object tsSTSource: TSpTBXTabItem
               Caption = 'Source'
@@ -671,19 +849,19 @@ object FrmDckMain: TFrmDckMain
           end
         end
         object PanSTSettings: TLMDDockPanel
-          Left = 6
-          Top = 315
-          Width = 207
-          Height = 288
+          Left = 187
+          Top = 6
+          Width = 185
+          Height = 107
           ParentBackground = False
           TabOrder = 7
           Caption = 'Settings'
         end
         object PanSTVariables: TLMDDockPanel
-          Left = 6
-          Top = 315
-          Width = 207
-          Height = 288
+          Left = 187
+          Top = 6
+          Width = 185
+          Height = 107
           ParentBackground = False
           TabOrder = 6
           Caption = 'Variables'
@@ -691,8 +869,8 @@ object FrmDckMain: TFrmDckMain
         object PanTvHackTemplate: TLMDDockPanel
           Left = 6
           Top = 6
-          Width = 207
-          Height = 303
+          Width = 175
+          Height = 127
           Buttons = [pbPin, pbMaximize, pbClose]
           ParentBackground = False
           TabOrder = 4
@@ -702,20 +880,20 @@ object FrmDckMain: TFrmDckMain
     end
     object PanHexEdit: TLMDDockPanel
       Left = 162
-      Top = 27
-      Width = 551
-      Height = 629
+      Top = 153
+      Width = 378
+      Height = 503
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 7
       Caption = 'Hex Editor'
-      OnEnter = PanImageEnter
+      OnEnter = PanImageOldEnter
       object KHexEditor: TKHexEditor
         AlignWithMargins = True
         Left = 3
         Top = 3
-        Width = 545
-        Height = 623
+        Width = 372
+        Height = 497
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -724,13 +902,83 @@ object FrmDckMain: TFrmDckMain
         Font.Pitch = fpFixed
         Font.Style = [fsBold]
         TabOrder = 0
+        ExplicitWidth = 383
+        ExplicitHeight = 623
+      end
+    end
+    object PanImage: TLMDDockPanel
+      Left = 162
+      Top = 153
+      Width = 378
+      Height = 503
+      ParentBackground = False
+      TabOrder = 14
+      Caption = 'Image'
+      object PanSize: TPanel
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 372
+        Height = 30
+        Align = alTop
+        BevelOuter = bvLowered
+        ParentColor = True
+        TabOrder = 0
+        ExplicitLeft = 6
+        ExplicitTop = 11
+        object Label7: TLabel
+          Left = 16
+          Top = 9
+          Width = 22
+          Height = 13
+          Caption = 'Size '
+        end
+        object EditImageSize: TEdit
+          Left = 73
+          Top = 5
+          Width = 125
+          Height = 21
+          Color = clBtnFace
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          ReadOnly = True
+          TabOrder = 0
+        end
+      end
+      object ScrlImage: TScrollBox
+        AlignWithMargins = True
+        Left = 3
+        Top = 39
+        Width = 372
+        Height = 461
+        Align = alClient
+        BevelEdges = []
+        BevelInner = bvNone
+        BevelOuter = bvNone
+        BorderStyle = bsNone
+        TabOrder = 1
+        OnEnter = PanImageOldEnter
+        ExplicitTop = 60
+        ExplicitWidth = 533
+        ExplicitHeight = 179
+        object ImgResource: TImage
+          Left = 0
+          Top = 0
+          Width = 94
+          Height = 74
+          AutoSize = True
+        end
       end
     end
     object PanInfo: TLMDDockPanel
       Left = 162
-      Top = 27
-      Width = 551
-      Height = 629
+      Top = 153
+      Width = 378
+      Height = 503
       Buttons = [pbMenu, pbPin, pbMaximize]
       ParentBackground = False
       TabOrder = 8
@@ -738,346 +986,134 @@ object FrmDckMain: TFrmDckMain
       object dckInfo: TLMDDockSite
         Left = 0
         Top = 0
-        Width = 551
-        Height = 629
+        Width = 378
+        Height = 503
         Manager = dckMgr
         Align = alClient
         TabOrder = 0
+        ExplicitWidth = 551
+        ExplicitHeight = 629
         Layout = {
           EFBBBF3C3F786D6C2076657273696F6E3D22312E302220656E636F64696E673D
           227574662D38223F3E0D0A3C736974656C6973743E0D0A093C73697465206964
-          3D2253454C465F53495445223E0D0A09093C7A6F6E65206B696E643D22564552
-          54223E0D0A0909093C7A6F6E65206B696E643D2250414E454C222069643D2250
-          616E46696C65496E666F222076697369626C653D2231222073697A653D223130
-          3922206473697A653D22302E313830313635323839323536313938222F3E0D0A
-          0909093C7A6F6E65206B696E643D225441425322206163746976657461623D22
-          30222073697A653D2232353422206473697A653D22302E343139383334373130
-          3734333830322220697373706163653D2231223E0D0A090909093C7A6F6E6520
-          6B696E643D2250414E454C222069643D2250616E4D6F644F7074696F6E732220
-          76697369626C653D2231222F3E0D0A090909093C7A6F6E65206B696E643D2250
-          414E454C222069643D2250616E437573746F6D4D6F64222076697369626C653D
-          2231222F3E0D0A0909093C2F7A6F6E653E0D0A0909093C7A6F6E65206B696E64
-          3D2250414E454C222069643D2250616E496D616765222076697369626C653D22
-          31222073697A653D2232343222206473697A653D22302E34222F3E0D0A09093C
-          2F7A6F6E653E0D0A093C2F736974653E0D0A3C2F736974656C6973743E}
-        object PanCustomMod: TLMDDockPanel
+          3D2253454C465F53495445223E0D0A09093C7A6F6E65206B696E643D22484F52
+          5A223E0D0A0909093C7A6F6E65206B696E643D2250414E454C222069643D224C
+          4D44446F636B50616E656C31222076697369626C653D2230222073697A653D22
+          333222206473697A653D22302E30363030333735323334353231353736222F3E
+          0D0A0909093C7A6F6E65206B696E643D2250414E454C222073697A653D223336
+          3622206473697A653D22312220697373706163653D2231222F3E0D0A09093C2F
+          7A6F6E653E0D0A093C2F736974653E0D0A3C2F736974656C6973743E}
+        object LMDDockPanel1: TLMDDockPanel
           Left = 6
-          Top = 142
-          Width = 539
-          Height = 233
-          Buttons = [pbPin, pbMaximize, pbClose]
-          ParentBackground = False
-          TabOrder = 6
-          Caption = 'Custom Mod'
-        end
-        object PanFileInfo: TLMDDockPanel
-          Left = 6
-          Top = 6
-          Width = 539
-          Height = 109
-          Buttons = [pbPin, pbMaximize, pbClose]
+          Top = 121
+          Width = 32
+          Height = 254
+          PanelVisible = False
           ParentBackground = False
           TabOrder = 4
-          Caption = 'File Info'
-          DesignSize = (
-            539
-            109)
-          object Label6: TLabel
-            Left = 225
-            Top = 83
-            Width = 47
-            Height = 13
-            Caption = 'Language'
-          end
-          object Label4: TLabel
-            Left = 137
-            Top = 83
-            Width = 35
-            Height = 13
-            Caption = 'Version'
-          end
-          object Label2: TLabel
-            Left = 137
-            Top = 60
-            Width = 18
-            Height = 13
-            Caption = 'Tier'
-          end
-          object Label3: TLabel
-            Left = 13
-            Top = 83
-            Width = 54
-            Height = 13
-            Caption = 'Min Version'
-          end
-          object Label1: TLabel
-            Left = 12
-            Top = 60
-            Width = 40
-            Height = 13
-            Caption = 'Platform'
-          end
-          object Label5: TLabel
-            Left = 12
-            Top = 33
-            Width = 43
-            Height = 13
-            Caption = 'FileName'
-          end
-          object EditLanguage: TEdit
-            Left = 282
-            Top = 79
-            Width = 34
-            Height = 21
-            Color = clBtnFace
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clBlack
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ReadOnly = True
-            TabOrder = 5
-          end
-          object EditVersion: TEdit
-            Left = 181
-            Top = 79
-            Width = 34
-            Height = 21
-            Color = clBtnFace
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clBlack
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ReadOnly = True
-            TabOrder = 4
-          end
-          object EditTier: TEdit
-            Left = 181
-            Top = 54
-            Width = 57
-            Height = 21
-            Color = clBtnFace
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clBlack
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ReadOnly = True
-            TabOrder = 2
-          end
-          object EditMinVersion: TEdit
-            Left = 70
-            Top = 79
-            Width = 57
-            Height = 21
-            Color = clBtnFace
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clBlack
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ReadOnly = True
-            TabOrder = 3
-          end
-          object EditPlatform: TEdit
-            Left = 70
-            Top = 54
-            Width = 57
-            Height = 21
-            Color = clBtnFace
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clBlack
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ReadOnly = True
-            TabOrder = 1
-          end
-          object EditFileName: TEdit
-            Left = 70
-            Top = 29
-            Width = 457
-            Height = 21
-            Anchors = [akLeft, akTop, akRight]
-            Color = clBtnFace
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clBlack
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentFont = False
-            ReadOnly = True
-            TabOrder = 0
-          end
-        end
-        object PanImage: TLMDDockPanel
-          Left = 6
-          Top = 381
-          Width = 539
-          Height = 242
-          Buttons = [pbPin, pbMaximize, pbClose]
-          ParentBackground = False
-          TabOrder = 7
-          Caption = 'Image'
-          OnEnter = PanImageEnter
-          object ScrlImage: TScrollBox
-            AlignWithMargins = True
-            Left = 3
-            Top = 60
-            Width = 533
-            Height = 179
-            Align = alClient
-            BevelEdges = []
-            BevelInner = bvNone
-            BevelOuter = bvNone
-            BorderStyle = bsNone
-            TabOrder = 1
-            object ImgResource: TImage
-              Left = 0
-              Top = 0
-              Width = 94
-              Height = 74
-              AutoSize = True
-            end
-          end
-          object PanSize: TPanel
-            AlignWithMargins = True
-            Left = 3
-            Top = 24
-            Width = 533
-            Height = 30
-            Align = alTop
-            BevelOuter = bvLowered
-            ParentColor = True
-            TabOrder = 0
-            object Label7: TLabel
-              Left = 16
-              Top = 9
-              Width = 22
-              Height = 13
-              Caption = 'Size '
-            end
-            object EditImageSize: TEdit
-              Left = 73
-              Top = 5
-              Width = 125
-              Height = 21
-              Color = clBtnFace
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clBlack
-              Font.Height = -11
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              ParentFont = False
-              ReadOnly = True
-              TabOrder = 0
-            end
-          end
-        end
-        object PanModOptions: TLMDDockPanel
-          Left = 6
-          Top = 142
-          Width = 539
-          Height = 233
-          Buttons = [pbPin, pbMaximize, pbClose]
-          ParentBackground = False
-          TabOrder = 5
-          Caption = 'Mod Options'
-          object chkUnlimitedTime: TSpTBXCheckBox
-            Left = 13
-            Top = 127
-            Width = 92
-            Height = 21
-            Caption = 'Unlimited Time'
-            ParentColor = True
-            TabOrder = 5
-          end
-          object chkFreeLandUpgade: TSpTBXCheckBox
-            Left = 13
-            Top = 106
-            Width = 116
-            Height = 21
-            Caption = 'Free Land Upgrade'
-            ParentColor = True
-            TabOrder = 4
-          end
-          object chkNonUnique: TSpTBXCheckBox
-            Left = 13
-            Top = 85
-            Width = 78
-            Height = 21
-            Caption = 'Non unique'
-            ParentColor = True
-            TabOrder = 3
-          end
-          object chkAllFree: TSpTBXCheckBox
-            Left = 13
-            Top = 64
-            Width = 60
-            Height = 21
-            Caption = 'All Free'
-            ParentColor = True
-            TabOrder = 2
-          end
-          object chkInstantBuild: TSpTBXCheckBox
-            Left = 13
-            Top = 43
-            Width = 84
-            Height = 21
-            Caption = 'Instant Build'
-            ParentColor = True
-            TabOrder = 1
-          end
-          object chkBuildStore: TSpTBXCheckBox
-            Left = 13
-            Top = 22
-            Width = 114
-            Height = 21
-            Caption = 'Build Custom Store'
-            ParentColor = True
-            TabOrder = 0
-          end
+          Caption = 'LMDDockPanel1'
         end
       end
     end
+    object PanModOptions: TLMDDockPanel
+      Left = 546
+      Top = 337
+      Width = 167
+      Height = 299
+      Buttons = [pbPin, pbMaximize, pbClose]
+      ParentBackground = False
+      TabOrder = 12
+      Caption = 'Mod Options'
+      object chkUnlimitedTime: TSpTBXCheckBox
+        Left = 21
+        Top = 135
+        Width = 92
+        Height = 21
+        Caption = 'Unlimited Time'
+        ParentColor = True
+        TabOrder = 0
+      end
+      object chkFreeLandUpgade: TSpTBXCheckBox
+        Left = 21
+        Top = 114
+        Width = 116
+        Height = 21
+        Caption = 'Free Land Upgrade'
+        ParentColor = True
+        TabOrder = 1
+      end
+      object chkNonUnique: TSpTBXCheckBox
+        Left = 21
+        Top = 93
+        Width = 78
+        Height = 21
+        Caption = 'Non unique'
+        ParentColor = True
+        TabOrder = 2
+      end
+      object chkAllFree: TSpTBXCheckBox
+        Left = 21
+        Top = 72
+        Width = 60
+        Height = 21
+        Caption = 'All Free'
+        ParentColor = True
+        TabOrder = 3
+      end
+      object chkInstantBuild: TSpTBXCheckBox
+        Left = 21
+        Top = 51
+        Width = 84
+        Height = 21
+        Caption = 'Instant Build'
+        ParentColor = True
+        TabOrder = 4
+      end
+      object chkBuildStore: TSpTBXCheckBox
+        Left = 21
+        Top = 30
+        Width = 114
+        Height = 21
+        Caption = 'Build Custom Store'
+        ParentColor = True
+        TabOrder = 5
+      end
+    end
     object PanProject: TLMDDockPanel
-      Left = 6
+      Left = 546
       Top = 6
-      Width = 150
-      Height = 630
+      Width = 167
+      Height = 305
+      Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 4
       Caption = 'Project'
     end
     object PanResources: TLMDDockPanel
-      Left = 6
+      Left = 546
       Top = 6
-      Width = 150
-      Height = 630
+      Width = 167
+      Height = 305
+      Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 9
       Caption = 'Resources'
       object PanFilterResources: TPanel
         Left = 0
         Top = 21
-        Width = 150
+        Width = 167
         Height = 22
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitWidth = 150
       end
     end
     object PanSbtp: TLMDDockPanel
       Left = 162
-      Top = 27
-      Width = 551
-      Height = 629
+      Top = 153
+      Width = 378
+      Height = 503
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 6
@@ -1087,7 +1123,7 @@ object FrmDckMain: TFrmDckMain
       Left = 6
       Top = 6
       Width = 150
-      Height = 630
+      Height = 650
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 5
