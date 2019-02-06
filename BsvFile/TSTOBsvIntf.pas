@@ -25,10 +25,10 @@ Type
     Procedure Assign(ASource : IInterface);
 
     Property ImageName : AnsiString Read GetImageName Write SetImageName;
-    Property X         : Word   Read GetX         Write SetX;
-    Property Y         : Word   Read GetY         Write SetY;
-    Property Width     : Word   Read GetWidth     Write SetWidth;
-    Property Height    : Word   Read GetHeight    Write SetHeight;
+    Property X         : Word       Read GetX         Write SetX;
+    Property Y         : Word       Read GetY         Write SetY;
+    Property Width     : Word       Read GetWidth     Write SetWidth;
+    Property Height    : Word       Read GetHeight    Write SetHeight;
 
   End;
 
@@ -60,8 +60,8 @@ Type
     Procedure Assign(ASource : IInterface);
 
     Property AnimationName : AnsiString Read GetAnimationName Write SetAnimationName;
-    Property StartFrame    : Word   Read GetStartFrame    Write SetStartFrame;
-    Property EndFrame      : Word   Read GetEndFrame      Write SetEndFrame;
+    Property StartFrame    : Word       Read GetStartFrame    Write SetStartFrame;
+    Property EndFrame      : Word       Read GetEndFrame      Write SetEndFrame;
 
   End;
 
@@ -191,7 +191,7 @@ Type
     Property FileSig             : Word           Read GetFileSig             Write SetFileSig;
     Property RegionCount         : Word           Read GetRegionCount;
     Property HasOpacity          : Byte           Read GetHasOpacity          Write SetHasOpacity;
-    Property RgbFileName         : AnsiString         Read GetRgbFileName         Write SetRgbFileName;
+    Property RgbFileName         : AnsiString     Read GetRgbFileName         Write SetRgbFileName;
     Property Region              : IBsvImages     Read GetRegion;
     Property TransformationCount : Word           Read GetTransformationCount;
     Property Sub                 : IBsvSubs       Read GetSub;

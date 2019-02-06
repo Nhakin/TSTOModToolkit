@@ -2,7 +2,7 @@ unit TSTOBsv.IO;
 
 interface
 
-Uses Windows, HsStreamEx, TSTOBsvIntf, TSTORgb;
+Uses Windows, ExtCtrls, ImagingRGB, HsStreamEx, TSTOBsvIntf, TSTORgb;
 
 Type
   IBsvImageIO = Interface(IBsvImage)
@@ -30,6 +30,8 @@ Type
   IBsvAnimationIO = Interface(IBsvAnimation)
     ['{4B61686E-29A0-2112-A8D5-278A640D622E}']
     Function GetFrames() : ITSTORgbFiles;
+
+    Function CreateAnimation(AImage : TImage) : IImagingAnimation;
 
     Property Frames : ITSTORgbFiles Read GetFrames;
 
@@ -88,7 +90,7 @@ Type
 
 implementation
 
-Uses SysUtils, Types, Math, PngImage,
+Uses SysUtils, Types, Math, PngImage, Imaging, ImagingClasses, ImagingTypes,
   HsFunctionsEx, HsInterfaceEx, HsXmlDocEx,
   TSTOBsvImpl, TSTOBsv.Bin, TSTOBsv.Xml, TSTORgbTrans;
 
@@ -130,6 +132,8 @@ Type
 
   Protected
     Function GetFrames() : ITSTORgbFiles;
+
+    Function CreateAnimation(AImage : TImage) : IImagingAnimation;
 
     Property BsvFile : IBsvFileIO Read GetBsvFile;
 
@@ -287,13 +291,46 @@ Begin
     lRect := GetAnimationRect();
 
     For X := StartFrame To EndFrame Do
-    Begin
       FFrames.Add(LoadFrame(X, lRect));
-//      Break;
-    End;
   End;
 
   Result := FFrames;
+End;
+
+Function TBsvAnimationIO.CreateAnimation(AImage : TImage) : IImagingAnimation;
+Var lMultImage : TMultiImage;
+    lMem       : IMemoryStreamEx;
+    X          : Integer;
+    lFrames    : ITSTORgbFiles;
+    lImageData : TImageData;
+Begin
+  lMem := TStringStreamEx.Create();
+  lFrames := GetFrames();
+  lMultImage := TMultiImage.Create();
+  Try
+    For X := 0 To lFrames.Count - 1 Do
+    Begin
+      lMem.Clear();
+      lFrames[X].SaveRgbToStream(lMem);
+      Try
+        LoadImageFromMemory(lMem.Memory, lMem.Size, lImageData);
+        lMultImage.AddImage(lImageData);
+
+        Finally
+          FreeImage(lImageData);
+      End;
+    End;
+
+    lMultImage.Height     := lMultImage[0].Height;
+    lMultImage.Width      := lMultImage[0].Width;
+    lMultImage.ImageCount := lFrames.Count;
+    lMultImage.Format     := lMultImage[0].Format;
+    Result := TImagingAnimation.Create(AImage, lMultImage, $FF262525);
+
+    Finally
+      lMultImage.Free();
+      lMem := Nil;
+  End;
 End;
 
 Function TBsvAnimationIO.GetAnimationRect() : TRect;

@@ -291,7 +291,7 @@ Type
     FTvScriptTemplate : TTSTOScriptTemplateTreeView;
     FTvSTSettings     : TTSTOScriptTemplateSettingsTreeView;
     FTvSTVariables    : TTSTOScriptTemplateVariablesTreeView;
-    FBsvAnim          : TImagingAnimation;
+    FBsvAnim          : IImagingAnimation;
 
     FWorkSpace    : ITSTOWorkSpaceProjectGroupIO;
     FResources    : ITSTOResourcePaths;
@@ -765,8 +765,7 @@ begin
   FBCell     := Nil;
   FDefLayout := Nil;
 
-  If Assigned(FBsvAnim) Then
-    FreeAndNil(FBsvAnim);
+  FBsvAnim := Nil;
 end;
 
 procedure TFrmDckMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -1904,12 +1903,6 @@ Var lPkg     : ITSTOPackageNode;
     lImg  : ITSTORgbFile;
     lXmlStr : String;
     lBsvAnimation : IBsvAnimationIO;
-
-    X : Integer;
-    lMultAnim  : TImagingAnimation;
-    lMultImage : TMultiImage;
-    lBaseImage : TBaseImage;
-    lImageData : TImageData;
 Begin
   tbPackMod.Enabled     := False;
   tbUnpackMod.Enabled   := False;
@@ -1919,8 +1912,7 @@ Begin
   ImgResource.Picture := Nil;
   EditImageSize.Text  := '';
 
-  If Assigned(FBsvAnim) Then
-    FreeAndNil(FBsvAnim);
+  FBsvAnim := Nil;
 
 //  PanHexEdit.Visible  := False;
 //  PanXml.Visible      := False;
@@ -1943,7 +1935,7 @@ Begin
         lPath := IncludeTrailingBackslash(FPrj.Settings.HackPath + ChangeFileExt(lPkg.FileName, ''));
 
         tbUnpackMod.Enabled   := lPkg.FileExist;
-        tbPackMod.Enabled     := DirectoryExists(lPath);
+        //tbPackMod.Enabled     := DirectoryExists(lPath);
         tbValidateXml.Enabled := DirectoryExists(lPath);
         tbCreateMod.Enabled   := FTvWorkSpace.GetNodeData(FTvWorkSpace.GetFirstSelected(), ITSTOWorkSpaceProjectIO)
       End
@@ -2039,34 +2031,7 @@ Begin
         End;
       End
       Else If GetNodeData(ANode, IBsvAnimationIO, lBsvAnimation) Then
-      Begin
-        lMultImage := TMultiImage.Create();
-        lMem := TStringStreamEx.Create();
-        Try
-          For X := 0 To lBsvAnimation.Frames.Count - 1 Do
-          Begin
-            lMem.Clear();
-            lBsvAnimation.Frames[X].SaveRgbToStream(lMem);
-            Try
-              LoadImageFromMemory(lMem.Memory, lMem.Size, lImageData);
-              lMultImage.AddImage(lImageData);
-
-              Finally
-                FreeImage(lImageData);
-            End;
-          End;
-
-          lMultImage.Height     := lMultImage[0].Height;
-          lMultImage.Width      := lMultImage[0].Width;
-          lMultImage.ImageCount := lBsvAnimation.Frames.Count;
-          lMultImage.Format     := lMultImage[0].Format;
-          FBsvAnim := TImagingAnimation.Create(ImgResource, lMultImage);
-
-          Finally
-            lMultImage.Free();
-            lMem := Nil;
-        End;
-      End
+        FBsvAnim := lBsvAnimation.CreateAnimation(ImgResource)
       Else If GetNodeData(ANode, ITSTORgbFile, lImg) Then
       Begin
         lMem := TMemoryStreamEx.Create();
