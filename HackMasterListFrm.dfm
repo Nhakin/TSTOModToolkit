@@ -2,8 +2,8 @@ object FrmHackMasterList: TFrmHackMasterList
   Left = 0
   Top = 0
   Caption = 'Hack MasterList'
-  ClientHeight = 453
-  ClientWidth = 662
+  ClientHeight = 556
+  ClientWidth = 709
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,47 +22,41 @@ object FrmHackMasterList: TFrmHackMasterList
     Left = 0
     Top = 26
     Width = 201
-    Height = 427
+    Height = 530
     Caption = 'PanTreeView'
     Align = alLeft
-    TabOrder = 0
+    TabOrder = 1
     Borders = False
-    ExplicitLeft = -1
-    ExplicitTop = 57
-    ExplicitHeight = 402
+    ExplicitHeight = 427
   end
   object SpTBXSplitter1: TSpTBXSplitter
     Left = 201
     Top = 26
-    Height = 427
+    Height = 530
     Cursor = crSizeWE
-    ExplicitLeft = 320
-    ExplicitTop = 216
-    ExplicitHeight = 100
+    ExplicitHeight = 427
   end
   object PanData: TSpTBXExPanel
     Left = 206
     Top = 26
-    Width = 456
-    Height = 427
+    Width = 503
+    Height = 530
     Color = 2499877
     Align = alClient
-    TabOrder = 2
+    TabOrder = 3
     Borders = False
-    ExplicitLeft = 424
-    ExplicitTop = 208
-    ExplicitWidth = 100
-    ExplicitHeight = 41
+    ExplicitWidth = 456
+    ExplicitHeight = 427
     object GrpPackage: TSpTBXGroupBox
       Left = 0
       Top = 81
-      Width = 456
+      Width = 503
       Height = 103
       Caption = ' Package '
       Align = alTop
       ParentColor = True
-      TabOrder = 0
-      ExplicitTop = 162
+      TabOrder = 1
+      ExplicitWidth = 456
       object Label1: TSpTBXLabel
         Left = 10
         Top = 49
@@ -76,7 +70,8 @@ object FrmHackMasterList: TFrmHackMasterList
         Top = 48
         Width = 371
         Height = 21
-        TabOrder = 0
+        TabOrder = 2
+        OnChange = EditPackageXmlFileChange
       end
       object chkPackageEnabled: TSpTBXCheckBox
         Left = 70
@@ -85,7 +80,8 @@ object FrmHackMasterList: TFrmHackMasterList
         Height = 28
         BiDiMode = bdLeftToRight
         ParentBiDiMode = False
-        TabOrder = 2
+        TabOrder = 4
+        OnClick = chkPackageEnabledClick
       end
       object SpTBXLabel1: TSpTBXLabel
         Left = 10
@@ -108,7 +104,8 @@ object FrmHackMasterList: TFrmHackMasterList
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 4
+        TabOrder = 0
+        OnChange = CmbPackageTypeChange
         Items.Strings = (
           'Building'
           'Character'
@@ -126,13 +123,13 @@ object FrmHackMasterList: TFrmHackMasterList
     object GrpCategory: TSpTBXGroupBox
       Left = 0
       Top = 0
-      Width = 456
+      Width = 503
       Height = 81
       Caption = ' Category '
       Align = alTop
       ParentColor = True
-      TabOrder = 1
-      ExplicitTop = 8
+      TabOrder = 0
+      ExplicitWidth = 456
       object SpTBXLabel3: TSpTBXLabel
         Left = 10
         Top = 21
@@ -147,6 +144,7 @@ object FrmHackMasterList: TFrmHackMasterList
         Width = 371
         Height = 21
         TabOrder = 0
+        OnChange = EditCategoryNameChange
       end
       object chkCategoryEnabled: TSpTBXCheckBox
         Left = 70
@@ -156,6 +154,7 @@ object FrmHackMasterList: TFrmHackMasterList
         BiDiMode = bdLeftToRight
         ParentBiDiMode = False
         TabOrder = 2
+        OnClick = chkCategoryEnabledClick
       end
       object SpTBXLabel4: TSpTBXLabel
         Left = 10
@@ -180,26 +179,27 @@ object FrmHackMasterList: TFrmHackMasterList
         Height = 28
         BiDiMode = bdLeftToRight
         ParentBiDiMode = False
-        TabOrder = 5
+        TabOrder = 3
+        OnClick = chkCategoryBuildStoreClick
       end
     end
     object GrpItem: TSpTBXGroupBox
       Left = 0
       Top = 184
-      Width = 456
-      Height = 243
+      Width = 503
+      Height = 346
       Caption = ' Item '
       Align = alClient
       ParentColor = True
       TabOrder = 2
-      ExplicitLeft = 10
-      ExplicitTop = 186
+      ExplicitWidth = 456
+      ExplicitHeight = 243
       object EditXmlData: TScintillaNPP
         AlignWithMargins = True
         Left = 5
-        Top = 125
-        Width = 446
-        Height = 113
+        Top = 177
+        Width = 493
+        Height = 164
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -617,21 +617,22 @@ object FrmHackMasterList: TFrmHackMasterList
         SelectedLanguage = 'XML'
         ExplicitLeft = 21
         ExplicitTop = 213
+        ExplicitWidth = 446
         ExplicitHeight = 129
       end
       object SpTBXExPanel1: TSpTBXExPanel
         Left = 2
         Top = 15
-        Width = 452
-        Height = 107
+        Width = 499
+        Height = 159
         Caption = 'SpTBXExPanel1'
         Align = alTop
         ParentColor = True
-        TabOrder = 1
+        TabOrder = 0
         Borders = False
         object SpTBXLabel7: TSpTBXLabel
           Left = 10
-          Top = 65
+          Top = 115
           Width = 54
           Height = 19
           Caption = 'Enabled : '
@@ -639,16 +640,17 @@ object FrmHackMasterList: TFrmHackMasterList
         end
         object chkItemAddInStore: TSpTBXCheckBox
           Left = 70
-          Top = 61
+          Top = 111
           Width = 20
           Height = 28
           BiDiMode = bdLeftToRight
           ParentBiDiMode = False
-          TabOrder = 1
+          TabOrder = 8
+          OnClick = chkItemAddInStoreClick
         end
         object SpTBXLabel8: TSpTBXLabel
           Left = 114
-          Top = 65
+          Top = 115
           Width = 58
           Height = 19
           Caption = 'Override : '
@@ -656,26 +658,29 @@ object FrmHackMasterList: TFrmHackMasterList
         end
         object chkItemOverRide: TSpTBXCheckBox
           Left = 175
-          Top = 61
+          Top = 111
           Width = 20
           Height = 28
           BiDiMode = bdLeftToRight
           ParentBiDiMode = False
-          TabOrder = 3
+          TabOrder = 9
+          OnClick = chkItemOverRideClick
         end
         object EditItemName: TSpTBXEdit
           Left = 70
           Top = 38
           Width = 371
           Height = 21
-          TabOrder = 4
+          TabOrder = 2
+          OnChange = EditItemNameChange
         end
         object EditItemId: TSpTBXEdit
           Left = 70
           Top = 12
           Width = 371
           Height = 21
-          TabOrder = 5
+          TabOrder = 0
+          OnChange = EditItemIdChange
         end
         object SpTBXLabel9: TSpTBXLabel
           Left = 10
@@ -695,11 +700,43 @@ object FrmHackMasterList: TFrmHackMasterList
         end
         object SpTBXLabel10: TSpTBXLabel
           Left = 10
-          Top = 87
+          Top = 137
           Width = 45
           Height = 19
           Caption = 'XmlData'
           ParentColor = True
+        end
+        object EditItemType: TSpTBXEdit
+          Left = 70
+          Top = 65
+          Width = 371
+          Height = 21
+          TabOrder = 4
+          OnChange = EditItemTypeChange
+        end
+        object SpTBXLabel11: TSpTBXLabel
+          Left = 10
+          Top = 67
+          Width = 37
+          Height = 19
+          Caption = 'Type :'
+          ParentColor = True
+        end
+        object SpTBXLabel12: TSpTBXLabel
+          Left = 10
+          Top = 94
+          Width = 67
+          Height = 19
+          Caption = 'Skin Object :'
+          ParentColor = True
+        end
+        object EditItemSkinObject: TSpTBXEdit
+          Left = 70
+          Top = 92
+          Width = 371
+          Height = 21
+          TabOrder = 6
+          OnChange = EditItemSkinObjectChange
         end
       end
     end
@@ -707,9 +744,10 @@ object FrmHackMasterList: TFrmHackMasterList
   object sptbxDckMain: TSpTBXDock
     Left = 0
     Top = 0
-    Width = 662
+    Width = 709
     Height = 26
     AllowDrag = False
+    ExplicitWidth = 662
     object sptbxtbMain: TSpTBXToolbar
       Left = 0
       Top = 0
@@ -736,10 +774,11 @@ object FrmHackMasterList: TFrmHackMasterList
     Left = 56
     Top = 296
     object tbPopupMenuItems: TSpTBXSubmenuItem
-      object tbSaveWorkSpace: TSpTBXItem
-        Caption = 'Save Project'
+      object tbSaveHackMasterList: TSpTBXItem
+        Caption = 'Save Hack MasterList'
         Enabled = False
         ImageIndex = 2
+        OnClick = tbSaveHackMasterListClick
       end
     end
   end

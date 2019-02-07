@@ -53,29 +53,29 @@ Type
   Protected
     Procedure Created(); OverRide;
 
-    Function  GetId() : Integer;
-    Procedure SetId(Const AId : Integer);
+    Function  GetId() : Integer; Virtual;
+    Procedure SetId(Const AId : Integer); Virtual;
 
-    Function  GetName() : String;
-    Procedure SetName(Const AName : String);
+    Function  GetName() : String; Virtual;
+    Procedure SetName(Const AName : String); Virtual;
 
-    Function  GetAddInStore() : Boolean;
-    Procedure SetAddInStore(Const AAddInStore : Boolean);
+    Function  GetAddInStore() : Boolean; Virtual;
+    Procedure SetAddInStore(Const AAddInStore : Boolean); Virtual;
 
-    Function  GetOverRide() : Boolean;
-    Procedure SetOverRide(Const AOverRide : Boolean);
+    Function  GetOverRide() : Boolean; Virtual;
+    Procedure SetOverRide(Const AOverRide : Boolean); Virtual;
 
-    Function  GetIsBadItem() : Boolean;
-    Procedure SetIsBadItem(Const AIsBadItem : Boolean);
+    Function  GetIsBadItem() : Boolean; Virtual;
+    Procedure SetIsBadItem(Const AIsBadItem : Boolean); Virtual;
 
-    Function  GetObjectType() : String;
-    Procedure SetObjectType(Const AObjectType : String);
+    Function  GetObjectType() : String; Virtual;
+    Procedure SetObjectType(Const AObjectType : String); Virtual;
 
-    Function  GetNPCCharacter() : Boolean;
-    Procedure SetNPCCharacter(Const ANPCCharacter : Boolean);
+    Function  GetNPCCharacter() : Boolean; Virtual;
+    Procedure SetNPCCharacter(Const ANPCCharacter : Boolean); Virtual;
 
-    Function  GetSkinObject() : String;
-    Procedure SetSkinObject(Const ASkinObject : String);
+    Function  GetSkinObject() : String; Virtual;
+    Procedure SetSkinObject(Const ASkinObject : String); Virtual;
 
     Function GetMiscData() : IHsStringListEx;
 
@@ -101,21 +101,21 @@ Type
 
     Function Get(Index : Integer) : ITSTOHackMasterDataID; OverLoad;
 
-    Function  GetPackageType() : String;
-    Procedure SetPackageType(Const APackageType : String);
+    Function  GetPackageType() : String; Virtual;
+    Procedure SetPackageType(Const APackageType : String); Virtual;
 
-    Function  GetXmlFile() : String;
-    Procedure SetXmlFile(Const AXmlFile : String);
+    Function  GetXmlFile() : String; Virtual;
+    Procedure SetXmlFile(Const AXmlFile : String); Virtual;
 
-    Function  GetEnabled() : Boolean;
-    Procedure SetEnabled(Const AEnabled : Boolean);
+    Function  GetEnabled() : Boolean; Virtual;
+    Procedure SetEnabled(Const AEnabled : Boolean); Virtual;
 
     Function Add() : ITSTOHackMasterDataID; ReIntroduce; OverLoad;
     Function Add(Const AItem : ITSTOHackMasterDataID) : Integer; ReIntroduce; OverLoad;
 
     Procedure Clear(); OverRide;
 
-    Procedure Assign(ASource : IInterface);
+    Procedure Assign(ASource : IInterface); Virtual;
     Procedure Sort();
 
     Property DataID[Index: Integer] : ITSTOHackMasterDataID Read Get; Default;
@@ -135,21 +135,21 @@ Type
 
     Function  Get(Index : Integer) : ITSTOHackMasterPackage; OverLoad;
 
-    Function  GetName() : String;
-    Procedure SetName(Const AName : String);
+    Function  GetName() : String; Virtual;
+    Procedure SetName(Const AName : String); Virtual;
 
-    Function  GetEnabled() : Boolean;
-    Procedure SetEnabled(Const AEnabled : Boolean);
+    Function  GetEnabled() : Boolean; Virtual;
+    Procedure SetEnabled(Const AEnabled : Boolean); Virtual;
 
-    Function  GetBuildStore() : Boolean;
-    Procedure SetBuildStore(Const ABuildStore : Boolean);
+    Function  GetBuildStore() : Boolean; Virtual;
+    Procedure SetBuildStore(Const ABuildStore : Boolean); Virtual;
 
     Function Add() : ITSTOHackMasterPackage; ReIntroduce; OverLoad;
     Function Add(Const AItem : ITSTOHackMasterPackage) : Integer; ReIntroduce; OverLoad;
 
     Procedure Clear(); OverRide;
 
-    Procedure Assign(ASource : IInterface);
+    Procedure Assign(ASource : IInterface); Virtual;
     Procedure Sort();
 
     Property Package[Index : Integer] : ITSTOHackMasterPackage Read Get; Default;
@@ -176,7 +176,7 @@ Type
     Function Add() : ITSTOHackMasterCategory; ReIntroduce; OverLoad;
     Function Add(Const AItem : ITSTOHackMasterCategory) : Integer; ReIntroduce; OverLoad;
 
-    Procedure Assign(ASource : IInterface);
+    Procedure Assign(ASource : IInterface); Virtual;
     Procedure Sort();
 
     Property Category[Index : Integer] : ITSTOHackMasterCategory Read Get; Default;

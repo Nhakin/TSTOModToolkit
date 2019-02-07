@@ -20,6 +20,9 @@ Type
     Function GetLevel() : Integer;
     Function GetIsFree() : Boolean;
 
+    Function  GetOnChange() : TNotifyEvent;
+    Procedure SetOnChange(AOnChange : TNotifyEvent);
+
     Property ItemType : tDataIDIOType Read GetItemType Write SetItemType;
 
     Property Unique   : Boolean Read GetUnique;
@@ -27,6 +30,8 @@ Type
     Property Sellable : Boolean Read GetSellable;
     Property Level    : Integer Read GetLevel;
     Property IsFree   : Boolean Read GetIsFree;
+
+    Property OnChange : TNotifyEvent Read GetOnChange Write SetOnChange;
 
   End;
 
@@ -37,8 +42,14 @@ Type
 
     Function Add() : ITSTOHackMasterDataIDIO; OverLoad;
     Function Add(Const AItem : ITSTOHackMasterDataIDIO) : Integer; OverLoad;
+    Function Remove(Const AItem : ITSTOHackMasterDataIDIO) : Integer;
+
+    Function  GetOnChange() : TNotifyEvent;
+    Procedure SetOnChange(AOnChange : TNotifyEvent);
 
     Property DataID[Index: Integer] : ITSTOHackMasterDataIDIO Read Get; Default;
+
+    Property OnChange : TNotifyEvent Read GetOnChange Write SetOnChange;
 
   End;
 
@@ -50,8 +61,12 @@ Type
     Function GetHaveUnique() : Boolean;
     Function GetMinLevel() : Integer;
 
+    Function  GetOnChange() : TNotifyEvent;
+    Procedure SetOnChange(AOnChange : TNotifyEvent);
+
     Function Add() : ITSTOHackMasterPackageIO; OverLoad;
     Function Add(Const AItem : ITSTOHackMasterPackageIO) : Integer; OverLoad;
+    Function Remove(Const AItem : ITSTOHackMasterPackageIO) : Integer;
     Function IndexOf(Const APackageType, AXmlFile : String) : Integer;
 
     Property Package[Index : Integer] : ITSTOHackMasterPackageIO Read Get; Default;
@@ -59,6 +74,8 @@ Type
     Property HaveNonUnique : Boolean Read GetHaveNonUnique;
     Property HaveUnique    : Boolean Read GetHaveUnique;
     Property MinLevel      : Integer Read GetMinLevel;
+
+    Property OnChange : TNotifyEvent Read GetOnChange Write SetOnChange;
 
   End;
 
@@ -69,9 +86,16 @@ Type
     Function  GetAsXml() : String;
     Procedure SetAsXml(Const AXmlString : String);
 
+    Function  GetModified() : Boolean;
+    Function  GetOnChange() : TNotifyEvent;
+    Procedure SetOnChange(AOnChange : TNotifyEvent);
+
     Function Add() : ITSTOHackMasterCategoryIO; OverLoad;
     Function Add(Const AItem : ITSTOHackMasterCategoryIO) : Integer; OverLoad;
+    Function Remove(Const AItem : ITSTOHackMasterCategoryIO) : Integer;
     Function IndexOf(Const ACategoryName : String) : Integer;
+
+    Procedure ForceChanged();
 
     Procedure BuildMasterList(AProject : ITSTOXMLProject); OverLoad;
     Procedure BuildMasterList(AProject : ITSTOXMLProject; Const ASaveInfo : Boolean); OverLoad;
@@ -127,6 +151,9 @@ Type
 
     Property AsXml : String Read GetAsXml Write SetAsXml;
 
+    Property Modified : Boolean      Read GetModified;
+    Property OnChange : TNotifyEvent Read GetOnChange Write SetOnChange;
+
   End;
 
   TTSTOHackMasterListIO = Class(TObject)
@@ -145,10 +172,20 @@ Type
   TTSTOHackMasterDataIDIO = Class(TTSTOHackMasterDataID, ITSTOHackMasterDataIDIO)
   Private
     FItemType : tDataIDIOType;
-    
+    FOnChange : TNotifyEvent;
+
   Protected
     Function  GetItemType() : tDataIDIOType;
     Procedure SetItemType(Const AItemType : tDataIDIOType);
+
+    Procedure SetId(Const AId : Integer); OverRide;
+    Procedure SetName(Const AName : String); OverRide;
+    Procedure SetAddInStore(Const AAddInStore : Boolean); OverRide;
+    Procedure SetOverRide(Const AOverRide : Boolean); OverRide;
+    Procedure SetIsBadItem(Const AIsBadItem : Boolean); OverRide;
+    Procedure SetObjectType(Const AObjectType : String); OverRide;
+    Procedure SetNPCCharacter(Const ANPCCharacter : Boolean); OverRide;
+    Procedure SetSkinObject(Const ASkinObject : String); OverRide;
 
     Function GetUnique() : Boolean;
     Function GetStorable() : Boolean;
@@ -157,21 +194,41 @@ Type
     Function GetBuildTime() : Integer;
     Function GetIsFree() : Boolean;
 
+    Procedure DoChange(Sender : TObject);
+    Function  GetOnChange() : TNotifyEvent;
+    Procedure SetOnChange(AOnChange : TNotifyEvent);
+
   End;
 
   TTSTOHackMasterPackageIO = Class(TTSTOHackMasterPackage, ITSTOHackMasterPackageIO)
+  Private
+    FOnChange : TNotifyEvent;
+
   Protected
     Function GetItemClass() : TInterfacedObjectExClass; OverRide;
 
     Function Get(Index : Integer) : ITSTOHackMasterDataIDIO; OverLoad;
 
-    Function Add() : ITSTOHackMasterDataIDIO; OverLoad;
-    Function Add(Const AItem : ITSTOHackMasterDataIDIO) : Integer; OverLoad;
+    Procedure SetPackageType(Const APackageType : String); OverRide;
+    Procedure SetXmlFile(Const AXmlFile : String); OverRide;
+    Procedure SetEnabled(Const AEnabled : Boolean); OverRide;
+
+    Procedure DoChange(Sender : TObject);
+    Function  GetOnChange() : TNotifyEvent;
+    Procedure SetOnChange(AOnChange : TNotifyEvent);
+
+    Function Add() : ITSTOHackMasterDataIDIO; ReIntroduce; OverLoad;
+    Function Add(Const AItem : ITSTOHackMasterDataIDIO) : Integer; ReIntroduce; OverLoad;
+    Function Remove(Const AItem : ITSTOHackMasterDataIDIO) : Integer; ReIntroduce;
     Function IndexOf(Const ADataID : Integer) : Integer; ReIntroduce; OverLoad;
+    Procedure Assign(ASource : IInterface); OverRide;
 
   End;
 
   TTSTOHackMasterCategoryIO = Class(TTSTOHackMasterCategory, ITSTOHackMasterCategoryIO)
+  Private
+    FOnChange : TNotifyEvent;
+
   Protected
     Function GetItemClass() : TInterfacedObjectExClass; OverRide;
 
@@ -181,9 +238,20 @@ Type
     Function GetHaveUnique() : Boolean;
     Function GetMinLevel() : Integer;
 
+    Procedure SetName(Const AName : String); OverRide;
+    Procedure SetEnabled(Const AEnabled : Boolean); OverRide;
+    Procedure SetBuildStore(Const ABuildStore : Boolean); OverRide;
+
+    Procedure DoChange(Sender : TObject);
+    Function  GetOnChange() : TNotifyEvent;
+    Procedure SetOnChange(AOnChange : TNotifyEvent);
+
     Function Add() : ITSTOHackMasterPackageIO; OverLoad;
     Function Add(Const AItem : ITSTOHackMasterPackageIO) : Integer; OverLoad;
+    Function Remove(Const AItem : ITSTOHackMasterPackageIO) : Integer;
     Function IndexOf(Const APackageType, AXmlFile : String) : Integer; ReIntroduce; OverLoad;
+
+    Procedure Assign(ASource : IInterface); OverRide;
 
     Property Package[Index : Integer] : ITSTOHackMasterPackageIO Read Get; Default;
 
@@ -197,6 +265,9 @@ Type
   Private
     FXmlImpl : IXmlTSTOHackMasterList;
     FBinImpl : IBinTSTOHackMasterList;
+
+    FModified : Boolean;
+    FOnChange : TNotifyEvent;
 
     Function GetXmlImplementor() : IXmlTSTOHackMasterList;
     Function GetBinImplementor() : IBinTSTOHackMasterList;
@@ -212,9 +283,18 @@ Type
     Function  GetAsXml() : String;
     Procedure SetAsXml(Const AXmlString : String);
 
+    Function  GetModified() : Boolean;
+    Procedure DoChange(Sender : TObject);
+    Function  GetOnChange() : TNotifyEvent;
+    Procedure SetOnChange(AOnChange : TNotifyEvent);
+    Procedure ForceChanged();
+
     Function Add() : ITSTOHackMasterCategoryIO; OverLoad;
     Function Add(Const AItem : ITSTOHackMasterCategoryIO) : Integer; OverLoad;
+    Function Remove(Const AItem : ITSTOHackMasterCategoryIO) : Integer;
     Function IndexOf(Const ACategoryName : String) : Integer; ReIntroduce; OverLoad;
+
+    Procedure Assign(ASource : IInterface); OverRide;
 
     Procedure LoadFromStream(AStream : IStreamEx);
     Procedure LoadFromFile(Const AFileName : String);
@@ -283,6 +363,78 @@ End;
 Procedure TTSTOHackMasterDataIDIO.SetItemType(Const AItemType : tDataIDIOType);
 Begin
   FItemType := AItemType;
+End;
+
+Procedure TTSTOHackMasterDataIDIO.SetId(Const AId : Integer);
+Begin
+  If GetId() <> AId Then
+  Begin
+    InHerited SetId(AId);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterDataIDIO.SetName(Const AName : String);
+Begin
+  If GetName() <> AName Then
+  Begin
+    InHerited SetName(AName);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterDataIDIO.SetAddInStore(Const AAddInStore : Boolean);
+Begin
+  If GetAddInStore() <> AAddInStore Then
+  Begin
+    InHerited SetAddInStore(AAddInStore);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterDataIDIO.SetOverRide(Const AOverRide : Boolean);
+Begin
+  If GetOverRide() <> AOverRide Then
+  Begin
+    InHerited SetOverRide(AOverRide);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterDataIDIO.SetIsBadItem(Const AIsBadItem : Boolean);
+Begin
+  If GetIsBadItem() <> AIsBadItem Then
+  Begin
+    InHerited SetIsBadItem(AIsBadItem);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterDataIDIO.SetObjectType(Const AObjectType : String);
+Begin
+  If GetObjectType() <> AObjectType Then
+  Begin
+    InHerited SetObjectType(AObjectType);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterDataIDIO.SetNPCCharacter(Const ANPCCharacter : Boolean);
+Begin
+  If GetNPCCharacter() <> ANPCCharacter Then
+  Begin
+    InHerited SetNPCCharacter(ANPCCharacter);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterDataIDIO.SetSkinObject(Const ASkinObject : String);
+Begin
+  If GetSkinObject() <> ASkinObject Then
+  Begin
+    InHerited SetSkinObject(ASkinObject);
+    DoChange(Self);
+  End;
 End;
 
 Function TTSTOHackMasterDataIDIO.GetUnique() : Boolean;
@@ -404,6 +556,31 @@ Begin
   End;
 End;
 
+Procedure TTSTOHackMasterDataIDIO.DoChange(Sender : TObject);
+Begin
+  If Assigned(FOnChange) Then
+    FOnChange(Sender);
+End;
+
+Function TTSTOHackMasterDataIDIO.GetOnChange() : TNotifyEvent;
+Begin
+  Result := FOnChange;
+End;
+
+Procedure TTSTOHackMasterDataIDIO.SetOnChange(AOnChange : TNotifyEvent);
+Begin
+  FOnChange := AOnChange;
+End;
+
+Procedure TTSTOHackMasterPackageIO.Assign(ASource : IInterface);
+Var X : Integer;
+Begin
+  InHerited Assign(ASource);
+
+  For X := 0 To Count - 1 Do
+    Get(X).OnChange := DoChange;
+End;
+
 Function TTSTOHackMasterPackageIO.GetItemClass() : TInterfacedObjectExClass;
 Begin
   Result := TTSTOHackMasterDataIDIO;
@@ -414,14 +591,69 @@ Begin
   Result := InHerited DataID[Index] As ITSTOHackMasterDataIDIO;
 End;
 
+Procedure TTSTOHackMasterPackageIO.SetPackageType(Const APackageType : String);
+Begin
+  If GetPackageType() <> APackageType Then
+  Begin
+    InHerited SetPackageType(APackageType);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterPackageIO.SetXmlFile(Const AXmlFile : String);
+Begin
+  If GetXmlFile() <> AXmlFile Then
+  Begin
+    InHerited SetXmlFile(AXmlFile);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterPackageIO.SetEnabled(Const AEnabled : Boolean);
+Begin
+  If GetEnabled() <> AEnabled Then
+  Begin
+    InHerited SetEnabled(AEnabled);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterPackageIO.DoChange(Sender : TObject);
+Begin
+  If Assigned(FOnChange) Then
+    FOnChange(Sender);
+End;
+
+Function TTSTOHackMasterPackageIO.GetOnChange() : TNotifyEvent;
+Begin
+  Result := FOnChange;
+End;
+
+Procedure TTSTOHackMasterPackageIO.SetOnChange(AOnChange : TNotifyEvent);
+Begin
+  FOnChange := AOnChange;
+End;
+
 Function TTSTOHackMasterPackageIO.Add() : ITSTOHackMasterDataIDIO;
 Begin
   Result := InHerited Add() As ITSTOHackMasterDataIDIO;
+  Result.OnChange := DoChange;
+  DoChange(Self);
 End;
 
 Function TTSTOHackMasterPackageIO.Add(Const AItem : ITSTOHackMasterDataIDIO) : Integer;
 Begin
   Result := InHerited Add(AItem);
+  AItem.OnChange := DoChange;
+  DoChange(Self);
+End;
+
+Function TTSTOHackMasterPackageIO.Remove(Const AItem : ITSTOHackMasterDataIDIO) : Integer;
+Begin
+  Result := IndexOf(AItem.Id);
+  If Result > -1 Then
+    Delete(Result);
+  DoChange(Self);
 End;
 
 Function TTSTOHackMasterPackageIO.IndexOf(Const ADataID : Integer) : Integer;
@@ -435,6 +667,15 @@ Begin
       Result := X;
       Break;
     End;
+End;
+
+Procedure TTSTOHackMasterCategoryIO.Assign(ASource : IInterface);
+Var X : Integer;
+Begin
+  InHerited Assign(ASource);
+
+  For X := 0 To Count - 1 Do
+    Get(X).OnChange := DoChange;
 End;
 
 Function TTSTOHackMasterCategoryIO.GetItemClass() : TInterfacedObjectExClass;
@@ -494,14 +735,69 @@ Begin
             Result := Min(Result, Package[X][Y].Level);
 End;
 
+Procedure TTSTOHackMasterCategoryIO.SetName(Const AName : String);
+Begin
+  If GetName() <> AName Then
+  Begin
+    InHerited SetName(AName);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterCategoryIO.SetEnabled(Const AEnabled : Boolean);
+Begin
+  If GetEnabled() <> AEnabled Then
+  Begin
+    InHerited SetEnabled(AEnabled);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterCategoryIO.SetBuildStore(Const ABuildStore : Boolean);
+Begin
+  If GetBuildStore() <> ABuildStore Then
+  Begin
+    InHerited SetBuildStore(ABuildStore);
+    DoChange(Self);
+  End;
+End;
+
+Procedure TTSTOHackMasterCategoryIO.DoChange(Sender : TObject);
+Begin
+  If Assigned(FOnChange) Then
+    FOnChange(Sender);
+End;
+
+Function TTSTOHackMasterCategoryIO.GetOnChange() : TNotifyEvent;
+Begin
+  Result := FOnChange;
+End;
+
+Procedure TTSTOHackMasterCategoryIO.SetOnChange(AOnChange : TNotifyEvent);
+Begin
+  FOnChange := AOnChange;
+End;
+
 Function TTSTOHackMasterCategoryIO.Add() : ITSTOHackMasterPackageIO;
 Begin
   Result := InHerited Add() As ITSTOHackMasterPackageIO;
+  Result.OnChange := DoChange;
+  DoChange(Self);
 End;
 
 Function TTSTOHackMasterCategoryIO.Add(Const AItem : ITSTOHackMasterPackageIO) : Integer;
 Begin
   Result := InHerited Add(AItem);
+  AItem.OnChange := DoChange;
+  DoChange(Self);
+End;
+
+Function TTSTOHackMasterCategoryIO.Remove(Const AItem : ITSTOHackMasterPackageIO) : Integer;
+Begin
+  Result := IndexOf(AItem.PackageType, AItem.XmlFile);
+  If Result > - 1 Then
+    Delete(Result);
+  DoChange(Self);
 End;
 
 Function TTSTOHackMasterCategoryIO.IndexOf(Const APackageType, AXmlFile : String) : Integer;
@@ -515,6 +811,15 @@ Begin
       Result := X;
       Break;
     End;
+End;
+
+Procedure TTSTOHackMasterListIOImpl.Assign(ASource : IInterface);
+Var X : Integer;
+Begin
+  InHerited Assign(ASource);
+
+  For X := 0 To Count - 1 Do
+    Get(X).OnChange := DoChange;
 End;
 
 Function TTSTOHackMasterListIOImpl.GetXmlImplementor() : IXmlTSTOHackMasterList;
@@ -563,14 +868,54 @@ Begin
 }
 End;
 
+Function TTSTOHackMasterListIOImpl.GetModified() : Boolean;
+Begin
+  Result := FModified;
+End;
+
+Procedure TTSTOHackMasterListIOImpl.DoChange(Sender : TObject);
+Begin
+  If Assigned(FOnChange) Then
+    FOnChange(Sender);
+  FModified := True;
+End;
+
+Function TTSTOHackMasterListIOImpl.GetOnChange() : TNotifyEvent;
+Begin
+  Result := FOnChange;
+End;
+
+Procedure TTSTOHackMasterListIOImpl.SetOnChange(AOnChange : TNotifyEvent);
+Begin
+  FOnChange := AOnChange;
+End;
+
+Procedure TTSTOHackMasterListIOImpl.ForceChanged();
+Begin
+  DoChange(Self);
+End;
+
 Function TTSTOHackMasterListIOImpl.Add() : ITSTOHackMasterCategoryIO;
 Begin
   Result := InHerited Add() As ITSTOHackMasterCategoryIO;
+  Result.OnChange := DoChange;
+  DoChange(Self);
 End;
 
 Function TTSTOHackMasterListIOImpl.Add(Const AItem : ITSTOHackMasterCategoryIO) : Integer;
 Begin
   Result := InHerited Add(AItem);
+  AItem.OnChange := DoChange;
+  DoChange(Self);
+End;
+
+Function TTSTOHackMasterListIOImpl.Remove(Const AItem : ITSTOHackMasterCategoryIO) : Integer;
+Begin
+  Result := IndexOf(AItem.Name);
+  If Result = -1 Then
+    Delete(Result);
+
+  DoChange(Self);
 End;
 
 Function TTSTOHackMasterListIOImpl.IndexOf(Const ACategoryName : String) : Integer;

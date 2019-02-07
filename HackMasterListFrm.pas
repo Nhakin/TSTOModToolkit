@@ -15,7 +15,7 @@ type
     PanData: TSpTBXExPanel;
     SpTBXBItemContainer1: TSpTBXBItemContainer;
     tbPopupMenuItems: TSpTBXSubmenuItem;
-    tbSaveWorkSpace: TSpTBXItem;
+    tbSaveHackMasterList: TSpTBXItem;
     sptbxDckMain: TSpTBXDock;
     sptbxtbMain: TSpTBXToolbar;
     tbMainPopup: TSpTBXTBGroupItem;
@@ -45,16 +45,35 @@ type
     SpTBXLabel9: TSpTBXLabel;
     SpTBXLabel6: TSpTBXLabel;
     SpTBXLabel10: TSpTBXLabel;
+    EditItemType: TSpTBXEdit;
+    SpTBXLabel11: TSpTBXLabel;
+    SpTBXLabel12: TSpTBXLabel;
+    EditItemSkinObject: TSpTBXEdit;
+
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure EditCategoryNameChange(Sender: TObject);
+    procedure tbSaveHackMasterListClick(Sender: TObject);
+    procedure chkCategoryEnabledClick(Sender: TObject);
+    procedure chkCategoryBuildStoreClick(Sender: TObject);
+    procedure CmbPackageTypeChange(Sender: TObject);
+    procedure EditPackageXmlFileChange(Sender: TObject);
+    procedure chkPackageEnabledClick(Sender: TObject);
+    procedure EditItemIdChange(Sender: TObject);
+    procedure EditItemNameChange(Sender: TObject);
+    procedure EditItemTypeChange(Sender: TObject);
+    procedure EditItemSkinObjectChange(Sender: TObject);
+    procedure chkItemAddInStoreClick(Sender: TObject);
+    procedure chkItemOverRideClick(Sender: TObject);
 
   private
-    FTvMasterList : TTSTOHackMasterListTreeView;
-    FMasterList   : ITSTOHackMasterListIO;
-    FAppSettings  : ITSTOXMLSettings;
-    FFormSettings : ITSTOXMLFormSetting;
+    FTvMasterList  : TTSTOHackMasterListTreeView;
+    FOriMasterList : ITSTOHackMasterListIO;
+    FMasterList    : ITSTOHackMasterListIO;
+    FAppSettings   : ITSTOXMLSettings;
+    FFormSettings  : ITSTOXMLFormSetting;
 
     Procedure SetMasterList(AMasterList : ITSTOHackMasterListIO);
 
@@ -66,6 +85,10 @@ type
     Procedure DoTvMasterListFocusChanged(Sender : TBaseVirtualTree;
       Node : PVirtualNode; Column : TColumnIndex);
 
+    Procedure DoMasterListChange(Sender : TObject);
+
+    Function GetGroupBoxData(APanel : TSpTBXGroupBox; AId : TGUID; Var AGroupBoxData) : Boolean;
+
   public
     Property MasterList  : ITSTOHackMasterListIO Read FMasterList  Write SetMasterList;
     Property LangMgr     : TSciLanguageManager   Read GetLangMgr   Write SetLangMgr;
@@ -75,9 +98,98 @@ type
 
 implementation
 
-Uses RTTI, SpTbxSkins, HsXmlDocEx, dmImage, TSTOHackMasterListIntf;
+Uses RTTI, SpTbxSkins, HsXmlDocEx, HsStreamEx, dmImage, TSTOHackMasterListIntf;
 
 {$R *.dfm}
+
+Function TFrmHackMasterList.GetGroupBoxData(APanel : TSpTBXGroupBox; AId : TGUID; Var AGroupBoxData) : Boolean;
+Begin
+  Result := Supports(IInterface(APanel.Tag), AId, AGroupBoxData);
+End;
+
+procedure TFrmHackMasterList.EditCategoryNameChange(Sender: TObject);
+Var lCategory : ITSTOHackMasterCategory;
+begin
+  If GetGroupBoxData(GrpCategory, ITSTOHackMasterCategory, lCategory) Then
+    lCategory.Name := EditCategoryName.Text;
+end;
+
+procedure TFrmHackMasterList.chkCategoryBuildStoreClick(Sender: TObject);
+Var lCategory : ITSTOHackMasterCategory;
+begin
+  If GetGroupBoxData(GrpCategory, ITSTOHackMasterCategory, lCategory) Then
+    lCategory.BuildStore := chkCategoryBuildStore.Checked;
+end;
+
+procedure TFrmHackMasterList.chkCategoryEnabledClick(Sender: TObject);
+Var lCategory : ITSTOHackMasterCategory;
+begin
+  If GetGroupBoxData(GrpCategory, ITSTOHackMasterCategory, lCategory) Then
+    lCategory.Enabled := chkCategoryEnabled.Checked;
+end;
+
+procedure TFrmHackMasterList.chkPackageEnabledClick(Sender: TObject);
+Var lPackage : ITSTOHackMasterPackage;
+begin
+  If GetGroupBoxData(GrpPackage, ITSTOHackMasterPackage, lPackage) Then
+    lPackage.Enabled := chkPackageEnabled.Checked;
+end;
+
+procedure TFrmHackMasterList.CmbPackageTypeChange(Sender: TObject);
+Var lPackage : ITSTOHackMasterPackage;
+begin
+  If GetGroupBoxData(GrpPackage, ITSTOHackMasterPackage, lPackage) Then
+    lPackage.PackageType := CmbPackageType.Text;
+end;
+
+procedure TFrmHackMasterList.EditPackageXmlFileChange(Sender: TObject);
+Var lPackage : ITSTOHackMasterPackage;
+begin
+  If GetGroupBoxData(GrpPackage, ITSTOHackMasterPackage, lPackage) Then
+    lPackage.XmlFile := EditPackageXmlFile.Text;
+end;
+
+procedure TFrmHackMasterList.chkItemAddInStoreClick(Sender: TObject);
+Var lItem : ITSTOHackMasterDataID;
+begin
+  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+    lItem.AddInStore := chkItemAddInStore.Checked;
+end;
+
+procedure TFrmHackMasterList.chkItemOverRideClick(Sender: TObject);
+Var lItem : ITSTOHackMasterDataID;
+begin
+  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+    lItem.OverRide := chkItemOverRide.Checked;
+end;
+
+procedure TFrmHackMasterList.EditItemIdChange(Sender: TObject);
+Var lItem : ITSTOHackMasterDataID;
+begin
+  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+    lItem.Id := StrToIntDef(EditItemId.Text, -1);
+end;
+
+procedure TFrmHackMasterList.EditItemNameChange(Sender: TObject);
+Var lItem : ITSTOHackMasterDataID;
+begin
+  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+    lItem.Name := EditItemName.Text;
+end;
+
+procedure TFrmHackMasterList.EditItemSkinObjectChange(Sender: TObject);
+Var lItem : ITSTOHackMasterDataID;
+begin
+  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+    lItem.SkinObject := EditItemSkinObject.Text;
+end;
+
+procedure TFrmHackMasterList.EditItemTypeChange(Sender: TObject);
+Var lItem : ITSTOHackMasterDataID;
+begin
+  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+    lItem.ObjectType := EditItemType.Text;
+end;
 
 procedure TFrmHackMasterList.FormActivate(Sender: TObject);
 begin
@@ -93,6 +205,12 @@ procedure TFrmHackMasterList.FormCloseQuery(Sender: TObject;
 begin
   CanClose := True;
 
+  If FMasterList.Modified Then
+    Case MessageDlg('Save changes to Textpool patches ?', mtInformation, [mbYes, mbNo, mbCancel], 0) Of
+      mrYes : tbSaveHackMasterListClick(Self);
+      mrCancel : CanClose := False;
+    End;
+
   If CanClose Then
   Begin
     FFormSettings.WindowState := TRttiEnumerationType.GetName(WindowState);
@@ -103,6 +221,9 @@ begin
       FFormSettings.H := Height;
       FFormSettings.W := Width;
     End;
+
+    FOriMasterList := Nil;
+    FMasterList    := Nil;
   End;
 end;
 
@@ -135,9 +256,26 @@ end;
 
 Procedure TFrmHackMasterList.SetMasterList(AMasterList : ITSTOHackMasterListIO);
 Begin
-  FMasterList := AMasterList;
+  FOriMasterList := AMasterList;
+
+  FMasterList := TTSTOHackMasterListIO.CreateHackMasterList();
+  FMasterList.Assign(FOriMasterList);
+  FMasterList.OnChange := DoMasterListChange;
+
   FTvMasterList.TvData := FMasterList;
 End;
+
+procedure TFrmHackMasterList.tbSaveHackMasterListClick(Sender: TObject);
+Var lMem : IMemoryStreamEx;
+begin
+  If FMasterList.Modified Then
+  Begin
+    FOriMasterList.Assign(FMasterList);
+    FOriMasterList.ForceChanged();
+  End;
+
+  ModalResult := mrOk;
+end;
 
 Function TFrmHackMasterList.GetLangMgr() : TSciLanguageManager;
 Begin
@@ -193,21 +331,31 @@ Begin
     EditCategoryName.Text := lCategory.Name;
     chkCategoryEnabled.Checked := lCategory.Enabled;
     chkCategoryBuildStore.Checked := lCategory.BuildStore;
+    GrpCategory.Tag := Integer(lCategory);
   End
   Else If FTvMasterList.GetNodeData(Node, ITSTOHackMasterPackageIO, lPackage) Then
   Begin
     CmbPackageType.ItemIndex  := CmbPackageType.Items.IndexOf(lPackage.PackageType);
     EditPackageXmlFile.Text   := lPackage.XmlFile;
     chkPackageEnabled.Checked := lPackage.Enabled;
+    GrpPackage.Tag := Integer(lPackage);
   End
   Else If FTvMasterList.GetNodeData(Node, ITSTOHackMasterDataIDIO, lItem) Then
   Begin
     EditItemId.Text := IntToStr(lItem.Id);
     EditItemName.Text := lItem.Name;
+    EditItemType.Text := lItem.ObjectType;
+    EditItemSkinObject.Text := lItem.SkinObject;
     chkItemAddInStore.Checked := lItem.AddInStore;
     chkItemOverRide.Checked := lItem.OverRide;
     EditXmlData.Lines.Text := FormatXmlData(lItem.MiscData.Text);
+    GrpItem.Tag := Integer(lItem);
   End
+End;
+
+Procedure TFrmHackMasterList.DoMasterListChange(Sender : TObject);
+Begin
+  tbSaveHackMasterList.Enabled := True;
 End;
 
 end.
