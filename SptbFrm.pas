@@ -102,10 +102,13 @@ procedure TFrmSbtp.FormActivate(Sender: TObject);
 Var X : Integer;
 begin
   WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
-  Left        := FFormSettings.X;
-  Top         := FFormSettings.Y;
-  Height      := FFormSettings.H;
-  Width       := FFormSettings.W;
+  If WindowState = wsNormal Then
+  Begin
+    Left   := FFormSettings.X;
+    Top    := FFormSettings.Y;
+    Height := FFormSettings.H;
+    Width  := FFormSettings.W;
+  End;
 
   For X := 0 To FFormSettings.Count - 1 Do
     If SameText(FFormSettings[X].SettingName, 'SplitTvsLeft') Then

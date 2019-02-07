@@ -806,10 +806,13 @@ end;
 procedure TFrmDckMain.FormActivate(Sender: TObject);
 begin
   WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
-  Left        := FFormSettings.X;
-  Top         := FFormSettings.Y;
-  Height      := FFormSettings.H;
-  Width       := FFormSettings.W;
+  If WindowState = wsNormal Then
+  Begin
+    Left        := FFormSettings.X;
+    Top         := FFormSettings.Y;
+    Height      := FFormSettings.H;
+    Width       := FFormSettings.W;
+  End;
 end;
 
 procedure TFrmDckMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);

@@ -552,6 +552,8 @@ Begin
         End;
       End;
     End;
+
+    FHackMasterList.OnChange := DoOnChange;
   End;
 
   Result := FHackMasterList;

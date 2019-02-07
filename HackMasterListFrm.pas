@@ -74,6 +74,7 @@ type
     FMasterList    : ITSTOHackMasterListIO;
     FAppSettings   : ITSTOXMLSettings;
     FFormSettings  : ITSTOXMLFormSetting;
+    FIsLoading     : Boolean;
 
     Procedure SetMasterList(AMasterList : ITSTOHackMasterListIO);
 
@@ -110,94 +111,98 @@ End;
 procedure TFrmHackMasterList.EditCategoryNameChange(Sender: TObject);
 Var lCategory : ITSTOHackMasterCategory;
 begin
-  If GetGroupBoxData(GrpCategory, ITSTOHackMasterCategory, lCategory) Then
+  If Not FIsLoading And GetGroupBoxData(GrpCategory, ITSTOHackMasterCategory, lCategory) Then
     lCategory.Name := EditCategoryName.Text;
 end;
 
 procedure TFrmHackMasterList.chkCategoryBuildStoreClick(Sender: TObject);
 Var lCategory : ITSTOHackMasterCategory;
 begin
-  If GetGroupBoxData(GrpCategory, ITSTOHackMasterCategory, lCategory) Then
+  If Not FIsLoading And GetGroupBoxData(GrpCategory, ITSTOHackMasterCategory, lCategory) Then
     lCategory.BuildStore := chkCategoryBuildStore.Checked;
 end;
 
 procedure TFrmHackMasterList.chkCategoryEnabledClick(Sender: TObject);
 Var lCategory : ITSTOHackMasterCategory;
 begin
-  If GetGroupBoxData(GrpCategory, ITSTOHackMasterCategory, lCategory) Then
+  If Not FIsLoading And GetGroupBoxData(GrpCategory, ITSTOHackMasterCategory, lCategory) Then
     lCategory.Enabled := chkCategoryEnabled.Checked;
 end;
 
 procedure TFrmHackMasterList.chkPackageEnabledClick(Sender: TObject);
 Var lPackage : ITSTOHackMasterPackage;
 begin
-  If GetGroupBoxData(GrpPackage, ITSTOHackMasterPackage, lPackage) Then
+  If Not FIsLoading And GetGroupBoxData(GrpPackage, ITSTOHackMasterPackage, lPackage) Then
     lPackage.Enabled := chkPackageEnabled.Checked;
 end;
 
 procedure TFrmHackMasterList.CmbPackageTypeChange(Sender: TObject);
 Var lPackage : ITSTOHackMasterPackage;
 begin
-  If GetGroupBoxData(GrpPackage, ITSTOHackMasterPackage, lPackage) Then
+  If Not FIsLoading And GetGroupBoxData(GrpPackage, ITSTOHackMasterPackage, lPackage) Then
     lPackage.PackageType := CmbPackageType.Text;
 end;
 
 procedure TFrmHackMasterList.EditPackageXmlFileChange(Sender: TObject);
 Var lPackage : ITSTOHackMasterPackage;
 begin
-  If GetGroupBoxData(GrpPackage, ITSTOHackMasterPackage, lPackage) Then
+  If Not FIsLoading And GetGroupBoxData(GrpPackage, ITSTOHackMasterPackage, lPackage) Then
     lPackage.XmlFile := EditPackageXmlFile.Text;
 end;
 
 procedure TFrmHackMasterList.chkItemAddInStoreClick(Sender: TObject);
 Var lItem : ITSTOHackMasterDataID;
 begin
-  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+  If Not FIsLoading And GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
     lItem.AddInStore := chkItemAddInStore.Checked;
 end;
 
 procedure TFrmHackMasterList.chkItemOverRideClick(Sender: TObject);
 Var lItem : ITSTOHackMasterDataID;
 begin
-  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+  If Not FIsLoading And GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
     lItem.OverRide := chkItemOverRide.Checked;
 end;
 
 procedure TFrmHackMasterList.EditItemIdChange(Sender: TObject);
 Var lItem : ITSTOHackMasterDataID;
 begin
-  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+  If Not FIsLoading And GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
     lItem.Id := StrToIntDef(EditItemId.Text, -1);
 end;
 
 procedure TFrmHackMasterList.EditItemNameChange(Sender: TObject);
 Var lItem : ITSTOHackMasterDataID;
 begin
-  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+  If Not FIsLoading And GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
     lItem.Name := EditItemName.Text;
 end;
 
 procedure TFrmHackMasterList.EditItemSkinObjectChange(Sender: TObject);
 Var lItem : ITSTOHackMasterDataID;
 begin
-  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+  If Not FIsLoading And GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
     lItem.SkinObject := EditItemSkinObject.Text;
 end;
 
 procedure TFrmHackMasterList.EditItemTypeChange(Sender: TObject);
 Var lItem : ITSTOHackMasterDataID;
 begin
-  If GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
+  If Not FIsLoading And GetGroupBoxData(GrpItem, ITSTOHackMasterDataID, lItem) Then
     lItem.ObjectType := EditItemType.Text;
 end;
 
 procedure TFrmHackMasterList.FormActivate(Sender: TObject);
 begin
   WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
-  Left        := FFormSettings.X;
-  Top         := FFormSettings.Y;
-  Height      := FFormSettings.H;
-  Width       := FFormSettings.W;
+
+  If WindowState = wsNormal Then
+  Begin
+    Left   := FFormSettings.X;
+    Top    := FFormSettings.Y;
+    Height := FFormSettings.H;
+    Width  := FFormSettings.W;
+  End;
 end;
 
 procedure TFrmHackMasterList.FormCloseQuery(Sender: TObject;
@@ -324,35 +329,41 @@ Var lMovedItem : ITSTOHackMasterMovedItem;
     lPackage   : ITSTOHackMasterPackageIO;
     lItem      : ITSTOHackMasterDataIDIO;
 Begin
-  If FTvMasterList.GetNodeData(Node, ITSTOHackMasterMovedItem, lMovedItem) Then
-  Begin
+  FIsLoading := True;
+  Try
+    If FTvMasterList.GetNodeData(Node, ITSTOHackMasterMovedItem, lMovedItem) Then
+    Begin
 
-  End
-  Else If FTvMasterList.GetNodeData(Node, ITSTOHackMasterCategoryIO, lCategory) Then
-  Begin
-    EditCategoryName.Text := lCategory.Name;
-    chkCategoryEnabled.Checked := lCategory.Enabled;
-    chkCategoryBuildStore.Checked := lCategory.BuildStore;
-    GrpCategory.Tag := Integer(lCategory);
-  End
-  Else If FTvMasterList.GetNodeData(Node, ITSTOHackMasterPackageIO, lPackage) Then
-  Begin
-    CmbPackageType.ItemIndex  := CmbPackageType.Items.IndexOf(lPackage.PackageType);
-    EditPackageXmlFile.Text   := lPackage.XmlFile;
-    chkPackageEnabled.Checked := lPackage.Enabled;
-    GrpPackage.Tag := Integer(lPackage);
-  End
-  Else If FTvMasterList.GetNodeData(Node, ITSTOHackMasterDataIDIO, lItem) Then
-  Begin
-    EditItemId.Text := IntToStr(lItem.Id);
-    EditItemName.Text := lItem.Name;
-    EditItemType.Text := lItem.ObjectType;
-    EditItemSkinObject.Text := lItem.SkinObject;
-    chkItemAddInStore.Checked := lItem.AddInStore;
-    chkItemOverRide.Checked := lItem.OverRide;
-    EditXmlData.Lines.Text := FormatXmlData(lItem.MiscData.Text);
-    GrpItem.Tag := Integer(lItem);
-  End
+    End
+    Else If FTvMasterList.GetNodeData(Node, ITSTOHackMasterCategoryIO, lCategory) Then
+    Begin
+      EditCategoryName.Text := lCategory.Name;
+      chkCategoryEnabled.Checked := lCategory.Enabled;
+      chkCategoryBuildStore.Checked := lCategory.BuildStore;
+      GrpCategory.Tag := Integer(lCategory);
+    End
+    Else If FTvMasterList.GetNodeData(Node, ITSTOHackMasterPackageIO, lPackage) Then
+    Begin
+      CmbPackageType.ItemIndex  := CmbPackageType.Items.IndexOf(lPackage.PackageType);
+      EditPackageXmlFile.Text   := lPackage.XmlFile;
+      chkPackageEnabled.Checked := lPackage.Enabled;
+      GrpPackage.Tag := Integer(lPackage);
+    End
+    Else If FTvMasterList.GetNodeData(Node, ITSTOHackMasterDataIDIO, lItem) Then
+    Begin
+      EditItemId.Text := IntToStr(lItem.Id);
+      EditItemName.Text := lItem.Name;
+      EditItemType.Text := lItem.ObjectType;
+      EditItemSkinObject.Text := lItem.SkinObject;
+      chkItemAddInStore.Checked := lItem.AddInStore;
+      chkItemOverRide.Checked := lItem.OverRide;
+      EditXmlData.Lines.Text := FormatXmlData(lItem.MiscData.Text);
+      GrpItem.Tag := Integer(lItem);
+    End
+
+    Finally
+      FIsLoading := False;
+  End;
 End;
 
 Procedure TFrmHackMasterList.DoMasterListChange(Sender : TObject);

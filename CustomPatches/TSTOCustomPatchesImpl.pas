@@ -389,6 +389,8 @@ Var lSrc : ITSTOCustomPatches;
 Begin
   If Supports(ASource, ITSTOCustomPatches, lSrc) Then
   Begin
+    FPatches.Clear();
+
     lPatches := lSrc.Patches;
     For X := 0 To lPatches.Count - 1 Do
       FPatches.Add().Assign(lPatches[X])

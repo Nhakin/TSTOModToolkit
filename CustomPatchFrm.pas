@@ -108,10 +108,13 @@ procedure TFrmCustomPatches.FormActivate(Sender: TObject);
 Var X : Integer;
 begin
   WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
-  Left        := FFormSettings.X;
-  Top         := FFormSettings.Y;
-  Height      := FFormSettings.H;
-  Width       := FFormSettings.W;
+  If WindowState = wsNormal Then
+  Begin
+    Left   := FFormSettings.X;
+    Top    := FFormSettings.Y;
+    Height := FFormSettings.H;
+    Width  := FFormSettings.W;
+  End;
 
   For X := 0 To FFormSettings.Count - 1 Do
     If SameText(FFormSettings[X].SettingName, 'SplitTvsLeft') Then
@@ -287,34 +290,12 @@ Var lStrStream : IStringStreamEx;
 begin
   If FCustomPatches.Modified Then
   Begin
-    lMem := TMemoryStreamEx.Create();
-    Try
-      FHackSettings.CustomPatches.AsXml := FCustomPatches.AsXml;
-      FHackSettings.CustomPatches.ForceChanged();
-
-      FCustomPatches.ClearChanges();
-
-      Finally
-        lMem := Nil;
-    End;
+    FHackSettings.CustomPatches.Assign(FCustomPatches);
+    FHackSettings.CustomPatches.ForceChanged();
+    FCustomPatches.ClearChanges();
   End;
 
   ModalResult := mrOk;
-(*
-  If (FProject.CustomPatches.Patches.Count > 0) And
-     (FProject.Settings.CustomPatchFileName <> '') Then
-  Begin
-    lStrStream := TStringStreamEx.Create(FormatXMLData(FProject.CustomPatches.Xml));
-    Try
-      lStrStream.SaveToFile(FProject.Settings.CustomPatchFileName);
-
-      Finally
-       lStrStream := Nil;
-    End;
-  End;
-
-  ModalResult := mrOk;
-*)
 end;
 
 procedure TFrmCustomPatches.tsXmlV1Change(Sender: TObject; NewTab: Integer;
