@@ -96,6 +96,7 @@ Type
     Function IndexOf(Const ACategoryName : String) : Integer;
 
     Procedure ForceChanged();
+    Procedure ClearChanges();
 
     Procedure BuildMasterList(AProject : ITSTOXMLProject); OverLoad;
     Procedure BuildMasterList(AProject : ITSTOXMLProject; Const ASaveInfo : Boolean); OverLoad;
@@ -288,6 +289,7 @@ Type
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
     Procedure ForceChanged();
+    Procedure ClearChanges();
 
     Function Add() : ITSTOHackMasterCategoryIO; OverLoad;
     Function Add(Const AItem : ITSTOHackMasterCategoryIO) : Integer; OverLoad;
@@ -893,6 +895,11 @@ End;
 Procedure TTSTOHackMasterListIOImpl.ForceChanged();
 Begin
   DoChange(Self);
+End;
+
+Procedure TTSTOHackMasterListIOImpl.ClearChanges();
+Begin
+  FModified := False;
 End;
 
 Function TTSTOHackMasterListIOImpl.Add() : ITSTOHackMasterCategoryIO;

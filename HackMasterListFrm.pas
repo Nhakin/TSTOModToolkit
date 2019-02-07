@@ -206,7 +206,7 @@ begin
   CanClose := True;
 
   If FMasterList.Modified Then
-    Case MessageDlg('Save changes to Textpool patches ?', mtInformation, [mbYes, mbNo, mbCancel], 0) Of
+    Case MessageDlg('Save changes to Hack MasterList ?', mtInformation, [mbYes, mbNo, mbCancel], 0) Of
       mrYes : tbSaveHackMasterListClick(Self);
       mrCancel : CanClose := False;
     End;
@@ -272,6 +272,8 @@ begin
   Begin
     FOriMasterList.Assign(FMasterList);
     FOriMasterList.ForceChanged();
+
+    FMasterList.ClearChanges();
   End;
 
   ModalResult := mrOk;

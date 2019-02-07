@@ -125,6 +125,7 @@ Type
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
     Procedure ForceChanged();
+    Procedure ClearChanges();
 
     Procedure LoadFromXml(Const AFileName : String);
     Procedure LoadFromStream(ASource : IStreamEx);
@@ -336,6 +337,7 @@ Type
 
     Procedure DoOnChange(Sender : TObject);
     Procedure ForceChanged();
+    Procedure ClearChanges();
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
 
@@ -910,6 +912,11 @@ End;
 Procedure TSbtpFilesIOImpl.ForceChanged();
 Begin
   DoOnChange(Self);
+End;
+
+Procedure TSbtpFilesIOImpl.ClearChanges();
+Begin
+  FModified := False;
 End;
 
 Function TSbtpFilesIOImpl.GetOnChange() : TNotifyEvent;

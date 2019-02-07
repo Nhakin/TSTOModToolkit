@@ -647,7 +647,7 @@ Begin
     End;
   End;
 
-  If Assigned(FHackMasterList) Then
+  If Assigned(FHackMasterList) And FHackMasterList.Modified Then
   Begin
     lIdx := HackCfgFiles.IndexOf(hiftHackMasterList);
     If lIdx > -1 Then
@@ -681,7 +681,7 @@ Begin
   If (Assigned(FScriptTemplates) And FScriptTemplates.Modified) Or
      (Assigned(FCustomPatches) And FCustomPatches.Modified) Or
      (Assigned(FTextPools) And FTextPools.Modified) Or
-     (Assigned(FHackMasterList)) Then
+     (Assigned(FHackMasterList) And FHackMasterList.Modified) Then
     InHerited SaveToFile(AFileName);
 End;
 

@@ -224,6 +224,7 @@ object FrmCustomPatches: TFrmCustomPatches
       Header.Font.Name = 'Tahoma'
       Header.Font.Style = []
       Header.MainColumn = -1
+      Header.Options = [hoColumnResize, hoDrag, hoOwnerDraw, hoShowSortGlyphs]
       PopupMenu = popVSTCustomPatches
       TabOrder = 0
       TreeOptions.PaintOptions = [toHideFocusRect, toHotTrack, toPopupMode, toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]

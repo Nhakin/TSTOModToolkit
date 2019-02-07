@@ -28,8 +28,6 @@ object FrmSbtp: TFrmSbtp
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 203
-    ExplicitWidth = 390
     object gbPatchInfoV2: TSpTBXGroupBox
       AlignWithMargins = True
       Left = 3
@@ -47,7 +45,6 @@ object FrmSbtp: TFrmSbtp
       ParentFont = False
       TabOrder = 0
       Visible = False
-      ExplicitWidth = 384
       DesignSize = (
         382
         90)
@@ -72,7 +69,6 @@ object FrmSbtp: TFrmSbtp
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 0
-        ExplicitWidth = 299
       end
       object EditVariableName: TEdit
         Left = 70
@@ -81,7 +77,6 @@ object FrmSbtp: TFrmSbtp
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 1
-        ExplicitWidth = 299
       end
     end
   end
@@ -162,8 +157,6 @@ object FrmSbtp: TFrmSbtp
     Top = 26
     Height = 333
     Cursor = crSizeWE
-    ExplicitTop = 216
-    ExplicitHeight = 100
   end
   object popSave: TPopupMenu
     Left = 50

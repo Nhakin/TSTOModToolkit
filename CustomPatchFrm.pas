@@ -184,12 +184,11 @@ begin
   If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
   Begin
     vstCustomPacthes.Color := $00262525;
+    vstCustomPacthes.Font.Color := $00F1F1F1;
     vstPatchData.Color := $00262525;
+    vstPatchData.Font.Color := $00F1F1F1;
     PanTreeView.Color := $00262525;
     PanInfo.Color := $00262525;
-
-    With SkinManager.CurrentSkin Do
-      Options(skncListItem, sknsNormal).TextColor := $00F1F1F1;
   End;
 end;
 
@@ -292,6 +291,8 @@ begin
     Try
       FHackSettings.CustomPatches.AsXml := FCustomPatches.AsXml;
       FHackSettings.CustomPatches.ForceChanged();
+
+      FCustomPatches.ClearChanges();
 
       Finally
         lMem := Nil;

@@ -322,6 +322,8 @@ begin
       FHackSettings.TextPools.LoadFromStream(lMem);
       FHackSettings.TextPools.ForceChanged();
 
+      FTvData.ClearChanges();
+
       Finally
         lMem := Nil;
     End;
