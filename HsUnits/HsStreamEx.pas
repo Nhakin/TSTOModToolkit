@@ -86,8 +86,8 @@ Type
     ['{4B61686E-29A0-2112-BD8B-8ED5119A24C6}']
     Function  Seek(Offset: Longint; Origin: Word) : Longint; Overload;
     Function  Seek(Const Offset: Int64; Origin: TSeekOrigin) : Int64; Overload;
-    Procedure ReadBuffer(Var Buffer; Count: Longint);
-    Procedure WriteBuffer(Const Buffer; Count: Longint);
+    Procedure ReadBuffer(Var Buffer; Count: NativeInt);
+    Procedure WriteBuffer(Const Buffer; Count: NativeInt);
     Function  Read(Var Buffer; Count: Longint) : Longint;
     Function  Write(Const Buffer; Count: Longint) : Longint;
     Function  CopyFrom(Source: TStream; Count: Int64) : Int64; OverLoad;
