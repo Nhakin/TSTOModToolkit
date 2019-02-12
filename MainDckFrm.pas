@@ -919,6 +919,7 @@ begin
   Try
     ProjectFile := FPrj;
     HackSettings := FWorkSpace.HackSettings;
+    LangMgr := SciLangMgr;
 
     If ShowModal() = mrOk Then
     Begin

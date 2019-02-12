@@ -198,7 +198,7 @@ begin
       lNewHack := TTSTOHackSettings.CreateHackSettings();
       Try
         lNewHack.NewHackFile();
-        lNewHack.SaveToFile(FileName);
+        lNewHack.SaveToFile(FileName, True);
         ShowMessage('Done');
 
         Finally

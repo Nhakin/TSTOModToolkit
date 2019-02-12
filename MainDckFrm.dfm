@@ -207,7 +207,7 @@ object FrmDckMain: TFrmDckMain
       Height = 299
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 11
+      TabOrder = 13
       Caption = 'Custom Mod'
     end
     object PanFileInfo: TLMDDockPanel
@@ -217,7 +217,7 @@ object FrmDckMain: TFrmDckMain
       Height = 120
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 13
+      TabOrder = 5
       Caption = 'File Info'
       DesignSize = (
         378
@@ -277,7 +277,7 @@ object FrmDckMain: TFrmDckMain
         Font.Style = []
         ParentFont = False
         ReadOnly = True
-        TabOrder = 0
+        TabOrder = 5
       end
       object EditVersion: TEdit
         Left = 181
@@ -292,7 +292,7 @@ object FrmDckMain: TFrmDckMain
         Font.Style = []
         ParentFont = False
         ReadOnly = True
-        TabOrder = 1
+        TabOrder = 4
       end
       object EditTier: TEdit
         Left = 181
@@ -337,7 +337,7 @@ object FrmDckMain: TFrmDckMain
         Font.Style = []
         ParentFont = False
         ReadOnly = True
-        TabOrder = 4
+        TabOrder = 1
       end
       object EditFileName: TEdit
         Left = 70
@@ -353,7 +353,7 @@ object FrmDckMain: TFrmDckMain
         Font.Style = []
         ParentFont = False
         ReadOnly = True
-        TabOrder = 5
+        TabOrder = 0
       end
     end
     object PanHackTemplateMaster: TLMDDockPanel
@@ -400,7 +400,7 @@ object FrmDckMain: TFrmDckMain
           Width = 366
           Height = 337
           ParentBackground = False
-          TabOrder = 5
+          TabOrder = 7
           Caption = 'Template Source'
           object EditScriptTemplate: TScintillaNPP
             Left = 0
@@ -853,7 +853,7 @@ object FrmDckMain: TFrmDckMain
           Width = 185
           Height = 107
           ParentBackground = False
-          TabOrder = 7
+          TabOrder = 5
           Caption = 'Settings'
         end
         object PanSTVariables: TLMDDockPanel
@@ -884,7 +884,7 @@ object FrmDckMain: TFrmDckMain
       Height = 503
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 7
+      TabOrder = 11
       Caption = 'Hex Editor'
       OnEnter = PanImageOldEnter
       object KHexEditor: TKHexEditor
@@ -909,7 +909,7 @@ object FrmDckMain: TFrmDckMain
       Width = 378
       Height = 503
       ParentBackground = False
-      TabOrder = 14
+      TabOrder = 12
       Caption = 'Image'
       object PanSize: TPanel
         AlignWithMargins = True
@@ -973,7 +973,7 @@ object FrmDckMain: TFrmDckMain
       Height = 503
       Buttons = [pbMenu, pbPin, pbMaximize]
       ParentBackground = False
-      TabOrder = 8
+      TabOrder = 9
       Caption = 'XML Editor'
       object dckInfo: TLMDDockSite
         Left = 0
@@ -1000,7 +1000,7 @@ object FrmDckMain: TFrmDckMain
           Height = 0
           PanelVisible = False
           ParentBackground = False
-          TabOrder = 4
+          TabOrder = 0
           Caption = 'LMDDockPanel1'
         end
       end
@@ -1012,7 +1012,7 @@ object FrmDckMain: TFrmDckMain
       Height = 299
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 12
+      TabOrder = 14
       Caption = 'Mod Options'
       object chkUnlimitedTime: TSpTBXCheckBox
         Left = 21
@@ -1022,7 +1022,7 @@ object FrmDckMain: TFrmDckMain
         Caption = 'Unlimited Time'
         AutoSize = False
         ParentColor = True
-        TabOrder = 0
+        TabOrder = 5
       end
       object chkFreeLandUpgade: TSpTBXCheckBox
         Left = 21
@@ -1032,7 +1032,7 @@ object FrmDckMain: TFrmDckMain
         Caption = 'Free Land Upgrade'
         AutoSize = False
         ParentColor = True
-        TabOrder = 1
+        TabOrder = 4
       end
       object chkNonUnique: TSpTBXCheckBox
         Left = 21
@@ -1042,7 +1042,7 @@ object FrmDckMain: TFrmDckMain
         Caption = 'Non unique'
         AutoSize = False
         ParentColor = True
-        TabOrder = 2
+        TabOrder = 3
       end
       object chkAllFree: TSpTBXCheckBox
         Left = 21
@@ -1052,7 +1052,7 @@ object FrmDckMain: TFrmDckMain
         Caption = 'All Free'
         AutoSize = False
         ParentColor = True
-        TabOrder = 3
+        TabOrder = 2
       end
       object chkInstantBuild: TSpTBXCheckBox
         Left = 21
@@ -1062,7 +1062,7 @@ object FrmDckMain: TFrmDckMain
         Caption = 'Instant Build'
         AutoSize = False
         ParentColor = True
-        TabOrder = 4
+        TabOrder = 1
       end
       object chkBuildStore: TSpTBXCheckBox
         Left = 21
@@ -1072,7 +1072,7 @@ object FrmDckMain: TFrmDckMain
         Caption = 'Build Custom Store'
         AutoSize = False
         ParentColor = True
-        TabOrder = 5
+        TabOrder = 0
       end
     end
     object PanProject: TLMDDockPanel
@@ -1082,7 +1082,7 @@ object FrmDckMain: TFrmDckMain
       Height = 305
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 4
+      TabOrder = 7
       Caption = 'Project'
     end
     object PanResources: TLMDDockPanel
@@ -1092,7 +1092,7 @@ object FrmDckMain: TFrmDckMain
       Height = 305
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 9
+      TabOrder = 6
       Caption = 'Resources'
       object PanFilterResources: TPanel
         Left = 0
@@ -1111,7 +1111,7 @@ object FrmDckMain: TFrmDckMain
       Height = 503
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 6
+      TabOrder = 8
       Caption = 'Sbtp File'
     end
     object PanTreeView: TLMDDockPanel
@@ -1121,7 +1121,7 @@ object FrmDckMain: TFrmDckMain
       Height = 650
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 5
+      TabOrder = 4
       Caption = 'DLC Server'
       object PanFilter: TPanel
         Left = 0

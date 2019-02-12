@@ -450,9 +450,9 @@ End;
 
 Procedure TTSTOCustomPatchListIO.DoOnChange(Sender : TObject);
 Begin
+  FModified := True;
   If Assigned(FOnChange) Then
     FOnChange(Sender);
-  FModified := True;
 End;
 
 Function TTSTOCustomPatchListIO.GetOnChange() : TNotifyEvent;
@@ -516,9 +516,9 @@ End;
 
 Procedure TTSTOCustomPatchesIOImpl.DoOnChange(Sender : TObject);
 Begin
+  FModified := True;
   If Assigned(FOnChange) Then
     FOnChange(Sender);
-  FModified := True;
 End;
 
 Function TTSTOCustomPatchesIOImpl.GetOnChange() : TNotifyEvent;

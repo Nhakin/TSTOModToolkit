@@ -773,4 +773,83 @@ object FrmHackMasterList: TFrmHackMasterList
       end
     end
   end
+  object actlstScintilla: TActionList
+    Left = 72
+    Top = 80
+    object SciToggleBookMark1: TSciToggleBookMark
+      Category = 'ScIntilla'
+      Caption = 'Toggle Bookmark'
+      ShortCut = 16497
+    end
+    object SciNextBookmark1: TSciNextBookmark
+      Category = 'ScIntilla'
+      Caption = 'Next Bookmark'
+      ShortCut = 113
+    end
+    object SciPrevBookmark1: TSciPrevBookmark
+      Category = 'ScIntilla'
+      Caption = 'Previous Bookmark'
+      ShortCut = 8305
+    end
+    object SciFoldAll1: TSciFoldAll
+      Category = 'ScIntilla'
+      Caption = 'Fold All'
+      ShortCut = 32816
+    end
+    object SciUnFoldAll1: TSciUnFoldAll
+      Category = 'ScIntilla'
+      Caption = 'Unfold All'
+      ShortCut = 41008
+    end
+    object SciCollapseCurrentLevel1: TSciCollapseCurrentLevel
+      Category = 'ScIntilla'
+      Caption = 'Collapse Current Level'
+      ShortCut = 49222
+    end
+    object SciUnCollapseCurrentLevel1: TSciUnCollapseCurrentLevel
+      Category = 'ScIntilla'
+      Caption = 'Uncollapse Current Level'
+      ShortCut = 57414
+    end
+    object SciCollapseLevel11: TSciCollapseLevel1
+      Category = 'ScIntilla'
+      Caption = 'Collapse Level 1'
+      ShortCut = 32817
+    end
+    object SciCollapseLevel21: TSciCollapseLevel2
+      Category = 'ScIntilla'
+      Caption = 'Collapse Level 2'
+      ShortCut = 32818
+    end
+    object SciCollapseLevel31: TSciCollapseLevel3
+      Category = 'ScIntilla'
+      Caption = 'Collapse Level 3'
+      ShortCut = 32819
+    end
+    object SciCollapseLevel41: TSciCollapseLevel4
+      Category = 'ScIntilla'
+      Caption = 'Collapse Level 4'
+      ShortCut = 32820
+    end
+    object SciExpandLevel11: TSciExpandLevel1
+      Category = 'ScIntilla'
+      Caption = 'Uncollapse Level 1'
+      ShortCut = 41009
+    end
+    object SciExpandLevel21: TSciExpandLevel2
+      Category = 'ScIntilla'
+      Caption = 'Uncollapse Level 2'
+      ShortCut = 41010
+    end
+    object SciExpandLevel31: TSciExpandLevel3
+      Category = 'ScIntilla'
+      Caption = 'Uncollapse Level 3'
+      ShortCut = 41011
+    end
+    object SciExpandLevel41: TSciExpandLevel4
+      Category = 'ScIntilla'
+      Caption = 'Uncollapse Level 4'
+      ShortCut = 41012
+    end
+  end
 end
