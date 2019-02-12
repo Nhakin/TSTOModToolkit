@@ -310,6 +310,7 @@ Type
     FDefLayout   : IMemoryStreamEx;
     FCurData     : ITSTOCurrentData;
     FCurDlcIndex : String;
+    FFormPosLoaded : Boolean;
 
     Procedure ShowPanelClick(Sender : TObject);
     Procedure DoWorkSpaceOnChanged(Sender : TObject);
@@ -733,6 +734,7 @@ begin
   End;
 
   FLoaded := False;
+  FFormPosLoaded := False;
 end;
 
 procedure TFrmDckMain.FormDestroy(Sender: TObject);
@@ -786,13 +788,18 @@ end;
 
 procedure TFrmDckMain.FormActivate(Sender: TObject);
 begin
-  WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
-  If WindowState = wsNormal Then
+  If Not FFormPosLoaded Then
   Begin
-    Left        := FFormSettings.X;
-    Top         := FFormSettings.Y;
-    Height      := FFormSettings.H;
-    Width       := FFormSettings.W;
+    WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
+    If WindowState = wsNormal Then
+    Begin
+      Left        := FFormSettings.X;
+      Top         := FFormSettings.Y;
+      Height      := FFormSettings.H;
+      Width       := FFormSettings.W;
+    End;
+
+    FFormPosLoaded := True;
   End;
 end;
 
@@ -849,8 +856,16 @@ begin
 end;
 
 procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
+Var lHML : ITSTOHackMasterListIO;
 begin
-//
+  lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+  Try
+    lHML.LoadFromFile('HackMasterList.xml');
+    ShowMessage(lHML.AsXml);
+
+    Finally
+      lHML := Nil;
+  End;
 end;
 
 procedure TFrmDckMain.sptbxMainMenuMouseDown(Sender: TObject;

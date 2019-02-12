@@ -458,6 +458,11 @@ object FrmCustomPatches: TFrmCustomPatches
       Height = 100
       Version = '6.2.5.918'
       Align = alTop
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNone
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
       Header.AutoSizeIndex = 2
       Header.Font.Charset = DEFAULT_CHARSET
       Header.Font.Color = clWindowText
@@ -465,6 +470,7 @@ object FrmCustomPatches: TFrmCustomPatches
       Header.Font.Name = 'Tahoma'
       Header.Font.Style = []
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoOwnerDraw, hoShowSortGlyphs, hoVisible]
+      ParentFont = False
       PopupMenu = popVSTPatchData
       TabOrder = 0
       TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]

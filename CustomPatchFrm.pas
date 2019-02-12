@@ -841,8 +841,9 @@ begin
 
   TargetCanvas.Brush.Style := bsClear;
   TargetCanvas.Font.Assign(Sender.Font);
-  If CurrentSkin.Options(skncListItem, lCurState).TextColor <> clNone Then
-    TargetCanvas.Font.Color := CurrentSkin.Options(skncListItem, lCurState).TextColor;
+  If Sender.Font.Color = clNone Then
+    If CurrentSkin.Options(skncListItem, lCurState).TextColor <> clNone Then
+      TargetCanvas.Font.Color := CurrentSkin.Options(skncListItem, lCurState).TextColor;
 
   lRect.Left := lRect.Left + 8;
   lRect.Top  := (lRect.Bottom - lRect.Top - TargetCanvas.TextHeight('XXX')) Div 2;

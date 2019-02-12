@@ -2,6 +2,8 @@ unit VTCombos;
 
 interface
 
+{$Define VT60}
+
 Uses
   Windows, Classes, Messages, SysUtils, Forms,
   VTEditors, VirtualTrees

@@ -851,9 +851,25 @@ Begin
 End;
 
 Function TTSTOHackMasterListIOImpl.GetAsXml() : String;
+  Procedure AddComment(Const AComment : String; AParent : IXMLNode);
+  Var lComment : IXMLNode;
+  Begin
+    lComment := AParent.OwnerDocument.CreateNode(AComment, ntComment);
+    AParent.ChildNodes.Add(lComment);
+  End;
+
+Var lXml : IXmlTSTOHackMasterList;
 Begin
-  Result := FormatXmlData(XmlImpl.Xml);
-  FXmlImpl := Nil;
+  lXml := XmlImpl;
+  Try
+    If lXml.MovedItems.Count = 0 Then
+      AddComment(' <MovedPackage XmlFileName="" OldCategory="" NewCategory=""/> ', lXml.MovedItems);
+    Result := FormatXmlData(lXml.Xml);
+    FXmlImpl := Nil;
+
+    Finally
+      lXml := Nil;
+  End;
 End;
 
 Procedure TTSTOHackMasterListIOImpl.SetAsXml(Const AXmlString : String);
