@@ -18,6 +18,8 @@ Type
     Function  GetIsDebugMode() : Boolean; Virtual;
     Procedure SetIsDebugMode(Const AIsDebugMode : Boolean); Virtual;
 
+    Procedure InitSkin(); Virtual;
+
   Public
     Property IsDebugMode : Boolean Read GetIsDebugMode Write SetIsDebugMode;
 
@@ -508,22 +510,26 @@ Begin
   Header.AutoSizeIndex := 0;
 End;
 
-Procedure TTSTOBaseTreeView.WMSpSkinChange(Var Message: TMessage);
+Procedure TTSTOBaseTreeView.InitSkin();
 Begin
-  InHerited;
-
   If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
   Begin
     Color := $00262525;
-    With SkinManager.CurrentSkin Do
-      Options(skncListItem, sknsNormal).TextColor := $00F1F1F1;
-  End
+    Font.Color := $00F1F1F1
+  End;{
   Else
   Begin
     Color := clWindow;
     With SkinManager.CurrentSkin Do
       Options(skncListItem, sknsNormal).TextColor := clWindowText;
-  End;
+  End;}
+End;
+
+Procedure TTSTOBaseTreeView.WMSpSkinChange(Var Message: TMessage);
+Begin
+  InHerited;
+
+  InitSkin();
 End;
 
 Function  TTSTOBaseTreeView.DebugEnabled() : Boolean;

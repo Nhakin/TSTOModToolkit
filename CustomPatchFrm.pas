@@ -166,30 +166,15 @@ Var lTop, lLeft : Integer;
 begin
   FPrevPatch     := Nil;
   FPrevPatchData := Nil;
-(*
-  For X := gbPatchInfoV1.ControlCount - 1 DownTo 0 Do
-  Begin
-    lControl := gbPatchInfoV1.Controls[X];
-    lLeft := lControl.Left;
-    lTop  := lControl.Top;
-    If lControl Is TLabel Then
-    Begin
-      lControl := TSpTBXLabel.Create(Self);
-      TSpTbxLabel(lControl).Caption := TLabel(gbPatchInfoV1.Controls[X]).Caption;
-      lControl.Height := gbPatchInfoV1.Controls[X].Height;
-      lControl.Width  := gbPatchInfoV1.Controls[X].Width;
-    End;
-    lControl.Parent := gbPatchInfoV2;
-    lControl.Left := lLeft;
-    lControl.Top  := lTop;
-  End;
-*)
+
   If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
   Begin
     vstCustomPacthes.Color := $00262525;
     vstCustomPacthes.Font.Color := $00F1F1F1;
+
     vstPatchData.Color := $00262525;
     vstPatchData.Font.Color := $00F1F1F1;
+
     PanTreeView.Color := $00262525;
     PanInfo.Color := $00262525;
   End;

@@ -172,10 +172,9 @@ begin
   If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
   Begin
     vstSbtpFile.Color := $00262525;
+    vstSbtpFile.Font.Color := $00F1F1F1;
     FTvSbtpData.Color :=  $00262525;
-
-    With SkinManager.CurrentSkin Do
-      Options(skncListItem, sknsNormal).TextColor := $00F1F1F1;
+    FTvSbtpData.Font.Color := $00F1F1F1;
   End;
 end;
 

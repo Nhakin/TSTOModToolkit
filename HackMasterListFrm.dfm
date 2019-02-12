@@ -27,14 +27,12 @@ object FrmHackMasterList: TFrmHackMasterList
     Align = alLeft
     TabOrder = 1
     Borders = False
-    ExplicitHeight = 427
   end
   object SpTBXSplitter1: TSpTBXSplitter
     Left = 201
     Top = 26
     Height = 530
     Cursor = crSizeWE
-    ExplicitHeight = 427
   end
   object PanData: TSpTBXExPanel
     Left = 206
@@ -45,8 +43,6 @@ object FrmHackMasterList: TFrmHackMasterList
     Align = alClient
     TabOrder = 3
     Borders = False
-    ExplicitWidth = 456
-    ExplicitHeight = 427
     object GrpPackage: TSpTBXGroupBox
       Left = 0
       Top = 81
@@ -56,7 +52,6 @@ object FrmHackMasterList: TFrmHackMasterList
       Align = alTop
       ParentColor = True
       TabOrder = 1
-      ExplicitWidth = 456
       object Label1: TSpTBXLabel
         Left = 10
         Top = 49
@@ -129,7 +124,6 @@ object FrmHackMasterList: TFrmHackMasterList
       Align = alTop
       ParentColor = True
       TabOrder = 0
-      ExplicitWidth = 456
       object SpTBXLabel3: TSpTBXLabel
         Left = 10
         Top = 21
@@ -192,8 +186,6 @@ object FrmHackMasterList: TFrmHackMasterList
       Align = alClient
       ParentColor = True
       TabOrder = 2
-      ExplicitWidth = 456
-      ExplicitHeight = 243
       object EditXmlData: TScintillaNPP
         AlignWithMargins = True
         Left = 5
@@ -645,7 +637,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Height = 28
           BiDiMode = bdLeftToRight
           ParentBiDiMode = False
-          TabOrder = 8
+          TabOrder = 7
           OnClick = chkItemAddInStoreClick
         end
         object SpTBXLabel8: TSpTBXLabel
@@ -711,7 +703,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Top = 65
           Width = 371
           Height = 21
-          TabOrder = 4
+          TabOrder = 3
           OnChange = EditItemTypeChange
         end
         object SpTBXLabel11: TSpTBXLabel
@@ -735,7 +727,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Top = 92
           Width = 371
           Height = 21
-          TabOrder = 6
+          TabOrder = 5
           OnChange = EditItemSkinObjectChange
         end
       end
@@ -747,7 +739,6 @@ object FrmHackMasterList: TFrmHackMasterList
     Width = 709
     Height = 26
     AllowDrag = False
-    ExplicitWidth = 662
     object sptbxtbMain: TSpTBXToolbar
       Left = 0
       Top = 0

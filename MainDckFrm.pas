@@ -648,7 +648,6 @@ begin
   FTvDlcServer.Parent         := PanTreeView;
   FTvDlcServer.Align          := alClient;
   FTvDlcServer.Images         := DataModuleImage.imgToolBar;
-  FTvDlcServer.Font.Color     := clBlack;
   FTvDlcServer.PopupMenu      := popTv;
   FTvDlcServer.OnFocusChanged := DoTvDlcServerOnFocusChanged;
   FTvDlcServer.TSTOProject    := FPrj;
@@ -657,7 +656,6 @@ begin
   FTvWorkSpace.Parent         := PanProject;
   FTvWorkSpace.Align          := alClient;
   FTvWorkSpace.Images         := DataModuleImage.imgToolBar;
-  FTvWorkSpace.Font.Color     := clBlack;
   FTvWorkSpace.PopupMenu      := popTvWS;
   FTvWorkSpace.OnFocusChanged := DoTvWorkSpaceOnFocusChanged;
   FTvWorkSpace.OnDblClick     := DoTvWorkSpaceDblClick;
@@ -668,7 +666,6 @@ begin
   FTvResources.Parent         := PanResources;
   FTvResources.Align          := alClient;
   FTvResources.Images         := DataModuleImage.imgToolBar;
-  FTvResources.Font.Color     := clBlack;
   FTvResources.PopupMenu      := popTvResource;
   FTvResources.OnFocusChanged := DoTvResourcesOnFocusChanged;
   FTvResources.TvData         := FResources;
@@ -676,18 +673,15 @@ begin
   FTvSbtpFile := TTSTOSbtpFileTreeView.Create(Self);
   FTvSbtpFile.Parent     := PanSbtp;
   FTvSbtpFile.Align      := alClient;
-  FTvSbtpFile.Font.Color := clBlack;
 
   FTvCustomPatches := TTSTOCustomPatchesTreeView.Create(Self);
   FTvCustomPatches.Parent     := PanCustomMod;
   FTvCustomPatches.Align      := alClient;
-  FTvCustomPatches.Font.Color := clBlack;
   FTvCustomPatches.TvData     := FWorkSpace.HackSettings.CustomPatches.Patches;
 
   FTvScriptTemplate := TTSTOScriptTemplateTreeView.Create(Self);
   FTvScriptTemplate.Parent     := PanTvHackTemplate;
   FTvScriptTemplate.Align      := alClient;
-  FTvScriptTemplate.Font.Color := clBlack;
   FTvScriptTemplate.TvData     := FWorkSpace.HackSettings.ScriptTemplates;
   FTvScriptTemplate.PopupMenu  := popTvSTTemplate;
   FTvScriptTemplate.OnFocusChanged := DoTvScriptTemplateOnFocusChanged;
@@ -697,12 +691,10 @@ begin
   FTvSTSettings := TTSTOScriptTemplateSettingsTreeView.Create(Self);
   FTvSTSettings.Parent     := PanSTSettings;
   FTvSTSettings.Align      := alClient;
-  FTvSTSettings.Font.Color := clBlack;
 
   FTvSTVariables := TTSTOScriptTemplateVariablesTreeView.Create(Self);
   FTvSTVariables.Parent     := PanSTVariables;
   FTvSTVariables.Align      := alClient;
-  FTvSTVariables.Font.Color := clBlack;
   FTvSTVariables.PopupMenu  := popTvSTVariables;
 
   FDefLayout := TMemoryStreamEx.Create();
@@ -740,17 +732,6 @@ begin
     FFormSettings.W := Width;
   End;
 
-  If SameText(SkinManager.CurrentSkinName, 'WMP11') Then
-  Begin
-    FTvDlcServer.Font.Color      := $00F1F1F1;
-    FTvWorkSpace.Font.Color      := $00F1F1F1;
-    FTvSbtpFile.Font.Color       := $00F1F1F1;
-    FTvCustomPatches.Font.Color  := $00F1F1F1;
-    FTvResources.Font.Color      := $00F1F1F1;
-    FTvScriptTemplate.Font.Color := $00F1F1F1;
-    FTvSTSettings.Font.Color     := $00F1F1F1;
-    FTvSTVariables.Font.Color    := $00F1F1F1;
-  End;
   FLoaded := False;
 end;
 
