@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SpTBXItem, SpTBXControls, SpTBXExPanel, TSTOTreeviews, TSTOHackMasterList.IO,
   SpTBXDkPanels, TB2Item, TB2Dock, TB2Toolbar, Vcl.StdCtrls, SpTBXEditors, VirtualTrees,
-  SciScintillaBase, SciScintillaMemo, SciScintilla, SciScintillaNPP, SciLanguageManager, TSTOProject.Xml;
+  SciScintillaBase, SciScintillaMemo, SciScintilla, SciScintillaNPP, SciLanguageManager, TSTOProject.Xml,
+  SciActions, System.Actions, Vcl.ActnList;
 
 type
   TFrmHackMasterList = class(TForm)
@@ -49,6 +50,22 @@ type
     SpTBXLabel11: TSpTBXLabel;
     SpTBXLabel12: TSpTBXLabel;
     EditItemSkinObject: TSpTBXEdit;
+    actlstScintilla: TActionList;
+    SciToggleBookMark1: TSciToggleBookMark;
+    SciNextBookmark1: TSciNextBookmark;
+    SciPrevBookmark1: TSciPrevBookmark;
+    SciFoldAll1: TSciFoldAll;
+    SciUnFoldAll1: TSciUnFoldAll;
+    SciCollapseCurrentLevel1: TSciCollapseCurrentLevel;
+    SciUnCollapseCurrentLevel1: TSciUnCollapseCurrentLevel;
+    SciCollapseLevel11: TSciCollapseLevel1;
+    SciCollapseLevel21: TSciCollapseLevel2;
+    SciCollapseLevel31: TSciCollapseLevel3;
+    SciCollapseLevel41: TSciCollapseLevel4;
+    SciExpandLevel11: TSciExpandLevel1;
+    SciExpandLevel21: TSciExpandLevel2;
+    SciExpandLevel31: TSciExpandLevel3;
+    SciExpandLevel41: TSciExpandLevel4;
 
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);

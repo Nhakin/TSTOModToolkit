@@ -27,14 +27,12 @@ object FrmHackMasterList: TFrmHackMasterList
     Align = alLeft
     TabOrder = 1
     Borders = False
-    ExplicitHeight = 427
   end
   object SpTBXSplitter1: TSpTBXSplitter
     Left = 201
     Top = 26
     Height = 530
     Cursor = crSizeWE
-    ExplicitHeight = 427
   end
   object PanData: TSpTBXExPanel
     Left = 206
@@ -45,8 +43,6 @@ object FrmHackMasterList: TFrmHackMasterList
     Align = alClient
     TabOrder = 3
     Borders = False
-    ExplicitWidth = 456
-    ExplicitHeight = 427
     object GrpPackage: TSpTBXGroupBox
       Left = 0
       Top = 81
@@ -56,7 +52,6 @@ object FrmHackMasterList: TFrmHackMasterList
       Align = alTop
       ParentColor = True
       TabOrder = 1
-      ExplicitWidth = 456
       object Label1: TSpTBXLabel
         Left = 10
         Top = 49
@@ -129,7 +124,6 @@ object FrmHackMasterList: TFrmHackMasterList
       Align = alTop
       ParentColor = True
       TabOrder = 0
-      ExplicitWidth = 456
       object SpTBXLabel3: TSpTBXLabel
         Left = 10
         Top = 21
@@ -192,8 +186,6 @@ object FrmHackMasterList: TFrmHackMasterList
       Align = alClient
       ParentColor = True
       TabOrder = 2
-      ExplicitWidth = 456
-      ExplicitHeight = 243
       object EditXmlData: TScintillaNPP
         AlignWithMargins = True
         Left = 5
@@ -645,7 +637,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Height = 28
           BiDiMode = bdLeftToRight
           ParentBiDiMode = False
-          TabOrder = 8
+          TabOrder = 7
           OnClick = chkItemAddInStoreClick
         end
         object SpTBXLabel8: TSpTBXLabel
@@ -711,7 +703,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Top = 65
           Width = 371
           Height = 21
-          TabOrder = 4
+          TabOrder = 3
           OnChange = EditItemTypeChange
         end
         object SpTBXLabel11: TSpTBXLabel
@@ -735,7 +727,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Top = 92
           Width = 371
           Height = 21
-          TabOrder = 6
+          TabOrder = 5
           OnChange = EditItemSkinObjectChange
         end
       end
@@ -747,7 +739,6 @@ object FrmHackMasterList: TFrmHackMasterList
     Width = 709
     Height = 26
     AllowDrag = False
-    ExplicitWidth = 662
     object sptbxtbMain: TSpTBXToolbar
       Left = 0
       Top = 0
@@ -780,6 +771,85 @@ object FrmHackMasterList: TFrmHackMasterList
         ImageIndex = 2
         OnClick = tbSaveHackMasterListClick
       end
+    end
+  end
+  object actlstScintilla: TActionList
+    Left = 72
+    Top = 80
+    object SciToggleBookMark1: TSciToggleBookMark
+      Category = 'ScIntilla'
+      Caption = 'Toggle Bookmark'
+      ShortCut = 16497
+    end
+    object SciNextBookmark1: TSciNextBookmark
+      Category = 'ScIntilla'
+      Caption = 'Next Bookmark'
+      ShortCut = 113
+    end
+    object SciPrevBookmark1: TSciPrevBookmark
+      Category = 'ScIntilla'
+      Caption = 'Previous Bookmark'
+      ShortCut = 8305
+    end
+    object SciFoldAll1: TSciFoldAll
+      Category = 'ScIntilla'
+      Caption = 'Fold All'
+      ShortCut = 32816
+    end
+    object SciUnFoldAll1: TSciUnFoldAll
+      Category = 'ScIntilla'
+      Caption = 'Unfold All'
+      ShortCut = 41008
+    end
+    object SciCollapseCurrentLevel1: TSciCollapseCurrentLevel
+      Category = 'ScIntilla'
+      Caption = 'Collapse Current Level'
+      ShortCut = 49222
+    end
+    object SciUnCollapseCurrentLevel1: TSciUnCollapseCurrentLevel
+      Category = 'ScIntilla'
+      Caption = 'Uncollapse Current Level'
+      ShortCut = 57414
+    end
+    object SciCollapseLevel11: TSciCollapseLevel1
+      Category = 'ScIntilla'
+      Caption = 'Collapse Level 1'
+      ShortCut = 32817
+    end
+    object SciCollapseLevel21: TSciCollapseLevel2
+      Category = 'ScIntilla'
+      Caption = 'Collapse Level 2'
+      ShortCut = 32818
+    end
+    object SciCollapseLevel31: TSciCollapseLevel3
+      Category = 'ScIntilla'
+      Caption = 'Collapse Level 3'
+      ShortCut = 32819
+    end
+    object SciCollapseLevel41: TSciCollapseLevel4
+      Category = 'ScIntilla'
+      Caption = 'Collapse Level 4'
+      ShortCut = 32820
+    end
+    object SciExpandLevel11: TSciExpandLevel1
+      Category = 'ScIntilla'
+      Caption = 'Uncollapse Level 1'
+      ShortCut = 41009
+    end
+    object SciExpandLevel21: TSciExpandLevel2
+      Category = 'ScIntilla'
+      Caption = 'Uncollapse Level 2'
+      ShortCut = 41010
+    end
+    object SciExpandLevel31: TSciExpandLevel3
+      Category = 'ScIntilla'
+      Caption = 'Uncollapse Level 3'
+      ShortCut = 41011
+    end
+    object SciExpandLevel41: TSciExpandLevel4
+      Category = 'ScIntilla'
+      Caption = 'Uncollapse Level 4'
+      ShortCut = 41012
     end
   end
 end

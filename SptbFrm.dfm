@@ -180,7 +180,6 @@ object FrmSbtp: TFrmSbtp
         ImageIndex = 2
         Images = DataModuleImage.imgToolBar
         OnClick = tbSaveClick
-        DropdownCombo = True
         HideEmptyPopup = True
         object tbSave2: TSpTBXItem
           Caption = 'Save'

@@ -20,8 +20,8 @@ Type
     Procedure SetOnChanged(AOnChanged : TNotifyEvent);
 
     Procedure LoadFromFile(Const AFileName : String);
-    Procedure SaveToFile(); OverLoad;
-    Procedure SaveToFile(Const AFileName : String); OverLoad;
+    Procedure SaveToFile(Const AForceSave : Boolean = False); OverLoad;
+    Procedure SaveToFile(Const AFileName : String; Const AForceSave : Boolean = False); OverLoad;
 
     Procedure NewHackFile();
     Procedure ExtractHackSource(Const AFileFormat : THackIdxFileFormat; APath : String = '');
@@ -155,8 +155,8 @@ Type
 
     Procedure LoadFromFile(Const AFileName : String);
 
-    Procedure SaveToFile(Const AFileName : String); OverLoad;
-    Procedure SaveToFile(); OverLoad;
+    Procedure SaveToFile(Const AFileName : String; Const AForceSave : Boolean = False); OverLoad;
+    Procedure SaveToFile(Const AForceSave : Boolean = False); OverLoad;
 
     Procedure NewHackFile();
     Procedure ExtractHackSource(Const AFileFormat : THackIdxFileFormat; APath : String = '');
@@ -559,7 +559,7 @@ Begin
   Result := FHackMasterList;
 End;
 
-Procedure TTSTOHackSettingsImpl.SaveToFile(Const AFileName : String);
+Procedure TTSTOHackSettingsImpl.SaveToFile(Const AFileName : String; Const AForceSave : Boolean = False);
 Var lStrStrm : IStringStreamEx;
     lMemStrm : IMemoryStreamEx;
     lIdx : Integer;
@@ -683,11 +683,11 @@ Begin
   If (Assigned(FScriptTemplates) And FScriptTemplates.Modified) Or
      (Assigned(FCustomPatches) And FCustomPatches.Modified) Or
      (Assigned(FTextPools) And FTextPools.Modified) Or
-     (Assigned(FHackMasterList) And FHackMasterList.Modified) Then
+     (Assigned(FHackMasterList) And FHackMasterList.Modified) Or AForceSave Then
     InHerited SaveToFile(AFileName);
 End;
 
-Procedure TTSTOHackSettingsImpl.SaveToFile();
+Procedure TTSTOHackSettingsImpl.SaveToFile(Const AForceSave : Boolean = False);
 Begin
   SaveToFile(FFileName);
 End;
