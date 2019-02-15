@@ -7,18 +7,15 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   VirtualTrees, {$If CompilerVersion = 18.5}VirtualTrees.D2007Types,{$EndIf}
   Dialogs, ComCtrls, ToolWin, StdCtrls, ExtCtrls, Menus, Tabs,
-  SynEditHighlighter, SynHighlighterXML, SynEdit, SpTBXExControls, TB2Dock,
-  TB2Toolbar, SpTBXItem, TB2Item, SpTBXControls, SpTBXDkPanels, SpTBXTabs;
+  SpTBXExControls, TB2Dock,
+  TB2Toolbar, SpTBXItem, TB2Item, SpTBXControls, SpTBXDkPanels, SpTBXTabs,
+  SciScintillaBase, SciScintillaMemo, SciScintilla, SciScintillaNPP,
+  SciLanguageManager, SciActions, System.Actions, Vcl.ActnList;
 
 type
   TFrmCustomPatches = class(TForm)
     PanInfo: TPanel;
     PanTreeView: TPanel;
-    popVSTCustomPatches: TPopupMenu;
-    popAdd: TMenuItem;
-    popDelete: TMenuItem;
-    EditXml: TSynEdit;
-    SynXMLSyn1: TSynXMLSyn;
     vstPatchData: TSpTBXVirtualStringTree;
     dckTbMain: TSpTBXDock;
     tbMainV2: TSpTBXToolbar;
@@ -36,6 +33,29 @@ type
     EditPatchDesc: TEdit;
     lblPatchFileName: TLabel;
     EditPatchFileName: TEdit;
+    EditXml: TScintillaNPP;
+    popVSTCustomPatches: TSpTBXPopupMenu;
+    popDeletePatch: TSpTBXItem;
+    popAddPatch: TSpTBXItem;
+    actlstScintilla: TActionList;
+    SciToggleBookMark1: TSciToggleBookMark;
+    SciNextBookmark1: TSciNextBookmark;
+    SciPrevBookmark1: TSciPrevBookmark;
+    SciFoldAll1: TSciFoldAll;
+    SciUnFoldAll1: TSciUnFoldAll;
+    SciCollapseCurrentLevel1: TSciCollapseCurrentLevel;
+    SciUnCollapseCurrentLevel1: TSciUnCollapseCurrentLevel;
+    SciCollapseLevel11: TSciCollapseLevel1;
+    SciCollapseLevel21: TSciCollapseLevel2;
+    SciCollapseLevel31: TSciCollapseLevel3;
+    SciCollapseLevel41: TSciCollapseLevel4;
+    SciExpandLevel11: TSciExpandLevel1;
+    SciExpandLevel21: TSciExpandLevel2;
+    SciExpandLevel31: TSciExpandLevel3;
+    SciExpandLevel41: TSciExpandLevel4;
+    popVSTPatchData: TSpTBXPopupMenu;
+    popAddPatchData: TSpTBXItem;
+    popDeletePatchData: TSpTBXItem;
 
     procedure FormCreate(Sender: TObject);
     procedure tbSaveOldClick(Sender: TObject);
@@ -55,7 +75,6 @@ type
       Node: PVirtualNode; Column: TColumnIndex);
     procedure vstPatchDataKeyAction(Sender: TBaseVirtualTree;
       var CharCode: Word; var Shift: TShiftState; var DoDefault: Boolean);
-    procedure popAddClick(Sender: TObject);
     procedure vstPatchDataAfterCellPaint(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
       CellRect: TRect);
@@ -71,6 +90,10 @@ type
     procedure EditPatchNameExit(Sender: TObject);
     procedure EditPatchDescExit(Sender: TObject);
     procedure EditPatchFileNameExit(Sender: TObject);
+    procedure popAddPatchClick(Sender: TObject);
+    procedure popAddPatchDataClick(Sender: TObject);
+    procedure popDeletePatchClick(Sender: TObject);
+    procedure popDeletePatchDataClick(Sender: TObject);
 
   Private
     FProject       : ITSTOXMLProject;
@@ -84,6 +107,9 @@ type
     Procedure SetProject(AProject : ITSTOXMLProject);
     Procedure SetHackSettings(AHackSettings : ITSTOHackSettings);
 
+    Function  GetLangMgr() : TSciLanguageManager;
+    Procedure SetLangMgr(ALangMgr : TSciLanguageManager);
+
     Procedure SetNodeData(ANode : PVirtualNode; ANodeData : IInterface);
     Function  GetNodeData(ANode : PVirtualNode; AId : TGUID; Var ANodeData) : Boolean; OverLoad;
 
@@ -92,15 +118,16 @@ type
     Procedure DoOnPatchesChanged(Sender : TObject);
 
   Published
-    Property ProjectFile  : ITSTOXMLProject   Read FProject      Write SetProject;
-    Property HackSettings : ITSTOHackSettings Read FHackSettings Write SetHackSettings;
+    Property ProjectFile  : ITSTOXMLProject     Read FProject      Write SetProject;
+    Property HackSettings : ITSTOHackSettings   Read FHackSettings Write SetHackSettings;
+    Property LangMgr      : TSciLanguageManager Read GetLangMgr    Write SetLangMgr;
 
   end;
 
 implementation
 
-Uses SpTBXSkins, RTTI, TypInfo, XmlDoc, HsXmlDocEx, HsStreamEx, VTEditors, VTCombos,
-  TSTOPatches;
+Uses SpTBXSkins, RTTI, TypInfo, XmlDoc, HsFunctionsEx,
+  HsXmlDocEx, HsStreamEx, VTEditors, VTCombos, TSTOPatches;
 
 {$R *.dfm}
 
@@ -108,10 +135,13 @@ procedure TFrmCustomPatches.FormActivate(Sender: TObject);
 Var X : Integer;
 begin
   WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
-  Left        := FFormSettings.X;
-  Top         := FFormSettings.Y;
-  Height      := FFormSettings.H;
-  Width       := FFormSettings.W;
+  If WindowState = wsNormal Then
+  Begin
+    Left   := FFormSettings.X;
+    Top    := FFormSettings.Y;
+    Height := FFormSettings.H;
+    Width  := FFormSettings.W;
+  End;
 
   For X := 0 To FFormSettings.Count - 1 Do
     If SameText(FFormSettings[X].SettingName, 'SplitTvsLeft') Then
@@ -163,33 +193,17 @@ Var lTop, lLeft : Integer;
 begin
   FPrevPatch     := Nil;
   FPrevPatchData := Nil;
-(*
-  For X := gbPatchInfoV1.ControlCount - 1 DownTo 0 Do
-  Begin
-    lControl := gbPatchInfoV1.Controls[X];
-    lLeft := lControl.Left;
-    lTop  := lControl.Top;
-    If lControl Is TLabel Then
-    Begin
-      lControl := TSpTBXLabel.Create(Self);
-      TSpTbxLabel(lControl).Caption := TLabel(gbPatchInfoV1.Controls[X]).Caption;
-      lControl.Height := gbPatchInfoV1.Controls[X].Height;
-      lControl.Width  := gbPatchInfoV1.Controls[X].Width;
-    End;
-    lControl.Parent := gbPatchInfoV2;
-    lControl.Left := lLeft;
-    lControl.Top  := lTop;
-  End;
-*)
+
   If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
   Begin
     vstCustomPacthes.Color := $00262525;
+    vstCustomPacthes.Font.Color := $00F1F1F1;
+
     vstPatchData.Color := $00262525;
+    vstPatchData.Font.Color := $00F1F1F1;
+
     PanTreeView.Color := $00262525;
     PanInfo.Color := $00262525;
-
-    With SkinManager.CurrentSkin Do
-      Options(skncListItem, sknsNormal).TextColor := $00F1F1F1;
   End;
 end;
 
@@ -256,6 +270,18 @@ Begin
   End;
 End;
 
+Function TFrmCustomPatches.GetLangMgr() : TSciLanguageManager;
+Begin
+  Result := EditXml.LanguageManager;
+End;
+
+Procedure TFrmCustomPatches.SetLangMgr(ALangMgr : TSciLanguageManager);
+Begin
+  EditXml.LanguageManager := ALangMgr;
+  EditXml.SelectedLanguage := 'XML';
+  EditXml.Folding := EditXml.Folding + [foldFold];
+End;
+
 Procedure TFrmCustomPatches.DoOnPatchesChanged(Sender : TObject);
 Begin
   tbSave.Enabled := FCustomPatches.Modified;
@@ -288,32 +314,12 @@ Var lStrStream : IStringStreamEx;
 begin
   If FCustomPatches.Modified Then
   Begin
-    lMem := TMemoryStreamEx.Create();
-    Try
-      FHackSettings.CustomPatches.AsXml := FCustomPatches.AsXml;
-      FHackSettings.CustomPatches.ForceChanged();
-
-      Finally
-        lMem := Nil;
-    End;
+    FHackSettings.CustomPatches.Assign(FCustomPatches);
+    FHackSettings.CustomPatches.ForceChanged();
+    FCustomPatches.ClearChanges();
   End;
 
   ModalResult := mrOk;
-(*
-  If (FProject.CustomPatches.Patches.Count > 0) And
-     (FProject.Settings.CustomPatchFileName <> '') Then
-  Begin
-    lStrStream := TStringStreamEx.Create(FormatXMLData(FProject.CustomPatches.Xml));
-    Try
-      lStrStream.SaveToFile(FProject.Settings.CustomPatchFileName);
-
-      Finally
-       lStrStream := Nil;
-    End;
-  End;
-
-  ModalResult := mrOk;
-*)
 end;
 
 procedure TFrmCustomPatches.tsXmlV1Change(Sender: TObject; NewTab: Integer;
@@ -344,17 +350,66 @@ Begin
     Result := False;
 End;
 
+procedure TFrmCustomPatches.popAddPatchClick(Sender: TObject);
+begin
+  FCustomPatches.Patches.Add().PatchName := '<NewPatch>';
+  With vstCustomPacthes Do
+    ReinitNode(AddChild(Nil), False);
+end;
+
+procedure TFrmCustomPatches.popAddPatchDataClick(Sender: TObject);
+Var lPatch : ITSTOCustomPatchIO;
+begin
+  If GetNodeData(FPrevPatch, ITSTOCustomPatchIO, lPatch) Then
+  Begin
+    lPatch.PatchData.Add();
+    With vstPatchData Do
+      ReinitNode(AddChild(Nil), False);
+  End;
+end;
+
+procedure TFrmCustomPatches.popDeletePatchClick(Sender: TObject);
+Var lNode : PVirtualNode;
+    lPatch : ITSTOCustomPatchIO;
+begin
+  If MessageConfirm('Do you want to delete this patch?') Then
+    With vstCustomPacthes Do
+    Begin
+      lNode := GetFirstSelected();
+
+      If Self.GetNodeData(lNode, ITSTOCustomPatchIO, lPatch) Then
+      Begin
+        FCustomPatches.Patches.Remove(lPatch);
+        DeleteNode(lNode);
+      End;
+    End;
+end;
+
+procedure TFrmCustomPatches.popDeletePatchDataClick(Sender: TObject);
+Var lNode : PVirtualNode;
+    lPatch : ITSTOCustomPatchIO;
+    lPatchData : ITSTOPatchDataIO;
+begin
+  If MessageConfirm('Do you want to delete this patch item?') Then
+    With vstPatchData Do
+    Begin
+      lNode := GetFirstSelected();
+
+      If Self.GetNodeData(FPrevPatch, ITSTOCustomPatchIO, lPatch) And
+         Self.GetNodeData(lNode, ITSTOPatchDataIO, lPatchData) Then
+      Begin
+        DeleteNode(lNode);
+        lPatch.PatchData.Remove(lPatchData);
+      End;
+    End;
+end;
+
 Procedure TFrmCustomPatches.SetNodeData(ANode : PVirtualNode; ANodeData : IInterface);
 Var lNodeData : PPointer;
 Begin
   lNodeData  := TreeFromNode(ANode).GetNodeData(ANode);
   lNodeData^ := Pointer(ANodeData);
 End;
-
-procedure TFrmCustomPatches.popAddClick(Sender: TObject);
-begin
-//
-end;
 
 Procedure TFrmCustomPatches.DisplayXml(APatch : ITSTOCustomPatchIO; AIndex : Integer = -1);
 Var lXml   : IXmlDocumentEx;
@@ -385,7 +440,7 @@ Begin
 
       1 :
       Begin
-        EditXml.BeginUpdate();
+        //EditXml.BeginUpdate();
         lXml := LoadXMLDocument(FProject.Settings.SourcePath + APatch.FileName);
         Try
           EditXml.Lines.Text := '';
@@ -404,23 +459,23 @@ Begin
 
           Finally
             lXml := Nil;
-            EditXml.EndUpdate();
+            //EditXml.EndUpdate();
         End;
       End;
 
       2 :
       Begin
-        EditXml.BeginUpdate();
+        //EditXml.BeginUpdate();
         lXml := LoadXMLDocument(FProject.Settings.SourcePath + APatch.FileName);
         lModder := TTSTOModder.Create();
         Try
           lModder.PreviewCustomPatches(lXml, APatch.PatchData);
-          EditXml.Text := FormatXmlData(lXml.Xml.Text);
+          EditXml.Lines.Text := FormatXmlData(lXml.Xml.Text);
 
           Finally
             lModder := Nil;
             lXml := Nil;
-            EditXml.EndUpdate();
+//            EditXml.EndUpdate();
         End;
       End;
     End;
@@ -786,8 +841,9 @@ begin
 
   TargetCanvas.Brush.Style := bsClear;
   TargetCanvas.Font.Assign(Sender.Font);
-  If CurrentSkin.Options(skncListItem, lCurState).TextColor <> clNone Then
-    TargetCanvas.Font.Color := CurrentSkin.Options(skncListItem, lCurState).TextColor;
+  If Sender.Font.Color = clNone Then
+    If CurrentSkin.Options(skncListItem, lCurState).TextColor <> clNone Then
+      TargetCanvas.Font.Color := CurrentSkin.Options(skncListItem, lCurState).TextColor;
 
   lRect.Left := lRect.Left + 8;
   lRect.Top  := (lRect.Bottom - lRect.Top - TargetCanvas.TextHeight('XXX')) Div 2;

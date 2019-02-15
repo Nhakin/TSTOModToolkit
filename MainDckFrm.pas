@@ -209,6 +209,7 @@ Type
     EditImageSize: TEdit;
     ScrlImage: TScrollBox;
     ImgResource: TImage;
+    mnuHackMasterList: TSpTBXItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -280,6 +281,7 @@ Type
     procedure popCompareHackMasterListClick(Sender: TObject);
     procedure popDiffHackMasterListClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure mnuHackMasterListClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -308,6 +310,7 @@ Type
     FDefLayout   : IMemoryStreamEx;
     FCurData     : ITSTOCurrentData;
     FCurDlcIndex : String;
+    FFormPosLoaded : Boolean;
 
     Procedure ShowPanelClick(Sender : TObject);
     Procedure DoWorkSpaceOnChanged(Sender : TObject);
@@ -360,7 +363,7 @@ Uses RTTI, RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
   TSTOCustomPatches.IO, TSTOHackMasterList.Xml, TSTOBsv.IO,
   TSTOZero.Bin, TSTOSbtp.IO, TSTOProjectWorkSpaceIntf,
   TSTOProjectWorkSpace.Xml, TSTOProjectWorkSpace.Types,
-  RemoveFileFromProjectFrm, ProjectSettingFrm, ProjectGroupSettingFrm;
+  RemoveFileFromProjectFrm, ProjectSettingFrm, ProjectGroupSettingFrm, HackMasterListFrm;
 
 {$R *.dfm}
 
@@ -646,7 +649,6 @@ begin
   FTvDlcServer.Parent         := PanTreeView;
   FTvDlcServer.Align          := alClient;
   FTvDlcServer.Images         := DataModuleImage.imgToolBar;
-  FTvDlcServer.Font.Color     := clBlack;
   FTvDlcServer.PopupMenu      := popTv;
   FTvDlcServer.OnFocusChanged := DoTvDlcServerOnFocusChanged;
   FTvDlcServer.TSTOProject    := FPrj;
@@ -655,7 +657,6 @@ begin
   FTvWorkSpace.Parent         := PanProject;
   FTvWorkSpace.Align          := alClient;
   FTvWorkSpace.Images         := DataModuleImage.imgToolBar;
-  FTvWorkSpace.Font.Color     := clBlack;
   FTvWorkSpace.PopupMenu      := popTvWS;
   FTvWorkSpace.OnFocusChanged := DoTvWorkSpaceOnFocusChanged;
   FTvWorkSpace.OnDblClick     := DoTvWorkSpaceDblClick;
@@ -666,7 +667,6 @@ begin
   FTvResources.Parent         := PanResources;
   FTvResources.Align          := alClient;
   FTvResources.Images         := DataModuleImage.imgToolBar;
-  FTvResources.Font.Color     := clBlack;
   FTvResources.PopupMenu      := popTvResource;
   FTvResources.OnFocusChanged := DoTvResourcesOnFocusChanged;
   FTvResources.TvData         := FResources;
@@ -674,18 +674,15 @@ begin
   FTvSbtpFile := TTSTOSbtpFileTreeView.Create(Self);
   FTvSbtpFile.Parent     := PanSbtp;
   FTvSbtpFile.Align      := alClient;
-  FTvSbtpFile.Font.Color := clBlack;
 
   FTvCustomPatches := TTSTOCustomPatchesTreeView.Create(Self);
   FTvCustomPatches.Parent     := PanCustomMod;
   FTvCustomPatches.Align      := alClient;
-  FTvCustomPatches.Font.Color := clBlack;
   FTvCustomPatches.TvData     := FWorkSpace.HackSettings.CustomPatches.Patches;
 
   FTvScriptTemplate := TTSTOScriptTemplateTreeView.Create(Self);
   FTvScriptTemplate.Parent     := PanTvHackTemplate;
   FTvScriptTemplate.Align      := alClient;
-  FTvScriptTemplate.Font.Color := clBlack;
   FTvScriptTemplate.TvData     := FWorkSpace.HackSettings.ScriptTemplates;
   FTvScriptTemplate.PopupMenu  := popTvSTTemplate;
   FTvScriptTemplate.OnFocusChanged := DoTvScriptTemplateOnFocusChanged;
@@ -695,12 +692,10 @@ begin
   FTvSTSettings := TTSTOScriptTemplateSettingsTreeView.Create(Self);
   FTvSTSettings.Parent     := PanSTSettings;
   FTvSTSettings.Align      := alClient;
-  FTvSTSettings.Font.Color := clBlack;
 
   FTvSTVariables := TTSTOScriptTemplateVariablesTreeView.Create(Self);
   FTvSTVariables.Parent     := PanSTVariables;
   FTvSTVariables.Align      := alClient;
-  FTvSTVariables.Font.Color := clBlack;
   FTvSTVariables.PopupMenu  := popTvSTVariables;
 
   FDefLayout := TMemoryStreamEx.Create();
@@ -739,6 +734,7 @@ begin
   End;
 
   FLoaded := False;
+  FFormPosLoaded := False;
 end;
 
 procedure TFrmDckMain.FormDestroy(Sender: TObject);
@@ -792,11 +788,19 @@ end;
 
 procedure TFrmDckMain.FormActivate(Sender: TObject);
 begin
-  WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
-  Left        := FFormSettings.X;
-  Top         := FFormSettings.Y;
-  Height      := FFormSettings.H;
-  Width       := FFormSettings.W;
+  If Not FFormPosLoaded Then
+  Begin
+    WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
+    If WindowState = wsNormal Then
+    Begin
+      Left        := FFormSettings.X;
+      Top         := FFormSettings.Y;
+      Height      := FFormSettings.H;
+      Width       := FFormSettings.W;
+    End;
+
+    FFormPosLoaded := True;
+  End;
 end;
 
 procedure TFrmDckMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -837,9 +841,31 @@ End;
 
 (******************************************************************************)
 
-procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
+procedure TFrmDckMain.mnuHackMasterListClick(Sender: TObject);
 begin
-//
+  With TFrmHackMasterList.Create(Self) Do
+  Try
+    MasterList  := FWorkSpace.HackSettings.HackMasterList;
+    LangMgr     := SciLangMgr;
+    AppSettings := FPrj.Settings;
+    ShowModal();
+
+    Finally
+      Release();
+  End;
+end;
+
+procedure TFrmDckMain.SpTBXItem3Click(Sender: TObject);
+Var lHML : ITSTOHackMasterListIO;
+begin
+  lHML := TTSTOHackMasterListIO.CreateHackMasterList();
+  Try
+    lHML.LoadFromFile('HackMasterList.xml');
+    ShowMessage(lHML.AsXml);
+
+    Finally
+      lHML := Nil;
+  End;
 end;
 
 procedure TFrmDckMain.sptbxMainMenuMouseDown(Sender: TObject;
@@ -908,6 +934,7 @@ begin
   Try
     ProjectFile := FPrj;
     HackSettings := FWorkSpace.HackSettings;
+    LangMgr := SciLangMgr;
 
     If ShowModal() = mrOk Then
     Begin

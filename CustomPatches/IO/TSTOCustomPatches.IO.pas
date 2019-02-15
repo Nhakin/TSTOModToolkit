@@ -81,6 +81,7 @@ Type
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
     Procedure ForceChanged();
+    Procedure ClearChanges();
 
     Property AsXml    : String Read GetAsXml Write SetAsXml;
     Property Patches  : ITSTOCustomPatchListIO Read GetPatches;
@@ -212,6 +213,7 @@ Type
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
     Procedure ForceChanged();
+    Procedure ClearChanges();
 
     Procedure Assign(ASource : IInterface); OverRide;
 
@@ -448,9 +450,9 @@ End;
 
 Procedure TTSTOCustomPatchListIO.DoOnChange(Sender : TObject);
 Begin
+  FModified := True;
   If Assigned(FOnChange) Then
     FOnChange(Sender);
-  FModified := True;
 End;
 
 Function TTSTOCustomPatchListIO.GetOnChange() : TNotifyEvent;
@@ -514,9 +516,9 @@ End;
 
 Procedure TTSTOCustomPatchesIOImpl.DoOnChange(Sender : TObject);
 Begin
+  FModified := True;
   If Assigned(FOnChange) Then
     FOnChange(Sender);
-  FModified := True;
 End;
 
 Function TTSTOCustomPatchesIOImpl.GetOnChange() : TNotifyEvent;
@@ -532,6 +534,11 @@ End;
 Procedure TTSTOCustomPatchesIOImpl.ForceChanged();
 Begin
   DoOnChange(Self);
+End;
+
+Procedure TTSTOCustomPatchesIOImpl.ClearChanges();
+Begin
+  FModified := False;
 End;
 
 end.

@@ -102,10 +102,13 @@ procedure TFrmSbtp.FormActivate(Sender: TObject);
 Var X : Integer;
 begin
   WindowState := TRttiEnumerationType.GetValue<TWindowState>(FFormSettings.WindowState);
-  Left        := FFormSettings.X;
-  Top         := FFormSettings.Y;
-  Height      := FFormSettings.H;
-  Width       := FFormSettings.W;
+  If WindowState = wsNormal Then
+  Begin
+    Left   := FFormSettings.X;
+    Top    := FFormSettings.Y;
+    Height := FFormSettings.H;
+    Width  := FFormSettings.W;
+  End;
 
   For X := 0 To FFormSettings.Count - 1 Do
     If SameText(FFormSettings[X].SettingName, 'SplitTvsLeft') Then
@@ -169,10 +172,9 @@ begin
   If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
   Begin
     vstSbtpFile.Color := $00262525;
+    vstSbtpFile.Font.Color := $00F1F1F1;
     FTvSbtpData.Color :=  $00262525;
-
-    With SkinManager.CurrentSkin Do
-      Options(skncListItem, sknsNormal).TextColor := $00F1F1F1;
+    FTvSbtpData.Font.Color := $00F1F1F1;
   End;
 end;
 
@@ -321,6 +323,8 @@ begin
       lMem.Position := 0;
       FHackSettings.TextPools.LoadFromStream(lMem);
       FHackSettings.TextPools.ForceChanged();
+
+      FTvData.ClearChanges();
 
       Finally
         lMem := Nil;

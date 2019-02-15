@@ -95,7 +95,6 @@ begin
   Top         := FFormSettings.Y;
   Height      := FFormSettings.H;
   Width       := FFormSettings.W;
-
 end;
 
 procedure TFrmProjectSettings.FormCloseQuery(Sender: TObject;

@@ -68,6 +68,10 @@ object FrmDckMain: TFrmDckMain
             Caption = 'Sbtp Custom Patch'
             OnClick = mnuSbtpCustomPatchClick
           end
+          object mnuHackMasterList: TSpTBXItem
+            Caption = 'Hack MasterList'
+            OnClick = mnuHackMasterListClick
+          end
           object N1: TSpTBXSeparatorItem
           end
           object mnuExit: TSpTBXItem
@@ -168,7 +172,7 @@ object FrmDckMain: TFrmDckMain
       3C7A6F6E65206B696E643D2250414E454C222069643D2250616E46696C65496E
       666F222076697369626C653D2231222073697A653D2231323022206473697A65
       3D22302E313836333335343033373236373038222F3E0D0A090909093C7A6F6E
-      65206B696E643D225441425322206163746976657461623D2230222073697A65
+      65206B696E643D225441425322206163746976657461623D2234222073697A65
       3D2235323422206473697A653D22302E38313336363435393632373332393222
       20697373706163653D2231223E0D0A09090909093C7A6F6E65206B696E643D22
       50414E454C222069643D2250616E496E666F222076697369626C653D2231222F
@@ -203,7 +207,7 @@ object FrmDckMain: TFrmDckMain
       Height = 299
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 11
+      TabOrder = 13
       Caption = 'Custom Mod'
     end
     object PanFileInfo: TLMDDockPanel
@@ -213,7 +217,7 @@ object FrmDckMain: TFrmDckMain
       Height = 120
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 13
+      TabOrder = 5
       Caption = 'File Info'
       DesignSize = (
         378
@@ -273,7 +277,7 @@ object FrmDckMain: TFrmDckMain
         Font.Style = []
         ParentFont = False
         ReadOnly = True
-        TabOrder = 0
+        TabOrder = 5
       end
       object EditVersion: TEdit
         Left = 181
@@ -288,7 +292,7 @@ object FrmDckMain: TFrmDckMain
         Font.Style = []
         ParentFont = False
         ReadOnly = True
-        TabOrder = 1
+        TabOrder = 4
       end
       object EditTier: TEdit
         Left = 181
@@ -333,7 +337,7 @@ object FrmDckMain: TFrmDckMain
         Font.Style = []
         ParentFont = False
         ReadOnly = True
-        TabOrder = 4
+        TabOrder = 1
       end
       object EditFileName: TEdit
         Left = 70
@@ -349,8 +353,7 @@ object FrmDckMain: TFrmDckMain
         Font.Style = []
         ParentFont = False
         ReadOnly = True
-        TabOrder = 5
-        ExplicitWidth = 457
+        TabOrder = 0
       end
     end
     object PanHackTemplateMaster: TLMDDockPanel
@@ -369,8 +372,6 @@ object FrmDckMain: TFrmDckMain
         Manager = dckMgr
         Align = alClient
         TabOrder = 0
-        ExplicitWidth = 389
-        ExplicitHeight = 629
         Layout = {
           EFBBBF3C3F786D6C2076657273696F6E3D22312E302220656E636F64696E673D
           227574662D38223F3E0D0A3C736974656C6973743E0D0A093C73697465206964
@@ -399,7 +400,7 @@ object FrmDckMain: TFrmDckMain
           Width = 366
           Height = 337
           ParentBackground = False
-          TabOrder = 5
+          TabOrder = 7
           Caption = 'Template Source'
           object EditScriptTemplate: TScintillaNPP
             Left = 0
@@ -836,8 +837,6 @@ object FrmDckMain: TFrmDckMain
             ActiveTabIndex = 0
             TabPosition = ttpBottom
             OnActiveTabChange = tsScriptTemplateActiveTabChange
-            ExplicitTop = 568
-            ExplicitWidth = 164
             HiddenItems = <>
             object tsSTSource: TSpTBXTabItem
               Caption = 'Source'
@@ -854,7 +853,7 @@ object FrmDckMain: TFrmDckMain
           Width = 185
           Height = 107
           ParentBackground = False
-          TabOrder = 7
+          TabOrder = 5
           Caption = 'Settings'
         end
         object PanSTVariables: TLMDDockPanel
@@ -885,7 +884,7 @@ object FrmDckMain: TFrmDckMain
       Height = 503
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 7
+      TabOrder = 11
       Caption = 'Hex Editor'
       OnEnter = PanImageOldEnter
       object KHexEditor: TKHexEditor
@@ -902,8 +901,6 @@ object FrmDckMain: TFrmDckMain
         Font.Pitch = fpFixed
         Font.Style = [fsBold]
         TabOrder = 0
-        ExplicitWidth = 383
-        ExplicitHeight = 623
       end
     end
     object PanImage: TLMDDockPanel
@@ -912,7 +909,7 @@ object FrmDckMain: TFrmDckMain
       Width = 378
       Height = 503
       ParentBackground = False
-      TabOrder = 14
+      TabOrder = 12
       Caption = 'Image'
       object PanSize: TPanel
         AlignWithMargins = True
@@ -924,8 +921,6 @@ object FrmDckMain: TFrmDckMain
         BevelOuter = bvLowered
         ParentColor = True
         TabOrder = 0
-        ExplicitLeft = 6
-        ExplicitTop = 11
         object Label7: TLabel
           Left = 16
           Top = 9
@@ -962,9 +957,6 @@ object FrmDckMain: TFrmDckMain
         BorderStyle = bsNone
         TabOrder = 1
         OnEnter = PanImageOldEnter
-        ExplicitTop = 60
-        ExplicitWidth = 533
-        ExplicitHeight = 179
         object ImgResource: TImage
           Left = 0
           Top = 0
@@ -981,7 +973,7 @@ object FrmDckMain: TFrmDckMain
       Height = 503
       Buttons = [pbMenu, pbPin, pbMaximize]
       ParentBackground = False
-      TabOrder = 8
+      TabOrder = 9
       Caption = 'XML Editor'
       object dckInfo: TLMDDockSite
         Left = 0
@@ -991,8 +983,6 @@ object FrmDckMain: TFrmDckMain
         Manager = dckMgr
         Align = alClient
         TabOrder = 0
-        ExplicitWidth = 551
-        ExplicitHeight = 629
         Layout = {
           EFBBBF3C3F786D6C2076657273696F6E3D22312E302220656E636F64696E673D
           227574662D38223F3E0D0A3C736974656C6973743E0D0A093C73697465206964
@@ -1004,13 +994,13 @@ object FrmDckMain: TFrmDckMain
           3622206473697A653D22312220697373706163653D2231222F3E0D0A09093C2F
           7A6F6E653E0D0A093C2F736974653E0D0A3C2F736974656C6973743E}
         object LMDDockPanel1: TLMDDockPanel
-          Left = 6
-          Top = 121
+          Left = 0
+          Top = 0
           Width = 32
-          Height = 254
+          Height = 0
           PanelVisible = False
           ParentBackground = False
-          TabOrder = 4
+          TabOrder = 0
           Caption = 'LMDDockPanel1'
         end
       end
@@ -1022,16 +1012,17 @@ object FrmDckMain: TFrmDckMain
       Height = 299
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 12
+      TabOrder = 14
       Caption = 'Mod Options'
       object chkUnlimitedTime: TSpTBXCheckBox
         Left = 21
         Top = 135
-        Width = 92
+        Width = 116
         Height = 21
         Caption = 'Unlimited Time'
+        AutoSize = False
         ParentColor = True
-        TabOrder = 0
+        TabOrder = 5
       end
       object chkFreeLandUpgade: TSpTBXCheckBox
         Left = 21
@@ -1039,44 +1030,49 @@ object FrmDckMain: TFrmDckMain
         Width = 116
         Height = 21
         Caption = 'Free Land Upgrade'
+        AutoSize = False
         ParentColor = True
-        TabOrder = 1
+        TabOrder = 4
       end
       object chkNonUnique: TSpTBXCheckBox
         Left = 21
         Top = 93
-        Width = 78
+        Width = 116
         Height = 21
         Caption = 'Non unique'
+        AutoSize = False
         ParentColor = True
-        TabOrder = 2
+        TabOrder = 3
       end
       object chkAllFree: TSpTBXCheckBox
         Left = 21
         Top = 72
-        Width = 60
+        Width = 116
         Height = 21
         Caption = 'All Free'
+        AutoSize = False
         ParentColor = True
-        TabOrder = 3
+        TabOrder = 2
       end
       object chkInstantBuild: TSpTBXCheckBox
         Left = 21
         Top = 51
-        Width = 84
+        Width = 116
         Height = 21
         Caption = 'Instant Build'
+        AutoSize = False
         ParentColor = True
-        TabOrder = 4
+        TabOrder = 1
       end
       object chkBuildStore: TSpTBXCheckBox
         Left = 21
         Top = 30
-        Width = 114
+        Width = 116
         Height = 21
         Caption = 'Build Custom Store'
+        AutoSize = False
         ParentColor = True
-        TabOrder = 5
+        TabOrder = 0
       end
     end
     object PanProject: TLMDDockPanel
@@ -1086,7 +1082,7 @@ object FrmDckMain: TFrmDckMain
       Height = 305
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 4
+      TabOrder = 7
       Caption = 'Project'
     end
     object PanResources: TLMDDockPanel
@@ -1096,7 +1092,7 @@ object FrmDckMain: TFrmDckMain
       Height = 305
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 9
+      TabOrder = 6
       Caption = 'Resources'
       object PanFilterResources: TPanel
         Left = 0
@@ -1106,7 +1102,6 @@ object FrmDckMain: TFrmDckMain
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 150
       end
     end
     object PanSbtp: TLMDDockPanel
@@ -1116,7 +1111,7 @@ object FrmDckMain: TFrmDckMain
       Height = 503
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 6
+      TabOrder = 8
       Caption = 'Sbtp File'
     end
     object PanTreeView: TLMDDockPanel
@@ -1126,7 +1121,7 @@ object FrmDckMain: TFrmDckMain
       Height = 650
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
-      TabOrder = 5
+      TabOrder = 4
       Caption = 'DLC Server'
       object PanFilter: TPanel
         Left = 0

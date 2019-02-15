@@ -4,6 +4,7 @@ uses
   Forms,
   CustomPatchFrm in 'CustomPatchFrm.pas' {FrmCustomPatches},
   dmImage in 'dmImage.pas' {DataModuleImage: TDataModule},
+  HackMasterListFrm in 'HackMasterListFrm.pas' {FrmHackMasterList},
   HsAlarmEx in 'HsUnits\HsAlarmEx.pas',
   HsBase64Ex in 'HsUnits\HsBase64Ex.pas',
   HsBaseConvEx in 'HsUnits\HsBaseConvEx.pas',

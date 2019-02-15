@@ -2,7 +2,7 @@ unit TSTOHackMasterList.Bin;
 
 interface
 
-Uses HsInterfaceEx, HsStreamEx,
+Uses Windows, HsInterfaceEx, HsStreamEx,
   TSTOHackMasterListIntf;
 
 Type
@@ -23,16 +23,20 @@ Type
 implementation
 
 Uses
-  Math, SysUtils, TSTOHackMasterListImpl;
+  Math, SysUtils, HsStringListEx, TSTOHackMasterListImpl;
 
 
 Type
   TBinTSTOHackMasterListImpl = Class(TTSTOHackMasterList, IBinTSTOHackMasterList)
   Private
+    Procedure LoadMiscData(AStream : IStreamEx; AList : IHsStringListEx; Const ACounterSize, AStringSize : Integer);
+    Procedure LoadMovedItems(AStream : IStreamEx);
+
     Procedure LoadFromStreamV001(AStream : IStreamEx);
     Procedure LoadFromStreamV002(AStream : IStreamEx);
-    Procedure LoadFromStreamV003(AStream : IStreamEx);
+    Procedure LoadFromStreamV003(AStream : IStreamEx; Const ACounterSize, AStringSize : Integer);
     Procedure LoadFromStreamV004(AStream : IStreamEx);
+    Procedure LoadFromStreamV005(AStream : IStreamEx);
 
   Protected
     Procedure LoadFromStream(AStream : IStreamEx);
@@ -65,7 +69,7 @@ End;
 (******************************************************************************)
 
 Const
-  cFileVersion = 4;
+  cFileVersion = 5;
 
   cCategoryEnabled = 1;
   cBuildStore = 2;
@@ -74,7 +78,25 @@ Const
   cAddInStore = 1;
   cOverRide = 2;
 
-Procedure TBinTSTOHackMasterListImpl.LoadFromStreamV004(AStream : IStreamEx);
+Procedure TBinTSTOHackMasterListImpl.LoadMiscData(AStream : IStreamEx; AList : IHsStringListEx; Const ACounterSize, AStringSize : Integer);
+Var X : DWord;
+Begin
+  Case ACounterSize Of
+    1 : X := AStream.ReadByte();
+    2 : X := AStream.ReadWord();
+    4 : X := AStream.ReadDWord();
+  End;
+
+  AList.Add('<MiscData>');
+  While X > 0 Do
+  Begin
+    AList.Add(AStream.ReadAnsiString(AStringSize, False));
+    Dec(X);
+  End;
+  AList.Add('</MiscData>');
+End;
+
+Procedure TBinTSTOHackMasterListImpl.LoadMovedItems(AStream : IStreamEx);
 Var lNbItem : Word;
 Begin
   lNbItem := AStream.ReadWord();
@@ -89,11 +111,21 @@ Begin
 
     Dec(lNbItem);
   End;
-
-  LoadFromStreamV003(AStream);
 End;
 
-Procedure TBinTSTOHackMasterListImpl.LoadFromStreamV003(AStream : IStreamEx);
+Procedure TBinTSTOHackMasterListImpl.LoadFromStreamV005(AStream : IStreamEx);
+Begin
+  LoadMovedItems(AStream);
+  LoadFromStreamV003(AStream, 2, 2);
+End;
+
+Procedure TBinTSTOHackMasterListImpl.LoadFromStreamV004(AStream : IStreamEx);
+Begin
+  LoadMovedItems(AStream);
+  LoadFromStreamV003(AStream, 2, 1);
+End;
+
+Procedure TBinTSTOHackMasterListImpl.LoadFromStreamV003(AStream : IStreamEx; Const ACounterSize, AStringSize : Integer);
 Var X, Y, Z, W : Integer;
     lItemFlags : Byte;
 Begin
@@ -131,15 +163,7 @@ Begin
               ObjectType   := AStream.ReadAnsiString();
               SkinObject   := AStream.ReadAnsiString();
 
-              W := AStream.ReadWord();
-              MiscData.Add('<MiscData>');
-              While W > 0 Do
-              Begin
-                MiscData.Add(AStream.ReadAnsiString());
-
-                Dec(W);
-              End;
-              MiscData.Add('</MiscData>');
+              LoadMiscData(AStream, MiscData, ACounterSize, AStringSize);
 
               Dec(Z);
             End;
@@ -191,15 +215,7 @@ Begin
               NPCCharacter := lItemFlags And cNPCCharacter = cNPCCharacter;
               ObjectType   := AStream.ReadAnsiString();
 
-              W := AStream.ReadWord();
-              MiscData.Add('<MiscData>');
-              While W > 0 Do
-              Begin
-                MiscData.Add(AStream.ReadAnsiString());
-
-                Dec(W);
-              End;
-              MiscData.Add('</MiscData>');
+              LoadMiscData(AStream, MiscData, 2, 1);
 
               Dec(Z);
             End;
@@ -249,15 +265,7 @@ Begin
               OverRide   := lItemFlags And cOverRide = cOverRide;
               IsBadItem  := lItemFlags And cBadItem = cBadItem;
 
-              W := AStream.ReadWord();
-              MiscData.Add('<MiscData>');
-              While W > 0 Do
-              Begin
-                MiscData.Add(AStream.ReadAnsiString());
-
-                Dec(W);
-              End;
-              MiscData.Add('</MiscData>');
+              LoadMiscData(AStream, MiscData, 2, 1);
 
               Dec(Z);
             End;
@@ -277,8 +285,9 @@ Begin
   Case AStream.ReadByte() Of
     1 : LoadFromStreamV001(AStream);
     2 : LoadFromStreamV002(AStream);
-    3 : LoadFromStreamV003(AStream);
+    3 : LoadFromStreamV003(AStream, 2, 1);
     4 : LoadFromStreamV004(AStream);
+    5 : LoadFromStreamV005(AStream);
 
     Else
       Raise Exception.Create('Invalid file version');
@@ -344,7 +353,7 @@ Begin
         AStream.WriteWord(Max(Category[X][Y][Z].MiscData.Count - 2, 0));
 
         For W := 1 To Category[X][Y][Z].MiscData.Count - 2 Do
-          AStream.WriteAnsiString(Category[X][Y][Z].MiscData[W]);
+          AStream.WriteAnsiString(Category[X][Y][Z].MiscData[W], True, 2, False);
       End;
     End;
   End;

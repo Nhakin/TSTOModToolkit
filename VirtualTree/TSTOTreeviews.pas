@@ -6,7 +6,7 @@ Uses Windows, Classes, ImgList, Graphics, VirtualTrees, Messages,
   SpTBXExControls, SpTBXSkins, HsInterfaceEx,
   TSTOPackageList, TSTOProject.Xml, TSTOCustomPatches.IO, TSTODlcIndex,
   TSTOSbtp.IO, TSTOProjectWorkSpace.IO, TSTORessource, TSTOProjectWorkSpaceIntf,
-  TSTOScriptTemplate.IO//, TSTOScriptTemplateIntf
+  TSTOScriptTemplate.IO, TSTOHackMasterList.IO
   {$If CompilerVersion = 18.5}, VirtualTrees.D2007Types{$EndIf};
 
 Type
@@ -17,6 +17,8 @@ Type
 
     Function  GetIsDebugMode() : Boolean; Virtual;
     Procedure SetIsDebugMode(Const AIsDebugMode : Boolean); Virtual;
+
+    Procedure InitSkin(); Virtual;
 
   Public
     Property IsDebugMode : Boolean Read GetIsDebugMode Write SetIsDebugMode;
@@ -326,12 +328,33 @@ Type
 
   End;
 
+  TTSTOHackMasterListTreeView = Class(TTSTOBaseTreeView)
+  Private
+    FTvData : Pointer;
+
+    Function  GetTvData() : ITSTOHackMasterListIO;
+    Procedure SetTvData(ATvData : ITSTOHackMasterListIO);
+
+  Protected
+    Procedure DoInitNode(Parent, Node : PVirtualNode; Var InitStates : TVirtualNodeInitStates); OverRide;
+    Function  DoInitChildren(Node: PVirtualNode; Var ChildCount : Cardinal) : Boolean; OverRide;
+    Procedure DoGetText(Var pEventArgs : TVSTGetCellTextEventArgs); OverRide;
+    Function  DoGetImageIndex(Node : PVirtualNode; Kind : TVTImageKind; Column : TColumnIndex;
+      Var Ghosted : Boolean; Var Index : TImageIndex): TCustomImageList; OverRide;
+
+  Public
+    Property TvData : ITSTOHackMasterListIO Read GetTvData Write SetTvData;
+
+    Procedure LoadData();
+
+  End;
+
 implementation
 
 Uses SysUtils, Controls, TypInfo,
   HsZipUtils, HsStreamEx, HsXmlDocEx, VTEditors, VTCombos,
   TSTOModToolKit, TSTOZero.Bin, TSTOBsv.IO, TSTORgb, TSTOSbtpIntf,
-  TSTOProjectWorkSpaceImpl, TSTOScriptTemplateTypes;
+  TSTOProjectWorkSpaceImpl, TSTOScriptTemplateTypes, TSTOHackMasterListIntf;
 
 Type
   PInterface = ^IInterface;
@@ -487,22 +510,26 @@ Begin
   Header.AutoSizeIndex := 0;
 End;
 
-Procedure TTSTOBaseTreeView.WMSpSkinChange(Var Message: TMessage);
+Procedure TTSTOBaseTreeView.InitSkin();
 Begin
-  InHerited;
-
   If SameText(SkinManager.CurrentSkin.SkinName, 'WMP11') Then
   Begin
     Color := $00262525;
-    With SkinManager.CurrentSkin Do
-      Options(skncListItem, sknsNormal).TextColor := $00F1F1F1;
-  End
+    Font.Color := $00F1F1F1
+  End;{
   Else
   Begin
     Color := clWindow;
     With SkinManager.CurrentSkin Do
       Options(skncListItem, sknsNormal).TextColor := clWindowText;
-  End;
+  End;}
+End;
+
+Procedure TTSTOBaseTreeView.WMSpSkinChange(Var Message: TMessage);
+Begin
+  InHerited;
+
+  InitSkin();
 End;
 
 Function  TTSTOBaseTreeView.DebugEnabled() : Boolean;
@@ -2479,6 +2506,135 @@ Begin
         EndUpdate();
     End;
   End;
+End;
+
+Function TTSTOHackMasterListTreeView.GetTvData() : ITSTOHackMasterListIO;
+Begin
+  Result := ITSTOHackMasterListIO(FTvData);
+End;
+
+Procedure TTSTOHackMasterListTreeView.SetTvData(ATvData : ITSTOHackMasterListIO);
+Begin
+  FTvData := Pointer(ATvData);
+
+  LoadData();
+End;
+
+Procedure TTSTOHackMasterListTreeView.LoadData();
+Begin
+  RootNodeCount := 0;
+
+  If Assigned(TvData) Then
+  Begin
+    BeginUpdate();
+    Try
+      RootNodeCount := TvData.Count + 1;
+
+      Finally
+        EndUpdate();
+    End;
+  End;
+End;
+
+Procedure TTSTOHackMasterListTreeView.DoInitNode(Parent, Node : PVirtualNode; Var InitStates : TVirtualNodeInitStates);
+Var lCategory  : ITSTOHackMasterCategoryIO;
+    lMovedItem : ITSTOHackMasterMovedItems;
+    lPackage   : ITSTOHackMasterPackageIO;
+    lItem      : ITSTOHackMasterDataIDIO;
+Begin
+  If Not Assigned(Parent) Then
+  Begin
+    If Node.Index = 0 Then
+    Begin
+      SetNodeData(Node, TvData.MovedItems);
+      If TvData.MovedItems.Count > 0 Then
+        Node.States := Node.States + [vsHasChildren];
+    End
+    Else
+    Begin
+      SetNodeData(Node, TvData[Node.Index - 1]);
+      If TvData[Node.Index - 1].Count > 0 Then
+        Node.States := Node.States + [vsHasChildren];
+    End;
+  End
+  Else
+  Begin
+    If GetNodeData(Parent, ITSTOHackMasterMovedItems, lMovedItem) Then
+      SetNodeData(Node, lMovedItem[Node.Index])
+    Else If GetNodeData(Parent, ITSTOHackMasterCategoryIO, lCategory) Then
+    Begin
+      SetNodeData(Node, lCategory[Node.Index]);
+
+      If lCategory[Node.Index].Count > 0 Then
+        Node.States := Node.States + [vsHasChildren];
+    End
+    Else If GetNodeData(Parent, ITSTOHackMasterPackageIO, lPackage) Then
+      SetNodeData(Node, lPackage[Node.Index]);
+  End;
+End;
+
+Function TTSTOHackMasterListTreeView.DoInitChildren(Node: PVirtualNode; Var ChildCount : Cardinal) : Boolean;
+Var lMovedItem : ITSTOHackMasterMovedItems;
+    lCategory  : ITSTOHackMasterCategoryIO;
+    lPackage   : ITSTOHackMasterPackageIO;
+Begin
+  ChildCount := 0;
+
+  If GetNodeData(Node, ITSTOHackMasterMovedItems, lMovedItem) Then
+    ChildCount := lMovedItem.Count
+  Else If GetNodeData(Node, ITSTOHackMasterCategoryIO, lCategory) Then
+    ChildCount := lCategory.Count
+  Else If GetNodeData(Node, ITSTOHackMasterPackageIO, lPackage) Then
+    ChildCount := lPackage.Count;
+
+  Result := ChildCount > 0;
+End;
+
+Procedure TTSTOHackMasterListTreeView.DoGetText(Var pEventArgs : TVSTGetCellTextEventArgs);
+Var lMovedItem : ITSTOHackMasterMovedItem;
+    lCategory  : ITSTOHackMasterCategoryIO;
+    lPackage   : ITSTOHackMasterPackageIO;
+    lItem      : ITSTOHackMasterDataIDIO;
+Begin
+  With pEventArgs Do
+  Begin
+    If GetNodeData(Node, ITSTOHackMasterMovedItems) Then
+      CellText := 'Moved package'
+    Else If GetNodeData(Node, ITSTOHackMasterMovedItem, lMovedItem) Then
+      CellText := lMovedItem.XmlFileName
+    Else If GetNodeData(Node, ITSTOHackMasterCategoryIO, lCategory) Then
+    Begin
+      If lCategory.Name = '' Then
+        CellText := 'Default'
+      Else
+        CellText := lCategory.Name;
+    End
+    Else If GetNodeData(Node, ITSTOHackMasterPackageIO, lPackage) Then
+      CellText := lPackage.XmlFile
+    Else If GetNodeData(Node, ITSTOHackMasterDataIDIO, lItem) Then
+      CellText := lItem.Name
+  End;
+End;
+
+Function TTSTOHackMasterListTreeView.DoGetImageIndex(Node : PVirtualNode; Kind : TVTImageKind; Column : TColumnIndex;
+  Var Ghosted : Boolean; Var Index : TImageIndex): TCustomImageList;
+Begin
+  Result := Nil;
+
+  If Column = 0 Then
+  Begin
+    If GetNodeData(Node, ITSTOHackMasterMovedItems) Then
+      Index := -1
+    Else If GetNodeData(Node, ITSTOHackMasterMovedItem) Then
+      Index := -1
+    Else If GetNodeData(Node, ITSTOHackMasterCategoryIO) Then
+      Index := 13
+    Else If GetNodeData(Node, ITSTOHackMasterPackageIO) Then
+      Index := 58
+    Else If GetNodeData(Node, ITSTOHackMasterDataIDIO) Then
+      Index := 108
+  End;
+
 End;
 
 end.

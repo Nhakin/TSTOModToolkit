@@ -47,7 +47,6 @@ object FrmSettings: TFrmSettings
     Width = 447
     Height = 26
     Enabled = False
-    ExplicitTop = 195
   end
   object PanData: TSpTBXExPanel
     Left = 0
@@ -65,7 +64,6 @@ object FrmSettings: TFrmSettings
     ParentFont = False
     TabOrder = 0
     ShowCaption = True
-    ExplicitHeight = 169
     DesignSize = (
       447
       148)
