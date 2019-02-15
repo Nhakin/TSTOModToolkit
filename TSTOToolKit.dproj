@@ -3,7 +3,7 @@
         <ProjectGuid>{A62B0428-5926-41EA-9B9A-D6AF996A1E0B}</ProjectGuid>
         <MainSource>TSTOToolKit.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
@@ -97,7 +97,10 @@
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.0.0.5;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <Icon_MainIcon>TSTOToolKit_Icon.ico</Icon_MainIcon>
+        <VerInfo_MajorVer>2</VerInfo_MajorVer>
+        <VerInfo_Build>5</VerInfo_Build>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;DONT_LINK_TARGA;DONT_LINK_DDS;DONT_LINK_GIF;DONT_LINK_MNG;DONT_LINK_JNG;DONT_LINK_PNM;DONT_LINK_RADHDR;DONT_LINK_EXTRAS;VT60;$(DCC_Define)</DCC_Define>
@@ -114,7 +117,6 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
-        <DCC_Define>DONT_LINK_TARGA;DONT_LINK_DDS;DONT_LINK_GIF;DONT_LINK_MNG;DONT_LINK_JNG;DONT_LINK_PNM;DONT_LINK_RADHDR;DONT_LINK_EXTRAS;VT60;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

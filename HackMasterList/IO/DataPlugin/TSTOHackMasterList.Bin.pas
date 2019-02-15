@@ -90,8 +90,7 @@ Begin
   AList.Add('<MiscData>');
   While X > 0 Do
   Begin
-    AList.Add(AStream.ReadAnsiString(AStringSize));
-
+    AList.Add(AStream.ReadAnsiString(AStringSize, False));
     Dec(X);
   End;
   AList.Add('</MiscData>');
