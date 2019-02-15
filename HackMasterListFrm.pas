@@ -66,6 +66,8 @@ type
     SciExpandLevel21: TSciExpandLevel2;
     SciExpandLevel31: TSciExpandLevel3;
     SciExpandLevel41: TSciExpandLevel4;
+    SpTBXLabel13: TSpTBXLabel;
+    chkItemIsBadItem: TSpTBXCheckBox;
 
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -374,6 +376,7 @@ Begin
       EditItemSkinObject.Text := lItem.SkinObject;
       chkItemAddInStore.Checked := lItem.AddInStore;
       chkItemOverRide.Checked := lItem.OverRide;
+      chkItemIsBadItem.Checked := lItem.IsBadItem;
       EditXmlData.Lines.Text := FormatXmlData(lItem.MiscData.Text);
       GrpItem.Tag := Integer(lItem);
     End

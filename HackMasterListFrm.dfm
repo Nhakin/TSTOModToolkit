@@ -622,6 +622,16 @@ object FrmHackMasterList: TFrmHackMasterList
         ParentColor = True
         TabOrder = 0
         Borders = False
+        object chkItemIsBadItem: TSpTBXCheckBox
+          Left = 271
+          Top = 111
+          Width = 20
+          Height = 28
+          BiDiMode = bdLeftToRight
+          ParentBiDiMode = False
+          TabOrder = 14
+          OnClick = chkItemOverRideClick
+        end
         object SpTBXLabel7: TSpTBXLabel
           Left = 10
           Top = 115
@@ -637,7 +647,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Height = 28
           BiDiMode = bdLeftToRight
           ParentBiDiMode = False
-          TabOrder = 7
+          TabOrder = 6
           OnClick = chkItemAddInStoreClick
         end
         object SpTBXLabel8: TSpTBXLabel
@@ -727,8 +737,16 @@ object FrmHackMasterList: TFrmHackMasterList
           Top = 92
           Width = 371
           Height = 21
-          TabOrder = 5
+          TabOrder = 4
           OnChange = EditItemSkinObjectChange
+        end
+        object SpTBXLabel13: TSpTBXLabel
+          Left = 210
+          Top = 115
+          Width = 56
+          Height = 19
+          Caption = 'Bad Item :'
+          ParentColor = True
         end
       end
     end
