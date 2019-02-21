@@ -101,6 +101,10 @@
         <Icon_MainIcon>TSTOToolKit_Icon.ico</Icon_MainIcon>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_Build>5</VerInfo_Build>
+        <DCC_IMPLICIT_STRING_CAST>false</DCC_IMPLICIT_STRING_CAST>
+        <DCC_IMPLICIT_STRING_CAST_LOSS>false</DCC_IMPLICIT_STRING_CAST_LOSS>
+        <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
+        <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;DONT_LINK_TARGA;DONT_LINK_DDS;DONT_LINK_GIF;DONT_LINK_MNG;DONT_LINK_JNG;DONT_LINK_PNM;DONT_LINK_RADHDR;DONT_LINK_EXTRAS;VT60;$(DCC_Define)</DCC_Define>
@@ -260,6 +264,7 @@
                     <Source Name="MainSource">TSTOToolKit.dpr</Source>
                 </Source>
                 <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclRESTBackendComponents260.bpl">Embarcadero REST-Backend Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\DataExplorerDBXPluginEnt260.bpl">DBExpress Enterprise Data Explorer Integration</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>

@@ -33,6 +33,10 @@ type
     EditVariableValue: TEdit;
     EditVariableName: TEdit;
     SplitTvs: TSpTBXSplitter;
+    popTV: TSpTBXPopupMenu;
+    popTvtems: TSpTBXTBGroupItem;
+    popAdd: TSpTBXItem;
+    popDelete: TSpTBXItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -67,6 +71,9 @@ type
       Column: TColumnIndex; NewText: string);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormActivate(Sender: TObject);
+    procedure popTVPopup(Sender: TObject);
+    procedure popAddClick(Sender: TObject);
+    procedure popDeleteClick(Sender: TObject);
 
   Private
     FHackSettings : ITSTOHackSettings;
@@ -161,6 +168,7 @@ begin
   FTvSbtpData.Parent := PanInfo;
   FTvSbtpData.Align  := alClient;
   FTvSbtpData.NodeDataSize := SizeOf(IInterface);
+  FTvSbtpData.PopupMenu := popTV;
 
   FTvSbtpData.OnEditing      := vstSbtpDataEditing;
   FTvSbtpData.OnFocusChanged := vstSbtpDataFocusChanged;
@@ -347,6 +355,84 @@ Begin
   Result := GetNodeData(ANode, AId, lDummy);
 End;
 
+procedure TFrmSbtp.popAddClick(Sender: TObject);
+Var lNode     : PVirtualNode;
+    lVariable : ISbtpVariableIO;
+begin
+  If popTV.PopupComponent = vstSbtpFile Then
+  Begin
+    Abort; //ToDo
+  End
+  Else If popTV.PopupComponent = FTvSbtpData Then
+  Begin
+    With FTvSbtpData Do
+    Begin
+      lNode := GetFirstSelected();
+
+      If Assigned(lNode) And GetNodeData(lNode, ISbtpVariableIO, lVariable) Then
+      Begin
+        lVariable.SubItem.Add().VariableName := '<NewVariable>';
+        ReinitNode(AddChild(lNode), False);
+      End;
+    End;
+  End;
+end;
+
+procedure TFrmSbtp.popDeleteClick(Sender: TObject);
+Var lNode        : PVirtualNode;
+    lVariable    : ISbtpVariableIO;
+    lSubVariable : ISbtpSubVariableIO;
+begin
+  If popTV.PopupComponent = vstSbtpFile Then
+  Begin
+    Abort; //ToDo
+  End
+  Else If popTV.PopupComponent = FTvSbtpData Then
+  Begin
+    With FTvSbtpData Do
+    Begin
+      lNode := GetFirstSelected();
+
+      If Assigned(lNode) And Assigned(lNode.Parent) And
+         GetNodeData(lNode, ISbtpSubVariableIO, lSubVariable) And
+         GetNodeData(lNode.Parent, ISbtpVariableIO, lVariable) Then
+      Begin
+        DeleteNode(lNode);
+        lVariable.SubItem.Remove(lSubVariable)
+      End;
+    End;
+  End;
+end;
+
+procedure TFrmSbtp.popTVPopup(Sender: TObject);
+Var lNode : PVirtualNode;
+    lNodeData : ^IInterfaceEx;
+begin
+  popDelete.Enabled := False;
+
+  If popTV.PopupComponent = vstSbtpFile Then
+  Begin
+    Abort; //ToDo
+  End
+  Else If popTV.PopupComponent = FTvSbtpData Then
+  Begin
+    lNode := FTvSbtpData.GetFirstSelected();
+
+//    If Assigned(lNode) Then
+//    Begin
+//      lNodeData := FTvSbtpData.GetNodeData(lNode);
+//      If Assigned(lNodeData) And Assigned(lNodeData^) Then
+//        ShowMessage(GetInterfaceName(lNodeData^));
+//    End;
+
+    popDelete.Enabled := GetNodeData(lNode, ISbtpSubVariableIO);
+
+    If Not Assigned(lNode) Or
+       Not (GetNodeData(lNode, ISbtpVariableIO) Or popDelete.Enabled) Then
+      Abort;
+  End;
+end;
+
 Procedure TFrmSbtp.SetNodeData(ANode : PVirtualNode; ANodeData : IInterface);
 Var lNodeData : PPointer;
 Begin
@@ -357,8 +443,8 @@ End;
 procedure TFrmSbtp.vstSbtpDataEditing(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
 begin
-  Allowed := ({FTvSbtpData.}GetNodeData(Node, ISbtpVariable) And (Column = 0)) Or
-             ({FTvSbtpData.}GetNodeData(Node, ISbtpSubVariable) And (Column In [1, 2]));
+  Allowed := (GetNodeData(Node, ISbtpVariable) And (Column = 0)) Or
+             (GetNodeData(Node, ISbtpSubVariable) And (Column In [1, 2]));
 end;
 
 procedure TFrmSbtp.vstSbtpDataFocusChanged(Sender: TBaseVirtualTree;
@@ -438,10 +524,8 @@ end;
 
 procedure TFrmSbtp.vstSbtpFileFocusChanged(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex);
-//Var lVarPref : ISbtpVariable;
 Var lFile : ISbtpFileIO;
 begin
-//(*
   With FTvSbtpData Do
   Begin
     If GetNodeData(Node, ISbtpFileIO, lFile) Or
@@ -459,30 +543,6 @@ begin
       End;
     End;
   End;
-//*)
-(*
-  If Assigned(FPrevNode) Then
-  Begin
-
-  End;
-
-  If GetNodeData(Node, ISbtpVariable, lVarPref) Then
-  Begin
-    If vstSbtpData.IsEditing Then
-      vstSbtpData.EndEditNode();
-
-    FPrevNode := Node;
-    FTvVarData := lVarPref;
-    vstSbtpData.BeginUpdate();
-    Try
-      vstSbtpData.Clear();
-      vstSbtpData.RootNodeCount := 1;
-
-      Finally
-        vstSbtpData.EndUpdate();
-    End;
-  End;
-*)
 end;
 
 procedure TFrmSbtp.vstSbtpFileGetText(Sender: TBaseVirtualTree;

@@ -18,6 +18,11 @@ Initialization
   RegisterInterface('ISbtpFiles', ISbtpFiles);
 
   //TSTOSbtp.IO
+  RegisterInterface('ISbtpSubVariableIO', ISbtpSubVariableIO);
+  RegisterInterface('ISbtpSubVariablesIO', ISbtpSubVariablesIO);
+  RegisterInterface('ISbtpVariableIO', ISbtpVariableIO);
+  RegisterInterface('ISbtpVariablesIO', ISbtpVariablesIO);
+  RegisterInterface('ISbtpHeaderIO', ISbtpHeaderIO);
   RegisterInterface('ISbtpFileIO', ISbtpFileIO);
   RegisterInterface('ISbtpFilesIO', ISbtpFilesIO);
 

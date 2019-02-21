@@ -1236,7 +1236,7 @@ begin
       FTvWorkSpace.DeleteNode(lNode);
 
       lSrcFolder.FileList.Remove(lSrcFile);
-      tbSaveWorkSpace.Enabled := True;
+//      tbSaveWorkSpace.Enabled := True;
     End;
   End;
 end;

@@ -13,6 +13,7 @@ type
     SBOk: TSpTBXButton;
     SbCancel: TSpTBXButton;
     PanTreeView: TPanel;
+
     procedure FormCreate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
 
@@ -45,7 +46,10 @@ begin
   FTvFiles.Align  := alClient;
 
   If SameText(SkinManager.CurrentSkinName, 'WMP11') Then
-    FTvFiles.Color := $00262525
+  Begin
+    FTvFiles.Color := $00262525;
+    FTvFiles.Font.Color := clWhite;
+  End
   Else
     FTvFiles.Color := clNone;
 

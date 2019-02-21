@@ -1431,7 +1431,7 @@ Begin
 End;
 
 Procedure TTSTOSbtpFileTreeView.DoInitNode(Parent, Node : PVirtualNode; Var InitStates : TVirtualNodeInitStates);
-Var lVarPref : ISbtpVariable;
+Var lVarPref : ISbtpVariableIO;
 Begin
   If Not Assigned(Parent) Then
   Begin
@@ -1441,7 +1441,7 @@ Begin
   End
   Else
   Begin
-    If GetNodeData(Parent, ISbtpVariable, lVarPref) Then
+    If GetNodeData(Parent, ISbtpVariableIO, lVarPref) Then
       SetNodeData(Node, lVarPref.SubItem[Node.Index]);
   End;
 End;

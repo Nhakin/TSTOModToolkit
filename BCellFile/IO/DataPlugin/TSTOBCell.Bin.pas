@@ -78,10 +78,6 @@ Type
     Procedure LoadFromStream(ASource : IStreamEx);
     Procedure SaveToStream(ATarget : IStreamEx);
 
-    Property String1 : String Read GetString1 Write SetString1;
-    Property String2 : String Read GetString2 Write SetString2;
-    Property Padding : TBytes Read GetPadding;
-        
   End;
 
   TBinBCellSubItems = Class(TBCellSubItems, IBinBCellSubItems)
@@ -104,8 +100,8 @@ Type
     Procedure LoadFromStream(ASource : IStreamEx);
     Procedure SaveToStream(ATarget : IStreamEx);
 
-    Property RgbFileName : String         Read GetRgbFileName  Write SetRgbFileName;
-    Property xDiffs      : Double         Read GetxDiffs       Write SetxDiffs;
+    Property RgbFileName : AnsiString        Read GetRgbFileName  Write SetRgbFileName;
+    Property xDiffs      : Double            Read GetxDiffs       Write SetxDiffs;
     Property SubItems    : IBinBCellSubItems Read GetSubItems;
 
   End;
@@ -133,7 +129,7 @@ Type
     Procedure SaveToStream(ATarget : IStreamEx);
     Procedure SaveToFile(Const AFileName : String);
 
-    Property FileSig : String         Read GetFileSig Write SetFileSig;
+    Property FileSig : AnsiString     Read GetFileSig Write SetFileSig;
     Property Items   : IBinBCellItems Read GetItems;
 
   End;
