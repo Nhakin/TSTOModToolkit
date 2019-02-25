@@ -25,7 +25,6 @@ type
     Property IntfImpl : TInterfaceExImplementor Read GetIntfImpl Implements ITSTOApplication;
 
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
-    Function GetPluginPath() : String;
 
   public
 
@@ -42,14 +41,14 @@ Uses
   JvPlugin;
 
 procedure TForm4.FormCreate(Sender: TObject);
-  Procedure InternalListPlugins(AStartPath : String);
+  Procedure InternalListPlugins(AStartPath : String; ALvl : Integer);
   Var lSr : TSearchRec;
   Begin
     If FindFirst(AStartPath + '*.*', faAnyFile, lSr) = 0 Then
     Try
       Repeat
-        If (lSr.Attr And faDirectory = faDirectory) And (lSr.Name <> '.') And (lSr.Name <> '..') Then
-          InternalListPlugins(AStartPath + lSr.Name + '\')
+        If (lSr.Attr And faDirectory = faDirectory) And (lSr.Name <> '.') And (lSr.Name <> '..') And (ALvl < 1) Then
+          InternalListPlugins(AStartPath + lSr.Name + '\', ALvl + 1)
         Else If SameText(ExtractFileExt(lSr.Name), '.dll') Then
           JvPluginManager1.LoadPlugin(AStartPath + lSr.Name, plgDLL);
       Until FindNext(lSr) <> 0;
@@ -61,7 +60,7 @@ procedure TForm4.FormCreate(Sender: TObject);
 
 Var X : Integer;
 begin
-  InternalListPlugins(ExtractFilePath(ParamStr(0)) + 'Plugins\');
+  InternalListPlugins(ExtractFilePath(ParamStr(0)) + 'Plugins\', 0);
 
   For X := 0 To JvPluginManager1.PluginCount - 1 Do
     ListBox1.AddItem(JvPluginManager1.Plugins[X].Name, JvPluginManager1.Plugins[X]);
@@ -98,11 +97,6 @@ end;
 Function TForm4.GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
 Begin
   Result := FWorkSpace;
-End;
-
-Function TForm4.GetPluginPath() : String;
-Begin
-  Result := IncludeTrailingBackSlash(ExtractFilePath(ParamStr(0))) + 'Plugins';
 End;
 
 end.

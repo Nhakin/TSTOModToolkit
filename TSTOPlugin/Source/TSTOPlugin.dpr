@@ -21,7 +21,7 @@ uses
   TSTOSbtpIntf in 'TSTOSDK\TSTOSbtpIntf.pas',
   TSTOScriptTemplateIntf in 'TSTOSDK\TSTOScriptTemplateIntf.pas',
   TSTOScriptTemplateIntfIO in 'TSTOSDK\TSTOScriptTemplateIntfIO.pas',
-  TSTOWorkspaceIntf in 'TSTOSDK\TSTOWorkspaceIntf.pas';
+  TSTOWorkspaceIntf in 'TSTOSDK\TSTOWorkspaceIntf.pas' {$R *.res};
 
 {$R *.res}
 

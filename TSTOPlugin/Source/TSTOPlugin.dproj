@@ -175,6 +175,96 @@
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\5.0\Bpl\pngdelphi.bpl">File C:\Users\Public\Documents\RAD Studio\5.0\Bpl\pngdelphi.bpl not found</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\5.0\Bpl\dclDosCommand.bpl">File C:\Users\Public\Documents\RAD Studio\5.0\Bpl\dclDosCommand.bpl not found</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\5.0\Bpl\dclHsGridsEx.bpl">File C:\Users\Public\Documents\RAD Studio\5.0\Bpl\dclHsGridsEx.bpl not found</Excluded_Packages>
@@ -200,17 +290,6 @@
     <DCCReference Include="..\..\HsUnits\HsStreamEx.pas" />
     <DCCReference Include="..\..\HsUnits\HsStringListEx.pas" />
     <DCCReference Include="..\..\HsUnits\HsXmlDocEx.pas" />
-    <DCCReference Include="..\HsUnits\HsClipBoardEx.pas" />
-    <DCCReference Include="..\HsUnits\HsEncodingEx.pas" />
-    <DCCReference Include="..\HsUnits\HsEventListEx.pas" />
-    <DCCReference Include="..\HsUnits\HsFunctionsEx.pas">
-      <Form>$R *.res</Form>
-    </DCCReference>
-    <DCCReference Include="..\HsUnits\HsInterfaceEx.pas" />
-    <DCCReference Include="..\HsUnits\HsListEx.pas" />
-    <DCCReference Include="..\HsUnits\HsStreamEx.pas" />
-    <DCCReference Include="..\HsUnits\HsStringListEx.pas" />
-    <DCCReference Include="..\HsUnits\HsXmlDocEx.pas" />
     <DCCReference Include="TSTOPluginIntf.pas" />
     <DCCReference Include="TSTOPluginMainFrm.pas">
       <Form>Form4</Form>

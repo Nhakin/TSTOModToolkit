@@ -13,11 +13,15 @@ Type
     procedure JvPlugInConfigure(Sender: TObject);
 
   Private
-    FMainApp    : ITSTOApplication;
-    FIntfImpl   : TInterfaceExImplementor;
-    FPluginPath : String;
+    FIntfImpl       : TInterfaceExImplementor;
+    FMainApp        : ITSTOApplication;
+    FPluginPath     : String;
     FPluginFileName : String;
-    FEnabled    : Boolean;
+
+    FPluginSettings : Record
+      Enabled    : Boolean;
+      PluginKind : TTSTOPluginKind;
+    End;
 
     Function GetIntfImpl() : TInterfaceExImplementor;
 
@@ -26,6 +30,9 @@ Type
 
     Function  GetEnabled() : Boolean;
     Procedure SetEnabled(Const AEnabled : Boolean);
+
+    Function  GetPluginKind() : TTSTOPluginKind;
+    Procedure SetPluginKind(Const ATSTOPluginKind : TTSTOPluginKind);
 
     Procedure InitPlugin(AMainApplication : ITSTOApplication);
 
@@ -56,12 +63,22 @@ End;
 
 Function TTSTOPluginDemo.GetEnabled() : Boolean;
 Begin
-  Result := FEnabled;
+  Result := FPluginSettings.Enabled;
 End;
 
 Procedure TTSTOPluginDemo.SetEnabled(Const AEnabled : Boolean);
 Begin
-  FEnabled := AEnabled;
+  FPluginSettings.Enabled := AEnabled;
+End;
+
+Function TTSTOPluginDemo.GetPluginKind() : TTSTOPluginKind;
+Begin
+  Result := FPluginSettings.PluginKind;
+End;
+
+Procedure TTSTOPluginDemo.SetPluginKind(Const ATSTOPluginKind : TTSTOPluginKind);
+Begin
+  FPluginSettings.PluginKind := ATSTOPluginKind;
 End;
 
 Procedure TTSTOPluginDemo.InitPlugin(AMainApplication: ITSTOApplication);
@@ -74,8 +91,8 @@ Var lIni : TIniFile;
 begin
   lIni := TIniFile.Create(ChangeFileExt(FPluginFileName, '.cfg'));
   Try
-    FEnabled := lIni.ReadBool(Self.Name, 'Enabled', True);
-
+    FPluginSettings.Enabled := lIni.ReadBool(Self.Name, 'Enabled', True);
+    FPluginSettings.PluginKind := TTSTOPluginKind(lIni.ReadInteger(Self.Name, 'ProjectKind', 1);
     Finally
       lIni.Free();
   End;
@@ -98,7 +115,7 @@ Begin
 
   lIni := TIniFile.Create(ChangeFileExt(FPluginFileName, '.cfg'));
   Try
-    lIni.WriteBool(Self.Name, 'Enabled', FEnabled);
+    lIni.WriteBool(Self.Name, 'Enabled', FPluginSettings.Enabled);
 
     Finally
       lIni.Free();
