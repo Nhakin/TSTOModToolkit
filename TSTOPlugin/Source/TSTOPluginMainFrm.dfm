@@ -24,6 +24,7 @@ object Form4: TForm4
     OnClick = ListBox1Click
   end
   object JvPluginManager1: TJvPluginManager
+    PluginFolder = '.\Plugin'
     Extension = 'dll'
     PluginKind = plgDLL
     Left = 21

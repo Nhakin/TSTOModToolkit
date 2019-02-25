@@ -1,5 +1,6 @@
 object TSTOPluginDemo: TTSTOPluginDemo
   OldCreateOrder = False
+  OnCreate = JvPlugInCreate
   OnDestroy = JvPlugInDestroy
   Author = 'KahnAbyss'
   Commands = <
@@ -9,7 +10,8 @@ object TSTOPluginDemo: TTSTOPluginDemo
     end>
   Description = 'TSTO Basic Plugin'
   Copyright = 'Copyright '#169' 2019 by KahnAbyss; all rights reserved.'
-  PluginID = 'JVCL.TSTOToolKit.PlgTSTOPluginDemo'
+  PluginID = 'TSTOToolKit.PlgTSTOPluginDemo'
+  OnConfigure = JvPlugInConfigure
   Height = 150
   Width = 215
 end

@@ -24,7 +24,8 @@ type
   Protected
     Property IntfImpl : TInterfaceExImplementor Read GetIntfImpl Implements ITSTOApplication;
 
-    Function  GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function GetPluginPath() : String;
 
   public
 
@@ -41,9 +42,27 @@ Uses
   JvPlugin;
 
 procedure TForm4.FormCreate(Sender: TObject);
+  Procedure InternalListPlugins(AStartPath : String);
+  Var lSr : TSearchRec;
+  Begin
+    If FindFirst(AStartPath + '*.*', faAnyFile, lSr) = 0 Then
+    Try
+      Repeat
+        If (lSr.Attr And faDirectory = faDirectory) And (lSr.Name <> '.') And (lSr.Name <> '..') Then
+          InternalListPlugins(AStartPath + lSr.Name + '\')
+        Else If SameText(ExtractFileExt(lSr.Name), '.dll') Then
+          JvPluginManager1.LoadPlugin(AStartPath + lSr.Name, plgDLL);
+      Until FindNext(lSr) <> 0;
+
+      Finally
+        FindClose(lSr);
+    End;
+  End;
+
 Var X : Integer;
 begin
-  JvPluginManager1.LoadPlugins();
+  InternalListPlugins(ExtractFilePath(ParamStr(0)) + 'Plugins\');
+
   For X := 0 To JvPluginManager1.PluginCount - 1 Do
     ListBox1.AddItem(JvPluginManager1.Plugins[X].Name, JvPluginManager1.Plugins[X]);
 end;
@@ -62,8 +81,15 @@ begin
   lPlugin := TJvPlugin(ListBox1.Items.Objects[ListBox1.ItemIndex]);
   If lPlugin.GetInterface(ITSTOPlugin, lPluginIntf) Then
   Begin
-    lPluginIntf.InitPlugin(Self);
-    ShowMessage(lPlugin.Name + ' - ' + lPlugin.Copyright);
+    lPlugin.Configure();
+    
+    If lPluginIntf.Enabled Then
+    Begin
+      lPluginIntf.InitPlugin(Self);
+      ShowMessage(lPlugin.Name + ' - ' + lPlugin.Copyright);
+    End;{
+    Else
+      JvPluginManager1.UnloadPlugin(ListBox1.ItemIndex);}
   End
   Else
     ShowMessage('ITSTOPlugin not implemented');
@@ -72,6 +98,11 @@ end;
 Function TForm4.GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
 Begin
   Result := FWorkSpace;
+End;
+
+Function TForm4.GetPluginPath() : String;
+Begin
+  Result := IncludeTrailingBackSlash(ExtractFilePath(ParamStr(0))) + 'Plugins';
 End;
 
 end.
