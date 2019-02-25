@@ -15,7 +15,7 @@ Type
     Function  GetCount() : Integer;
     Procedure SetCount(NewCount: Integer);
 
-    Function  GetList() : {$If CompilerVersion < 24}PPointerList{$Else}TPointerList{$EndIf};
+    Function  GetList() : {$If CompilerVersion < 24}PPointerList{$Else}TPointerList{$IfEnd};
 
     Function  Add(Item: Pointer): Integer;
     Procedure Clear();
@@ -35,7 +35,7 @@ Type
 
     Property Capacity : Integer      Read GetCapacity Write SetCapacity;
     Property Count    : Integer      Read GetCount;
-    Property List     : {$If CompilerVersion < 24}PPointerList{$Else}TPointerList{$EndIf} Read GetList;
+    Property List     : {$If CompilerVersion < 24}PPointerList{$Else}TPointerList{$IfEnd} Read GetList;
     
   End;
 
@@ -49,7 +49,7 @@ Type
 
     Function  GetCapacity() : Integer;
     Function  GetCount() : Integer;
-    Function  GetList() : {$If CompilerVersion < 24}PPointerList{$Else}TPointerList{$EndIf};
+    Function  GetList() : {$If CompilerVersion < 24}PPointerList{$Else}TPointerList{$IfEnd};
 
   End;
 
@@ -170,7 +170,7 @@ Begin
   Result := InHerited Count;
 End;
 
-Function TInterfacedListEx.GetList() : {$If CompilerVersion < 24}PPointerList{$Else}TPointerList{$EndIf};
+Function TInterfacedListEx.GetList() : {$If CompilerVersion < 24}PPointerList{$Else}TPointerList{$IfEnd};
 Begin
   Result := InHerited List;
 End;

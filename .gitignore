@@ -1,4 +1,4 @@
-Skip to content
+﻿Skip to content
 Why GitHub? 
 Business
 Explore 
@@ -89,6 +89,8 @@ Misc/
 _*.*
 RgbViewer/
 Deprecated/
+AsProtect/
+*.psd
 
 # Castalia statistics file (since XE7 Castalia is distributed with Delphi)
 *.stat
@@ -109,3 +111,6 @@ About
 Press h to open a hovercard with more details.
 /MainFrm.pas
 /MainFrm.dfm
+/CustomPatches/IO/DataPlugin/TSTOCustomPatches.Xml Ok.pas
+/HackMasterList/IO/Copie (2) de TSTOHackMasterList.IO.pas
+/HackMasterList/IO/Copie de TSTOHackMasterList.IO.pas
