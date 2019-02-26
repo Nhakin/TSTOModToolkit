@@ -4,13 +4,19 @@ Interface
 
 Uses
   Windows, Messages, SysUtils, Classes, Dialogs, Forms, Controls,
-  JvPlugin, HsInterfaceEx, TSTOPluginIntf;
+  JvPlugin, HsInterfaceEx, TSTOPluginIntf, System.ImageList, Vcl.ImgList,
+  TB2Item, SpTBXItem;
 
 Type
   TTSTOPluginDemo = Class(TJvPlugIn, ITSTOPlugin)
+    SpTBXBItemContainer1: TSpTBXBItemContainer;
+    ilMain: TImageList;
+    popPluginDemo: TSpTBXItem;
+
     procedure JvPlugInCreate(Sender: TObject);
     Procedure JvPlugInDestroy(Sender : TObject);
     procedure JvPlugInConfigure(Sender: TObject);
+    procedure popPluginDemoClick(Sender: TObject);
 
   Private
     FIntfImpl       : TInterfaceExImplementor;
@@ -84,6 +90,9 @@ End;
 Procedure TTSTOPluginDemo.InitPlugin(AMainApplication: ITSTOApplication);
 Begin
   FMainApp := AMainApplication;
+
+  FMainApp.AddToolBarButton(Self, popPluginDemo);
+  FMainApp.AddMenuItem(Self, popPluginDemo);
 End;
 
 procedure TTSTOPluginDemo.JvPlugInConfigure(Sender: TObject);
@@ -92,7 +101,8 @@ begin
   lIni := TIniFile.Create(ChangeFileExt(FPluginFileName, '.cfg'));
   Try
     FPluginSettings.Enabled := lIni.ReadBool(Self.Name, 'Enabled', True);
-    FPluginSettings.PluginKind := TTSTOPluginKind(lIni.ReadInteger(Self.Name, 'ProjectKind', 1);
+    FPluginSettings.PluginKind := TTSTOPluginKind(lIni.ReadInteger(Self.Name, 'PluginKind', 1));
+
     Finally
       lIni.Free();
   End;
@@ -101,8 +111,8 @@ end;
 procedure TTSTOPluginDemo.JvPlugInCreate(Sender: TObject);
 Var lFileName : Array[0..MAX_PATH] Of Char;
 begin
-  FillChar(lFileName, sizeof(lFileName), #0);
-  GetModuleFileName(hInstance, lFileName, sizeof(lFileName));
+  FillChar(lFileName, SizeOf(lFileName), #0);
+  GetModuleFileName(hInstance, lFileName, SizeOf(lFileName));
 
   FPluginFileName := lFileName;
   FPluginPath     := ExtractFilePath(lFileName);
@@ -116,10 +126,16 @@ Begin
   lIni := TIniFile.Create(ChangeFileExt(FPluginFileName, '.cfg'));
   Try
     lIni.WriteBool(Self.Name, 'Enabled', FPluginSettings.Enabled);
+    lIni.WriteInteger(Self.Name, 'PluginKind', Ord(FPluginSettings.PluginKind));
 
     Finally
       lIni.Free();
   End;
 End;
+
+procedure TTSTOPluginDemo.popPluginDemoClick(Sender: TObject);
+begin
+  ShowMessage('Plugin Demo');
+end;
 
 End.

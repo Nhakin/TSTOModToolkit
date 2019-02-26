@@ -4,16 +4,32 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, JvComponentBase, JvPluginManager, StdCtrls, HsInterfaceEx,
-  TSTOPluginIntf, TSTOWorkspaceIntf;
+  Dialogs, JvComponentBase, JvPluginManager, JvPlugin, StdCtrls, HsInterfaceEx,
+  TSTOPluginIntf, TSTOWorkspaceIntf, TB2Item, SpTBXItem, TB2Dock, TB2Toolbar;
 
 type
   TForm4 = class(TForm, ITSTOApplication)
     JvPluginManager1: TJvPluginManager;
     ListBox1: TListBox;
+    SpTBXToolbar1: TSpTBXToolbar;
+    tbPlugins: TSpTBXTBGroupItem;
+    SpTBXToolbar2: TSpTBXToolbar;
+    SpTBXSubmenuItem1: TSpTBXSubmenuItem;
+    SpTBXItem1: TSpTBXItem;
+    mnuPlugins: TSpTBXSubmenuItem;
+    SpTBXTBGroupItem1: TSpTBXTBGroupItem;
+    SpTBXBItemContainer1: TSpTBXBItemContainer;
+    SpTBXItem2: TSpTBXItem;
+    SpTBXSubmenuItem2: TSpTBXSubmenuItem;
+    SpTBXItem3: TSpTBXItem;
+    SpTBXItem4: TSpTBXItem;
+    SpTBXSubmenuItem3: TSpTBXSubmenuItem;
+    SpTBXTBGroupItem2: TSpTBXTBGroupItem;
+    SpTBXSubmenuItem4: TSpTBXSubmenuItem;
 
     procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
+    procedure SpTBXItem1Click(Sender: TObject);
 
   Private
     FWorkSpace : ITSTOWorkSpaceProjectGroupIO;
@@ -25,6 +41,8 @@ type
     Property IntfImpl : TInterfaceExImplementor Read GetIntfImpl Implements ITSTOApplication;
 
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Procedure AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
+    Procedure AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
 
   public
 
@@ -36,9 +54,6 @@ var
 implementation
 
 {$R *.dfm}
-
-Uses
-  JvPlugin;
 
 procedure TForm4.FormCreate(Sender: TObject);
   Procedure InternalListPlugins(AStartPath : String; ALvl : Integer);
@@ -94,9 +109,51 @@ begin
     ShowMessage('ITSTOPlugin not implemented');
 end;
 
+procedure TForm4.SpTBXItem1Click(Sender: TObject);
+begin
+  Close();
+end;
+
 Function TForm4.GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
 Begin
   Result := FWorkSpace;
+End;
+
+Procedure TForm4.AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
+Var lMnu : TSpTBXSubmenuItem;
+Begin
+  lMnu := TSpTBXSubmenuItem.Create(Self);
+  lMnu.Name := 'tb' + Sender.Name + AItem.Name;
+  lMnu.Images := AItem.Images;
+  lMnu.ImageIndex := AItem.ImageIndex;
+  lMnu.LinkSubitems := AItem;
+
+  If AItem Is TSpTBXSubmenuItem Then
+    lMnu.DropdownCombo := TSpTBXSubmenuItem(AItem).DropdownCombo;
+  tbPlugins.Add(lMnu);
+End;
+
+Procedure TForm4.AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
+Var lMnu : TSpTBXTBGroupItem;
+Begin
+  lMnu := TSpTBXTBGroupItem.Create(Self);
+  lMnu.Name := 'mnu' + Sender.Name + AItem.Name;
+  lMnu.Images := AItem.Images;
+  lMnu.ImageIndex := AItem.ImageIndex;
+  lMnu.LinkSubitems := AItem;
+
+  mnuPlugins.Add(lMnu);
+{
+  lMnu := TSpTBXSubmenuItem.Create(Self);
+  lMnu.Name := 'mnu' + Sender.Name + AItem.Name;
+  lMnu.Images := AItem.Images;
+  lMnu.ImageIndex := AItem.ImageIndex;
+  lMnu.LinkSubitems := AItem;
+
+  If AItem Is TSpTBXSubmenuItem Then
+    lMnu.DropdownCombo := TSpTBXSubmenuItem(AItem).DropdownCombo;
+  mnuPluginItems.Add(lMnu);
+}
 End;
 
 end.

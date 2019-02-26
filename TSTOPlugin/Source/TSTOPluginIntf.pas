@@ -2,14 +2,19 @@ unit TSTOPluginIntf;
 
 interface
 
-Uses HsInterfaceEx, TSTOWorkspaceIntf;
+{x$Define MainApp}
+
+Uses JvPlugin, SptbxItem, HsInterfaceEx,
+  {$IfDef MainApp}TSTOProjectWorkSpace.IO{$Else}TSTOWorkspaceIntf{$EndIf};
 
 Type
   ITSTOApplication = Interface(IInterfaceEx)
     ['{168D6848-663D-4EE2-9599-84B00AAC1ABC}']
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+
+    Procedure AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
+    Procedure AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
 {
-    Procedure AddToolBarButton(AItem : TSpTbxItem);
     Procedure RemoveToolBarButton(AItem : TSpTbxItem);
     Procedure AddMenuItem(AItem : TSpTbxItem);
     Procedure RemoveMenuItem(AItem : TSpTbxItem);

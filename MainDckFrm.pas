@@ -6,14 +6,15 @@ uses
   dmImage, HsStreamEx, HsInterfaceEx, VTEditors,
   TSTOTreeviews, TSTOProject.Xml, TSTOBCell, TSTOProjectWorkSpace.IO,
   TSTOPackageList, TSTORessource, TSTOScriptTemplate.IO, TSTOHackMasterList.IO,
-  TSTOHackSettings,
+  TSTOHackSettings, TSTOPluginIntf,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, ComCtrls, ToolWin, ActnList,
   StdCtrls, ExtCtrls, KControls, KHexEditor, VirtualTrees,
   LMDDckSite, LMDDckStyleElems, SciLanguageManager, SciScintillaBase,
   SciScintillaMemo, SciScintilla, SciScintillaNPP, SciActions, TB2Item, TB2Dock,
   TB2Toolbar, SpTBXItem, SpTBXSkins, SpTBXAdditionalSkins, SpTBXControls,
-  SpTBXEditors, Mask, System.Actions, SpTBXExPanel, SpTBXDkPanels, SpTBXTabs, ImagingRgb;
+  SpTBXEditors, Mask, System.Actions, SpTBXExPanel, SpTBXDkPanels, SpTBXTabs, ImagingRgb,
+  JvComponentBase, JvPluginManager, JvPlugin, SpTBXCustomizer;
 
 Type
   TTSTOCurrentDataType = (dtUnknown, dtXml, dtZeroIndex, dtText, dtRbg, dtBCell, dtBsv3);
@@ -32,7 +33,7 @@ Type
 
 (******************************************************************************)
 
-  TFrmDckMain = class(TForm)
+  TFrmDckMain = class(TForm, ITSTOApplication)
     dckMgr: TLMDDockManager;
 
     SciLangMgr: TSciLanguageManager;
@@ -210,6 +211,23 @@ Type
     ScrlImage: TScrollBox;
     ImgResource: TImage;
     mnuHackMasterList: TSpTBXItem;
+    JvPluginManager: TJvPluginManager;
+    SpTBXCustomizer1: TSpTBXCustomizer;
+    popCustomizeToolBar: TSpTBXPopupMenu;
+    pCustomize: TSpTBXItem;
+    pEmbeddedCustomize: TSpTBXItem;
+    SpTBXItem1: TSpTBXItem;
+    SpTBXItem2: TSpTBXItem;
+    SpTBXItem6: TSpTBXItem;
+    SpTBXItem7: TSpTBXItem;
+    SpTBXItem8: TSpTBXItem;
+    SpTBXItem9: TSpTBXItem;
+    SpTBXItem10: TSpTBXItem;
+    SpTBXSubmenuItem2: TSpTBXSubmenuItem;
+    SpTBXItem11: TSpTBXItem;
+    SpTBXItem12: TSpTBXItem;
+    SpTBXItem13: TSpTBXItem;
+    tbPlugins: TSpTBXTBGroupItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -282,6 +300,7 @@ Type
     procedure popDiffHackMasterListClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure mnuHackMasterListClick(Sender: TObject);
+    procedure pCustomizeClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -346,7 +365,22 @@ Type
 
     Procedure ApplyMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
     Procedure ValidateHackMasterList(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+    Procedure LoadPlugins();
 
+  {$Region ' ITSTOApplication '}
+  Private
+    FIntfImpl : TInterfaceExImplementor;
+
+    Function GetIntfImpl() : TInterfaceExImplementor;
+
+    Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+
+    Procedure AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
+
+  Protected
+    Property IntfImpl: TInterfaceExImplementor Read GetIntfImpl Implements ITSTOApplication;
+
+  {$EndRegion}
   end;
 
 var
@@ -733,6 +767,8 @@ begin
     FFormSettings.W := Width;
   End;
 
+  LoadPlugins();
+
   FLoaded := False;
   FFormPosLoaded := False;
 end;
@@ -871,14 +907,14 @@ end;
 procedure TFrmDckMain.sptbxMainMenuMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  If ([ssCtrl, ssAlt, ssShift, ssRight] * Shift  = Shift) And (Button = mbRight) Then
+  If ([ssCtrl, ssAlt, ssShift, ssRight] = Shift) Then
     mnuSkin.Visible := Not mnuSkin.Visible;
 end;
 
 procedure TFrmDckMain.sptbxtbMainMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  If ([ssCtrl, ssAlt, ssShift, ssRight] * Shift  = Shift) And (Button = mbRight) Then
+  If ([ssCtrl, ssAlt, ssShift, ssRight] = Shift) Then
   Begin
     FTvDlcServer.IsDebugMode      := Not FTvDlcServer.IsDebugMode;
     FTvWorkSpace.IsDebugMode      := Not FTvWorkSpace.IsDebugMode;
@@ -1097,6 +1133,11 @@ end;
 procedure TFrmDckMain.PanImageOldEnter(Sender: TObject);
 begin
   InitPanels(TLMDDockPanel(Sender));
+end;
+
+procedure TFrmDckMain.pCustomizeClick(Sender: TObject);
+begin
+  SpTBXCustomizer1.Show;
 end;
 
 procedure TFrmDckMain.popAddExistingProjectClick(Sender: TObject);
@@ -1482,6 +1523,40 @@ Begin
     End;
   End;
 End;
+
+Procedure TFrmDckMain.LoadPlugins();
+  Procedure InternalListPlugins(AStartPath : String; ALvl : Integer);
+  Var lSr : TSearchRec;
+  Begin
+    If FindFirst(AStartPath + '*.*', faAnyFile, lSr) = 0 Then
+    Try
+      Repeat
+        If (lSr.Attr And faDirectory = faDirectory) And (lSr.Name <> '.') And (lSr.Name <> '..') And (ALvl < 1) Then
+          InternalListPlugins(AStartPath + lSr.Name + '\', ALvl + 1)
+        Else If SameText(ExtractFileExt(lSr.Name), '.dll') Then
+          JvPluginManager.LoadPlugin(AStartPath + lSr.Name, plgDLL);
+      Until FindNext(lSr) <> 0;
+
+      Finally
+        FindClose(lSr);
+    End;
+  End;
+
+Var X : Integer;
+    lCurPlugin : ITSTOPlugin;
+begin
+  InternalListPlugins(ExtractFilePath(ParamStr(0)) + 'Plugins\', 0);
+
+  For X := JvPluginManager.PluginCount - 1 DownTo 0 Do
+    With JvPluginManager.Plugins[X] Do
+      If GetInterface(ITSTOPlugin, lCurPlugin) Then
+      Begin
+        Configure();
+
+        If lCurPlugin.Enabled Then
+          lCurPlugin.InitPlugin(Self);
+      End;
+end;
 
 procedure TFrmDckMain.popTvWSApplyModClick(Sender: TObject);
 Var lProject : ITSTOWorkSpaceProjectIO;
@@ -2954,6 +3029,30 @@ begin
       FTvDlcServer.EndUpdate();
   End;
 end;
+
+Function TFrmDckMain.GetIntfImpl() : TInterfaceExImplementor;
+Begin
+  If Not Assigned(FIntfImpl) Then
+    FIntfImpl := TInterfaceExImplementor.Create(Self, False);
+  Result := FIntfImpl;
+End;
+
+Function TFrmDckMain.GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+Begin
+  Result := FWorkSpace;
+End;
+
+Procedure TFrmDckMain.AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
+Var lItem : TSpTbxItem;
+Begin
+  lItem := TSpTBXSubmenuItem.Create(Self);
+  lItem.Name := 'Plg' + Sender.Name + AItem.Name;
+  lItem.Images := AItem.Images;
+  lItem.ImageIndex := AItem.ImageIndex;
+  lItem.LinkSubitems := AItem;
+  tbPlugins.Add(lItem);
+End;
+
 {
 http://www.xnxx.com/video-611oyc9/two_lesbians_teens_licking_pussy_and_fuck_with_a_dildo#_tabComments
 }

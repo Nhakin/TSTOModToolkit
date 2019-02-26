@@ -1,34 +1,62 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <ProjectGuid>{b130426e-12c8-4909-be6e-7d0686529a2b}</ProjectGuid>
-  </PropertyGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <Projects Include="TSTOToolKit.dproj" />
-  </ItemGroup>
-  <ProjectExtensions>
-    <Borland.Personality>Default.Personality</Borland.Personality>
-    <Borland.ProjectType />
-    <BorlandProject>
-<BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
-  </ProjectExtensions>
-  <Target Name="TSTOToolKit">
-    <MSBuild Projects="TSTOToolKit.dproj" Targets="" />
-  </Target>
-  <Target Name="TSTOToolKit:Clean">
-    <MSBuild Projects="TSTOToolKit.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="TSTOToolKit:Make">
-    <MSBuild Projects="TSTOToolKit.dproj" Targets="Make" />
-  </Target>
-  <Target Name="Build">
-    <CallTarget Targets="TSTOToolKit" />
-  </Target>
-  <Target Name="Clean">
-    <CallTarget Targets="TSTOToolKit:Clean" />
-  </Target>
-  <Target Name="Make">
-    <CallTarget Targets="TSTOToolKit:Make" />
-  </Target>
-  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+    <PropertyGroup>
+        <ProjectGuid>{b130426e-12c8-4909-be6e-7d0686529a2b}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="TSTOToolKit.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="TSTOPlugin\Source\PlgTSTOPluginDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="TSTOPlugin\Source\TSTOPlugin.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <BorlandProject>
+                <Default.Personality/>
+            </BorlandProject>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="TSTOToolKit">
+        <MSBuild Projects="TSTOToolKit.dproj"/>
+    </Target>
+    <Target Name="TSTOToolKit:Clean">
+        <MSBuild Projects="TSTOToolKit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TSTOToolKit:Make">
+        <MSBuild Projects="TSTOToolKit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PlgTSTOPluginDemo">
+        <MSBuild Projects="TSTOPlugin\Source\PlgTSTOPluginDemo.dproj"/>
+    </Target>
+    <Target Name="PlgTSTOPluginDemo:Clean">
+        <MSBuild Projects="TSTOPlugin\Source\PlgTSTOPluginDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PlgTSTOPluginDemo:Make">
+        <MSBuild Projects="TSTOPlugin\Source\PlgTSTOPluginDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="TSTOPlugin">
+        <MSBuild Projects="TSTOPlugin\Source\TSTOPlugin.dproj"/>
+    </Target>
+    <Target Name="TSTOPlugin:Clean">
+        <MSBuild Projects="TSTOPlugin\Source\TSTOPlugin.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TSTOPlugin:Make">
+        <MSBuild Projects="TSTOPlugin\Source\TSTOPlugin.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="TSTOToolKit;PlgTSTOPluginDemo;TSTOPlugin"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="TSTOToolKit:Clean;PlgTSTOPluginDemo:Clean;TSTOPlugin:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="TSTOToolKit:Make;PlgTSTOPluginDemo:Make;TSTOPlugin:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
