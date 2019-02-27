@@ -29,7 +29,6 @@ object FrmDckMain: TFrmDckMain
     AutoSize = True
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitTop = -8
     object sptbxDckMain: TSpTBXDock
       Left = 0
       Top = 0
@@ -111,6 +110,10 @@ object FrmDckMain: TFrmDckMain
             LinkSubitems = tbMiscItems
           end
         end
+        object mnuPlugins: TSpTBXSubmenuItem
+          Caption = 'Plugins'
+          LinkSubitems = grpMnuPluginItems
+        end
         object mnuSkin: TSpTBXSubmenuItem
           Caption = 'Skin'
           Visible = False
@@ -145,12 +148,15 @@ object FrmDckMain: TFrmDckMain
         object tbMainMisc: TSpTBXTBGroupItem
           LinkSubitems = tbMiscItems
         end
-        object tbPlugins: TSpTBXTBGroupItem
-        end
         object SpTBXItem3: TSpTBXItem
           ImageIndex = 35
           Visible = False
           OnClick = SpTBXItem3Click
+        end
+        object SpTBXSeparatorItem14: TSpTBXSeparatorItem
+        end
+        object tbPlugins: TSpTBXTBGroupItem
+          LinkSubitems = grpTbPluginItems
         end
       end
     end
@@ -1932,6 +1938,10 @@ object FrmDckMain: TFrmDckMain
         LinkSubitems = popTvWSProjectSrcFolderItems
       end
     end
+    object grpMnuPluginItems: TSpTBXTBGroupItem
+    end
+    object grpTbPluginItems: TSpTBXTBGroupItem
+    end
   end
   object popTvWS: TSpTBXPopupMenu
     OnPopup = popTvWSPopup
@@ -1982,92 +1992,5 @@ object FrmDckMain: TFrmDckMain
     PluginKind = plgDLL
     Left = 194
     Top = 252
-  end
-  object SpTBXCustomizer1: TSpTBXCustomizer
-    Images = DataModuleImage.imgToolBar
-    MenuBar = sptbxMainMenu
-    SaveFormState = False
-    Left = 378
-    Top = 64
-    object SpTBXItem1: TSpTBXItem
-      Caption = 'Synchronize DlcIndex'
-      Hint = 'Synchronize DlcIndex'
-      ImageIndex = 87
-      OnClick = tbSynchOldClick
-    end
-    object SpTBXItem2: TSpTBXItem
-      Caption = 'Download Files'
-      Hint = 'Download selected files'
-      ImageIndex = 17
-      OnClick = tbDownloadOldClick
-    end
-    object SpTBXItem6: TSpTBXItem
-      Caption = 'Save Project'
-      Enabled = False
-      ImageIndex = 2
-      OnClick = tbSaveWorkSpaceClick
-    end
-    object SpTBXItem7: TSpTBXItem
-      Caption = 'Unpack Files'
-      Hint = 'Unpack File'
-      Enabled = False
-      ImageIndex = 112
-      OnClick = tbUnpackModOldClick
-    end
-    object SpTBXItem8: TSpTBXItem
-      Caption = 'Pack Files'
-      Hint = 'Pack File'
-      Enabled = False
-      ImageIndex = 113
-      OnClick = tbPackModOldClick
-    end
-    object SpTBXItem9: TSpTBXItem
-      Caption = 'Create Mod'
-      Hint = 'Create Mod'
-      Enabled = False
-      ImageIndex = 44
-      OnClick = tbCreateModOldClick
-    end
-    object SpTBXItem10: TSpTBXItem
-      Caption = 'Validate XML'
-      Hint = 'Validate XML'
-      Enabled = False
-      ImageIndex = 111
-      OnClick = tbValidateXmlOldClick
-    end
-    object SpTBXSubmenuItem2: TSpTBXSubmenuItem
-      Caption = 'HackMasterlist'
-      ImageIndex = 70
-      OnClick = tbCreateMasterListClick
-      DropdownCombo = True
-      HideEmptyPopup = True
-      object SpTBXItem11: TSpTBXItem
-        Caption = 'New HackMasterlist'
-        OnClick = tbCreateMasterListClick
-      end
-      object SpTBXItem12: TSpTBXItem
-        Caption = 'Diff HackMasterlist'
-        OnClick = popDiffHackMasterListClick
-      end
-    end
-    object SpTBXItem13: TSpTBXItem
-      Caption = 'Build ReqLists'
-      Hint = 'Build ReqLists'
-      ImageIndex = 66
-      Visible = False
-      OnClick = tbBuildListClick
-    end
-  end
-  object popCustomizeToolBar: TSpTBXPopupMenu
-    Left = 280
-    Top = 64
-    object pCustomize: TSpTBXItem
-      Caption = 'Customize...'
-      OnClick = pCustomizeClick
-    end
-    object pEmbeddedCustomize: TSpTBXItem
-      Caption = 'Embedded Customize...'
-      Visible = False
-    end
   end
 end

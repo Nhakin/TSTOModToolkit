@@ -3,33 +3,42 @@ unit TSTOPluginMainFrm;
 interface
 
 uses
+  TSTOPluginIntf, TSTOProjectWorkSpace.IO,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, JvComponentBase, JvPluginManager, JvPlugin, StdCtrls, HsInterfaceEx,
-  TSTOPluginIntf, TSTOWorkspaceIntf, TB2Item, SpTBXItem, TB2Dock, TB2Toolbar;
+  TB2Item, SpTBXItem, TB2Dock, TB2Toolbar,
+  SpTBXControls, System.ImageList, Vcl.ImgList;
 
 type
-  TForm4 = class(TForm, ITSTOApplication)
+  TTSTOPluginManager = class(TForm, ITSTOApplication)
     JvPluginManager1: TJvPluginManager;
     ListBox1: TListBox;
-    SpTBXToolbar1: TSpTBXToolbar;
-    tbPlugins: TSpTBXTBGroupItem;
-    SpTBXToolbar2: TSpTBXToolbar;
-    SpTBXSubmenuItem1: TSpTBXSubmenuItem;
-    SpTBXItem1: TSpTBXItem;
-    mnuPlugins: TSpTBXSubmenuItem;
-    SpTBXTBGroupItem1: TSpTBXTBGroupItem;
     SpTBXBItemContainer1: TSpTBXBItemContainer;
+    SpTBXTestMnuItems: TSpTBXTBGroupItem;
     SpTBXItem2: TSpTBXItem;
     SpTBXSubmenuItem2: TSpTBXSubmenuItem;
     SpTBXItem3: TSpTBXItem;
     SpTBXItem4: TSpTBXItem;
+    grpTbPluginItems: TSpTBXTBGroupItem;
+    cmdLoadPlugins: TSpTBXButton;
+    ilToolBar: TImageList;
+    grpMnuPluginItems: TSpTBXTBGroupItem;
+    SpTBXDock1: TSpTBXDock;
+    tbMain: TSpTBXToolbar;
+    grp1: TSpTBXTBGroupItem;
+    SpTBXSeparatorItem1: TSpTBXSeparatorItem;
+    grp2: TSpTBXTBGroupItem;
+    mainMnu: TSpTBXToolbar;
+    SpTBXSubmenuItem1: TSpTBXSubmenuItem;
+    SpTBXItem1: TSpTBXItem;
+    mnuPlugins: TSpTBXSubmenuItem;
     SpTBXSubmenuItem3: TSpTBXSubmenuItem;
-    SpTBXTBGroupItem2: TSpTBXTBGroupItem;
-    SpTBXSubmenuItem4: TSpTBXSubmenuItem;
-
-    procedure FormCreate(Sender: TObject);
+    SpTBXSeparatorItem2: TSpTBXSeparatorItem;
     procedure ListBox1Click(Sender: TObject);
     procedure SpTBXItem1Click(Sender: TObject);
+    procedure SpTBXItem2Click(Sender: TObject);
+    procedure cmdLoadPluginsClick(Sender: TObject);
+    procedure pCustomizeClick(Sender: TObject);
 
   Private
     FWorkSpace : ITSTOWorkSpaceProjectGroupIO;
@@ -40,22 +49,81 @@ type
   Protected
     Property IntfImpl : TInterfaceExImplementor Read GetIntfImpl Implements ITSTOApplication;
 
+  {$Region ' ITSTOApplication '}
+  Private
+    Function AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXItem; ACommandPrefix : String) : TTBCustomItem; OverLoad;
+    Function AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem; ACommandPrefix : String) : TTBCustomItem; OverLoad;
+
+  Protected
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+
     Procedure AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
+    Procedure AddToolBarDropDownButton(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
+
     Procedure AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
+    Procedure AddSubMenuItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
+  {$EndRegion}
 
   public
 
   end;
 
 var
-  Form4: TForm4;
+  TSTOPluginManager: TTSTOPluginManager;
 
 implementation
 
 {$R *.dfm}
 
-procedure TForm4.FormCreate(Sender: TObject);
+Function TTSTOPluginManager.GetIntfImpl() : TInterfaceExImplementor;
+Begin
+  If Not Assigned(FIntfImpl) Then
+    FIntfImpl := TInterfaceExImplementor.Create(Self, False);
+  Result := FIntfImpl;
+End;
+
+procedure TTSTOPluginManager.ListBox1Click(Sender: TObject);
+Var lPluginIntf : ITSTOPlugin;
+    lPlugin     : TJvPlugin;
+begin
+  lPlugin := TJvPlugin(ListBox1.Items.Objects[ListBox1.ItemIndex]);
+  If lPlugin.GetInterface(ITSTOPlugin, lPluginIntf) Then
+  Begin
+    lPlugin.Configure();
+
+    If lPluginIntf.Enabled Then
+    Begin
+      lPluginIntf.InitPlugin(Self);
+      ShowMessage(lPlugin.Name + ' - ' + lPlugin.Copyright);
+    End;{
+    Else
+      JvPluginManager1.UnloadPlugin(ListBox1.ItemIndex);}
+  End
+  Else
+    ShowMessage('ITSTOPlugin not implemented');
+end;
+
+procedure TTSTOPluginManager.pCustomizeClick(Sender: TObject);
+begin
+//
+end;
+
+procedure TTSTOPluginManager.SpTBXItem1Click(Sender: TObject);
+begin
+  Close();
+end;
+
+procedure TTSTOPluginManager.SpTBXItem2Click(Sender: TObject);
+begin
+  ShowMessage('SingleClick');
+end;
+
+Function TTSTOPluginManager.GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+Begin
+  Result := FWorkSpace;
+End;
+
+procedure TTSTOPluginManager.cmdLoadPluginsClick(Sender: TObject);
   Procedure InternalListPlugins(AStartPath : String; ALvl : Integer);
   Var lSr : TSearchRec;
   Begin
@@ -81,79 +149,57 @@ begin
     ListBox1.AddItem(JvPluginManager1.Plugins[X].Name, JvPluginManager1.Plugins[X]);
 end;
 
-Function TForm4.GetIntfImpl() : TInterfaceExImplementor;
+Function TTSTOPluginManager.AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXItem; ACommandPrefix : String) : TTBCustomItem;
 Begin
-  If Not Assigned(FIntfImpl) Then
-    FIntfImpl := TInterfaceExImplementor.Create(Self, False);
-  Result := FIntfImpl;
+  Result := TSpTBXItem.Create(Self);
+  Result.Name := ACommandPrefix + Sender.Name + AItem.Name;
+  Result.Images := AItem.Images;
+  Result.ImageIndex := AItem.ImageIndex;
+  Result.OnClick := AItem.OnClick;
+  Result.Caption := AItem.Caption;
 End;
 
-procedure TForm4.ListBox1Click(Sender: TObject);
-Var lPluginIntf : ITSTOPlugin;
-    lPlugin     : TJvPlugin;
-begin
-  lPlugin := TJvPlugin(ListBox1.Items.Objects[ListBox1.ItemIndex]);
-  If lPlugin.GetInterface(ITSTOPlugin, lPluginIntf) Then
+Function TTSTOPluginManager.AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem; ACommandPrefix : String) : TTBCustomItem;
+Var X : Integer;
+Begin
+  Result := TSpTBXSubmenuItem.Create(Self);
+  With TSpTBXSubmenuItem(Result) Do
   Begin
-    lPlugin.Configure();
-    
-    If lPluginIntf.Enabled Then
-    Begin
-      lPluginIntf.InitPlugin(Self);
-      ShowMessage(lPlugin.Name + ' - ' + lPlugin.Copyright);
-    End;{
-    Else
-      JvPluginManager1.UnloadPlugin(ListBox1.ItemIndex);}
-  End
-  Else
-    ShowMessage('ITSTOPlugin not implemented');
-end;
+    Name := ACommandPrefix + Sender.Name + AItem.Name;
+    Images := AItem.Images;
+    ImageIndex := AItem.ImageIndex;
+    OnClick := AItem.OnClick;
+    Caption := AItem.Caption;
+    DropdownCombo := AItem.DropdownCombo;
 
-procedure TForm4.SpTBXItem1Click(Sender: TObject);
-begin
-  Close();
-end;
-
-Function TForm4.GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
-Begin
-  Result := FWorkSpace;
+    For X := 0 To AItem.Count - 1 Do
+      If SameText(AItem[X].ClassName, 'TSpTBXItem') Then
+        Result.Add(AddPluginCommandItem(Sender, TSpTBXItem(AItem[X]), ACommandPrefix))
+      Else If SameText(AItem[X].ClassName, 'TSpTBXSubmenuItem') Then
+        Result.Add(AddPluginCommandItem(Sender, TSpTBXSubmenuItem(AItem[X]), ACommandPrefix))
+      Else If SameText(AItem[X].ClassName, 'TSpTBXSeparatorItem') Then
+        Result.Add(TSpTBXSeparatorItem.Create(Self));
+  End;
 End;
 
-Procedure TForm4.AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
-Var lMnu : TSpTBXSubmenuItem;
+Procedure TTSTOPluginManager.AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
 Begin
-  lMnu := TSpTBXSubmenuItem.Create(Self);
-  lMnu.Name := 'tb' + Sender.Name + AItem.Name;
-  lMnu.Images := AItem.Images;
-  lMnu.ImageIndex := AItem.ImageIndex;
-  lMnu.LinkSubitems := AItem;
-
-  If AItem Is TSpTBXSubmenuItem Then
-    lMnu.DropdownCombo := TSpTBXSubmenuItem(AItem).DropdownCombo;
-  tbPlugins.Add(lMnu);
+  grpTbPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Tb'));
 End;
 
-Procedure TForm4.AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
-Var lMnu : TSpTBXTBGroupItem;
+Procedure TTSTOPluginManager.AddToolBarDropDownButton(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
 Begin
-  lMnu := TSpTBXTBGroupItem.Create(Self);
-  lMnu.Name := 'mnu' + Sender.Name + AItem.Name;
-  lMnu.Images := AItem.Images;
-  lMnu.ImageIndex := AItem.ImageIndex;
-  lMnu.LinkSubitems := AItem;
+  grpTbPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Tb'));
+End;
 
-  mnuPlugins.Add(lMnu);
-{
-  lMnu := TSpTBXSubmenuItem.Create(Self);
-  lMnu.Name := 'mnu' + Sender.Name + AItem.Name;
-  lMnu.Images := AItem.Images;
-  lMnu.ImageIndex := AItem.ImageIndex;
-  lMnu.LinkSubitems := AItem;
+Procedure TTSTOPluginManager.AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
+Begin
+  grpMnuPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Mnu'));
+End;
 
-  If AItem Is TSpTBXSubmenuItem Then
-    lMnu.DropdownCombo := TSpTBXSubmenuItem(AItem).DropdownCombo;
-  mnuPluginItems.Add(lMnu);
-}
+Procedure TTSTOPluginManager.AddSubMenuItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
+Begin
+  grpMnuPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Mnu'));
 End;
 
 end.

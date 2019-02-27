@@ -14,7 +14,7 @@ uses
   SciScintillaMemo, SciScintilla, SciScintillaNPP, SciActions, TB2Item, TB2Dock,
   TB2Toolbar, SpTBXItem, SpTBXSkins, SpTBXAdditionalSkins, SpTBXControls,
   SpTBXEditors, Mask, System.Actions, SpTBXExPanel, SpTBXDkPanels, SpTBXTabs, ImagingRgb,
-  JvComponentBase, JvPluginManager, JvPlugin, SpTBXCustomizer;
+  JvComponentBase, JvPluginManager, JvPlugin;
 
 Type
   TTSTOCurrentDataType = (dtUnknown, dtXml, dtZeroIndex, dtText, dtRbg, dtBCell, dtBsv3);
@@ -212,22 +212,11 @@ Type
     ImgResource: TImage;
     mnuHackMasterList: TSpTBXItem;
     JvPluginManager: TJvPluginManager;
-    SpTBXCustomizer1: TSpTBXCustomizer;
-    popCustomizeToolBar: TSpTBXPopupMenu;
-    pCustomize: TSpTBXItem;
-    pEmbeddedCustomize: TSpTBXItem;
-    SpTBXItem1: TSpTBXItem;
-    SpTBXItem2: TSpTBXItem;
-    SpTBXItem6: TSpTBXItem;
-    SpTBXItem7: TSpTBXItem;
-    SpTBXItem8: TSpTBXItem;
-    SpTBXItem9: TSpTBXItem;
-    SpTBXItem10: TSpTBXItem;
-    SpTBXSubmenuItem2: TSpTBXSubmenuItem;
-    SpTBXItem11: TSpTBXItem;
-    SpTBXItem12: TSpTBXItem;
-    SpTBXItem13: TSpTBXItem;
     tbPlugins: TSpTBXTBGroupItem;
+    mnuPlugins: TSpTBXSubmenuItem;
+    grpMnuPluginItems: TSpTBXTBGroupItem;
+    grpTbPluginItems: TSpTBXTBGroupItem;
+    SpTBXSeparatorItem14: TSpTBXSeparatorItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -300,7 +289,6 @@ Type
     procedure popDiffHackMasterListClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure mnuHackMasterListClick(Sender: TObject);
-    procedure pCustomizeClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -373,13 +361,19 @@ Type
 
     Function GetIntfImpl() : TInterfaceExImplementor;
 
-    Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
-
-    Procedure AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
+    Function AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXItem; ACommandPrefix : String) : TTBCustomItem; OverLoad;
+    Function AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem; ACommandPrefix : String) : TTBCustomItem; OverLoad;
 
   Protected
     Property IntfImpl: TInterfaceExImplementor Read GetIntfImpl Implements ITSTOApplication;
 
+    Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+
+    Procedure AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
+    Procedure AddToolBarDropDownButton(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
+
+    Procedure AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
+    Procedure AddSubMenuItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
   {$EndRegion}
   end;
 
@@ -1133,11 +1127,6 @@ end;
 procedure TFrmDckMain.PanImageOldEnter(Sender: TObject);
 begin
   InitPanels(TLMDDockPanel(Sender));
-end;
-
-procedure TFrmDckMain.pCustomizeClick(Sender: TObject);
-begin
-  SpTBXCustomizer1.Show;
 end;
 
 procedure TFrmDckMain.popAddExistingProjectClick(Sender: TObject);
@@ -3042,15 +3031,57 @@ Begin
   Result := FWorkSpace;
 End;
 
-Procedure TFrmDckMain.AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
-Var lItem : TSpTbxItem;
+Function TFrmDckMain.AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXItem; ACommandPrefix : String) : TTBCustomItem;
 Begin
-  lItem := TSpTBXSubmenuItem.Create(Self);
-  lItem.Name := 'Plg' + Sender.Name + AItem.Name;
-  lItem.Images := AItem.Images;
-  lItem.ImageIndex := AItem.ImageIndex;
-  lItem.LinkSubitems := AItem;
-  tbPlugins.Add(lItem);
+  Result := TSpTBXItem.Create(Self);
+  Result.Name := ACommandPrefix + Sender.Name + AItem.Name;
+  Result.Images := AItem.Images;
+  Result.ImageIndex := AItem.ImageIndex;
+  Result.OnClick := AItem.OnClick;
+  Result.Caption := AItem.Caption;
+End;
+
+Function TFrmDckMain.AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem; ACommandPrefix : String) : TTBCustomItem;
+Var X : Integer;
+Begin
+  Result := TSpTBXSubmenuItem.Create(Self);
+  With TSpTBXSubmenuItem(Result) Do
+  Begin
+    Name := ACommandPrefix + Sender.Name + AItem.Name;
+    Images := AItem.Images;
+    ImageIndex := AItem.ImageIndex;
+    OnClick := AItem.OnClick;
+    Caption := AItem.Caption;
+    DropdownCombo := AItem.DropdownCombo;
+
+    For X := 0 To AItem.Count - 1 Do
+      If SameText(AItem[X].ClassName, 'TSpTBXItem') Then
+        Result.Add(AddPluginCommandItem(Sender, TSpTBXItem(AItem[X]), ACommandPrefix))
+      Else If SameText(AItem[X].ClassName, 'TSpTBXSubmenuItem') Then
+        Result.Add(AddPluginCommandItem(Sender, TSpTBXSubmenuItem(AItem[X]), ACommandPrefix))
+      Else If SameText(AItem[X].ClassName, 'TSpTBXSeparatorItem') Then
+        Result.Add(TSpTBXSeparatorItem.Create(Self));
+  End;
+End;
+
+Procedure TFrmDckMain.AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
+Begin
+  grpTbPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Tb'));
+End;
+
+Procedure TFrmDckMain.AddToolBarDropDownButton(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
+Begin
+  grpTbPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Tb'));
+End;
+
+Procedure TFrmDckMain.AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
+Begin
+  grpMnuPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Mnu'));
+End;
+
+Procedure TFrmDckMain.AddSubMenuItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
+Begin
+  grpMnuPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Mnu'));
 End;
 
 {

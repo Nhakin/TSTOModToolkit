@@ -10,13 +10,23 @@ Uses
 Type
   TTSTOPluginDemo = Class(TJvPlugIn, ITSTOPlugin)
     SpTBXBItemContainer1: TSpTBXBItemContainer;
+    SpTbxPluginDemo: TSpTBXItem;
     ilMain: TImageList;
-    popPluginDemo: TSpTBXItem;
+    SpTbxSubMenu: TSpTBXSubmenuItem;
+    SpTbxStop: TSpTBXItem;
+    SpTbxPlay: TSpTBXItem;
+    SpTBXSeparatorItem1: TSpTBXSeparatorItem;
+    SpTbxChildSubMenu: TSpTBXSubmenuItem;
+    SpTbxPlayAnimation: TSpTBXItem;
+    SpTBXSeparatorItem2: TSpTBXSeparatorItem;
+    SpTbxStopAnimation: TSpTBXItem;
 
     procedure JvPlugInCreate(Sender: TObject);
     Procedure JvPlugInDestroy(Sender : TObject);
+    procedure SpTbxPluginDemoClick(Sender: TObject);
     procedure JvPlugInConfigure(Sender: TObject);
-    procedure popPluginDemoClick(Sender: TObject);
+    procedure SpTbxPlayClick(Sender: TObject);
+    procedure SpTbxStopClick(Sender: TObject);
 
   Private
     FIntfImpl       : TInterfaceExImplementor;
@@ -91,8 +101,10 @@ Procedure TTSTOPluginDemo.InitPlugin(AMainApplication: ITSTOApplication);
 Begin
   FMainApp := AMainApplication;
 
-  FMainApp.AddToolBarButton(Self, popPluginDemo);
-  FMainApp.AddMenuItem(Self, popPluginDemo);
+  FMainApp.AddToolBarButton(Self, SpTbxPluginDemo);
+  FMainApp.AddToolBarDropDownButton(Self, SpTbxSubMenu);
+  FMainApp.AddMenuItem(Self, SpTbxPluginDemo);
+  FMainApp.AddSubMenuItem(Self, SpTbxSubMenu);
 End;
 
 procedure TTSTOPluginDemo.JvPlugInConfigure(Sender: TObject);
@@ -133,9 +145,19 @@ Begin
   End;
 End;
 
-procedure TTSTOPluginDemo.popPluginDemoClick(Sender: TObject);
+procedure TTSTOPluginDemo.SpTbxPluginDemoClick(Sender: TObject);
 begin
   ShowMessage('Plugin Demo');
+end;
+
+procedure TTSTOPluginDemo.SpTbxStopClick(Sender: TObject);
+begin
+  ShowMessage('Stop Animation');
+end;
+
+procedure TTSTOPluginDemo.SpTbxPlayClick(Sender: TObject);
+begin
+  ShowMessage('Play Animation');
 end;
 
 End.

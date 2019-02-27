@@ -3,7 +3,7 @@ unit TSTOHackSettingsIntf;
 interface
 
 Uses Classes, HsInterfaceEx,
-  TSTOCustomPatchesIntf, TSTOSbtpIntf, TSTOScriptTemplateIntfIO, TSTOHackMasterListIntf;
+  TSTOCustomPatchesIntf, TSTOSbtp.IO, TSTOScriptTemplate.IO, TSTOHackMasterList.IO;
 
 Type
   THackIdxFileFormat = (hiffXml, hiffBin, hiffZip);

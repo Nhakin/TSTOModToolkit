@@ -2,7 +2,7 @@ unit TSTOScriptTemplateIntf;
 
 interface
 
-Uses Classes, HsInterfaceEx, RGBProgress;
+Uses Classes, HsInterfaceEx, TSTORGBProgress;
 
 Type
   ITSTOScriptTemplateSettings = Interface(IInterfaceEx)

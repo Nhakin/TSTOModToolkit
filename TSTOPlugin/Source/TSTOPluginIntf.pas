@@ -4,8 +4,7 @@ interface
 
 {x$Define MainApp}
 
-Uses JvPlugin, SptbxItem, HsInterfaceEx,
-  {$IfDef MainApp}TSTOProjectWorkSpace.IO{$Else}TSTOWorkspaceIntf{$EndIf};
+Uses JvPlugin, TB2Item, SptbxItem, HsInterfaceEx, TSTOProjectWorkSpace.IO;
 
 Type
   ITSTOApplication = Interface(IInterfaceEx)
@@ -13,7 +12,10 @@ Type
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
 
     Procedure AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
+    Procedure AddToolBarDropDownButton(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
+
     Procedure AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
+    Procedure AddSubMenuItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
 {
     Procedure RemoveToolBarButton(AItem : TSpTbxItem);
     Procedure AddMenuItem(AItem : TSpTbxItem);

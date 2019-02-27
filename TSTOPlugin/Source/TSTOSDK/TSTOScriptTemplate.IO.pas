@@ -1,9 +1,9 @@
-unit TSTOScriptTemplateIntfIO;
+unit TSTOScriptTemplate.IO;
 
 interface
 
 Uses Classes, HsInterfaceEx, HsStreamEx,
-  TSTOScriptTemplateIntf, TSTOHackMasterListIntf, RGBProgress;
+  TSTOScriptTemplateIntf, TSTOHackMasterList.IO, TSTORGBProgress;
 
 Type
   ITSTOScriptTemplateSettingsIO = Interface(ITSTOScriptTemplateSettings)

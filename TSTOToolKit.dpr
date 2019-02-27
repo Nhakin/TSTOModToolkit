@@ -1,6 +1,7 @@
 program TSTOToolKit;
 
 uses
+  ShareMem,
   Forms,
   CustomPatchFrm in 'CustomPatchFrm.pas' {FrmCustomPatches},
   dmImage in 'dmImage.pas' {DataModuleImage: TDataModule},
