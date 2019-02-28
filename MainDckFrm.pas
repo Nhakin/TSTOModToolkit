@@ -361,8 +361,13 @@ Type
 
     Function GetIntfImpl() : TInterfaceExImplementor;
 
+    Function UniqueComponentName(AComponentName : String) : String;
+
     Function AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXItem; ACommandPrefix : String) : TTBCustomItem; OverLoad;
     Function AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem; ACommandPrefix : String) : TTBCustomItem; OverLoad;
+    Function AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXTBGroupItem; ACommandPrefix : String) : TTBCustomItem; OverLoad;
+
+    Procedure InternalRemovePluginItem(AGroup : TSpTBXTBGroupItem; AItemId : NativeInt);
 
   Protected
     Property IntfImpl: TInterfaceExImplementor Read GetIntfImpl Implements ITSTOApplication;
@@ -371,9 +376,16 @@ Type
 
     Procedure AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
     Procedure AddToolBarDropDownButton(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
+    Procedure AddGroupToolBarItem(Sender : TJvPlugin; AItem : TSpTBXTBGroupItem);
+    Procedure AddToolBarSeparatorItem(Sender : TJvPlugin);
 
     Procedure AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
     Procedure AddSubMenuItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
+    Procedure AddGroupMenuItem(Sender : TJvPlugin; AItem : TSpTBXTBGroupItem);
+    Procedure AddMenuSeparatorItem(Sender : TJvPlugin);
+
+    Procedure RemoveToolBarItem(Sender : TJvPlugin; AItem : TTBCustomItem);
+    Procedure RemoveMenuItem(Sender : TJvPlugin; AItem : TTBCustomItem);
   {$EndRegion}
   end;
 
@@ -1542,8 +1554,8 @@ begin
       Begin
         Configure();
 
-        If lCurPlugin.Enabled Then
-          lCurPlugin.InitPlugin(Self);
+        If lCurPlugin.Enabled And Not lCurPlugin.Initialized Then
+          lCurPlugin.Initialize(Self);
       End;
 end;
 
@@ -3031,10 +3043,25 @@ Begin
   Result := FWorkSpace;
 End;
 
+Function TFrmDckMain.UniqueComponentName(AComponentName : String) : String;
+Var lIdx : Integer;
+Begin
+  Result := AComponentName;
+
+  If Assigned(FindComponent(Result)) Then
+  Begin
+    lIdx := 2;
+    Repeat
+      Result := AComponentName + IntToStr(lIdx);
+      Inc(lIdx);
+    Until Not Assigned(FindComponent(Result));
+  End;
+End;
+
 Function TFrmDckMain.AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXItem; ACommandPrefix : String) : TTBCustomItem;
 Begin
   Result := TSpTBXItem.Create(Self);
-  Result.Name := ACommandPrefix + Sender.Name + AItem.Name;
+  Result.Name := UniqueComponentName(ACommandPrefix + Sender.Name + AItem.Name);
   Result.Images := AItem.Images;
   Result.ImageIndex := AItem.ImageIndex;
   Result.OnClick := AItem.OnClick;
@@ -3043,25 +3070,67 @@ End;
 
 Function TFrmDckMain.AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem; ACommandPrefix : String) : TTBCustomItem;
 Var X : Integer;
+    lCurItem : TTBCustomItem;
 Begin
   Result := TSpTBXSubmenuItem.Create(Self);
   With TSpTBXSubmenuItem(Result) Do
   Begin
-    Name := ACommandPrefix + Sender.Name + AItem.Name;
+    Name := UniqueComponentName(ACommandPrefix + Sender.Name + AItem.Name);
     Images := AItem.Images;
     ImageIndex := AItem.ImageIndex;
     OnClick := AItem.OnClick;
     Caption := AItem.Caption;
     DropdownCombo := AItem.DropdownCombo;
 
-    For X := 0 To AItem.Count - 1 Do
-      If SameText(AItem[X].ClassName, 'TSpTBXItem') Then
-        Result.Add(AddPluginCommandItem(Sender, TSpTBXItem(AItem[X]), ACommandPrefix))
-      Else If SameText(AItem[X].ClassName, 'TSpTBXSubmenuItem') Then
-        Result.Add(AddPluginCommandItem(Sender, TSpTBXSubmenuItem(AItem[X]), ACommandPrefix))
-      Else If SameText(AItem[X].ClassName, 'TSpTBXSeparatorItem') Then
+    If Assigned(AItem.LinkSubitems) Then
+      lCurItem := AItem.LinkSubitems
+    Else
+      lCurItem := AItem;
+
+    For X := 0 To lCurItem.Count - 1 Do
+      If SameText(lCurItem[X].ClassName, 'TSpTBXItem') Then
+        Result.Add(AddPluginCommandItem(Sender, TSpTBXItem(lCurItem[X]), ACommandPrefix))
+      Else If SameText(lCurItem[X].ClassName, 'TSpTBXSubmenuItem') Then
+        Result.Add(AddPluginCommandItem(Sender, TSpTBXSubmenuItem(lCurItem[X]), ACommandPrefix))
+      Else If SameText(lCurItem[X].ClassName, 'TSpTBXTBGroupItem') Then
+        Result.Add(AddPluginCommandItem(Sender, TSpTBXTBGroupItem(lCurItem[X]), ACommandPrefix))
+      Else If SameText(lCurItem[X].ClassName, 'TSpTBXSeparatorItem') Then
         Result.Add(TSpTBXSeparatorItem.Create(Self));
   End;
+End;
+
+Function TFrmDckMain.AddPluginCommandItem(Sender : TJvPlugin; AItem : TSpTBXTBGroupItem; ACommandPrefix : String) : TTBCustomItem;
+Var X : Integer;
+    lCurItem : TTBCustomItem;
+Begin
+  Result := TSpTBXTBGroupItem.Create(Self);
+  With TSpTBXTBGroupItem(Result) Do
+  Begin
+    Name := UniqueComponentName(ACommandPrefix + Sender.Name + AItem.Name);
+
+    If Assigned(AItem.LinkSubitems) Then
+      lCurItem := AItem.LinkSubitems
+    Else
+      lCurItem := AItem;
+
+    For X := 0 To lCurItem.Count - 1 Do
+      If SameText(lCurItem[X].ClassName, 'TSpTBXItem') Then
+        Result.Add(AddPluginCommandItem(Sender, TSpTBXItem(lCurItem[X]), ACommandPrefix))
+      Else If SameText(lCurItem[X].ClassName, 'TSpTBXSubmenuItem') Then
+        Result.Add(AddPluginCommandItem(Sender, TSpTBXSubmenuItem(lCurItem[X]), ACommandPrefix))
+      Else If SameText(lCurItem[X].ClassName, 'TSpTBXTBGroupItem') Then
+        Result.Add(AddPluginCommandItem(Sender, TSpTBXTBGroupItem(lCurItem[X]), ACommandPrefix))
+      Else If SameText(lCurItem[X].ClassName, 'TSpTBXSeparatorItem') Then
+        Result.Add(TSpTBXSeparatorItem.Create(Self));
+  End;
+End;
+
+Procedure TFrmDckMain.InternalRemovePluginItem(AGroup : TSpTBXTBGroupItem; AItemId : NativeInt);
+Var X : Integer;
+Begin
+  For X := AGroup.Count - 1 DownTo 0 Do
+    If AGroup[X].Tag = Integer(AItemId) Then
+      AGroup.Remove(AGroup[X]);
 End;
 
 Procedure TFrmDckMain.AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
@@ -3074,6 +3143,16 @@ Begin
   grpTbPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Tb'));
 End;
 
+Procedure TFrmDckMain.AddGroupToolBarItem(Sender : TJvPlugin; AItem : TSpTBXTBGroupItem);
+Begin
+  grpTbPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Tb'));
+End;
+
+Procedure TFrmDckMain.AddToolBarSeparatorItem(Sender : TJvPlugin);
+Begin
+  grpTbPluginItems.Add(TSpTBXSeparatorItem.Create(Self));
+End;
+
 Procedure TFrmDckMain.AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
 Begin
   grpMnuPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Mnu'));
@@ -3082,6 +3161,26 @@ End;
 Procedure TFrmDckMain.AddSubMenuItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
 Begin
   grpMnuPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Mnu'));
+End;
+
+Procedure TFrmDckMain.AddGroupMenuItem(Sender : TJvPlugin; AItem : TSpTBXTBGroupItem);
+Begin
+  grpMnuPluginItems.Add(AddPluginCommandItem(Sender, AItem, 'Mnu'));
+End;
+
+Procedure TFrmDckMain.AddMenuSeparatorItem(Sender : TJvPlugin);
+Begin
+  grpMnuPluginItems.Add(TSpTBXSeparatorItem.Create(Self));
+End;
+
+Procedure TFrmDckMain.RemoveToolBarItem(Sender : TJvPlugin; AItem : TTBCustomItem);
+Begin
+  InternalRemovePluginItem(grpTbPluginItems, Integer(AItem));
+End;
+
+Procedure TFrmDckMain.RemoveMenuItem(Sender : TJvPlugin; AItem : TTBCustomItem);
+Begin
+  InternalRemovePluginItem(grpMnuPluginItems, Integer(AItem));
 End;
 
 {

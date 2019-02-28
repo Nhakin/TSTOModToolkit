@@ -20,6 +20,12 @@ Type
     SpTbxPlayAnimation: TSpTBXItem;
     SpTBXSeparatorItem2: TSpTBXSeparatorItem;
     SpTbxStopAnimation: TSpTBXItem;
+    GrpPluginDemoItems: TSpTBXTBGroupItem;
+    SpTBXGrpSingleItem: TSpTBXItem;
+    SpTbxGrpSubMenu: TSpTBXSubmenuItem;
+    SpTBXGrpSubItem2: TSpTBXItem;
+    SpTBXGrpSubItem1: TSpTBXItem;
+    GrpPluginDemo: TSpTBXTBGroupItem;
 
     procedure JvPlugInCreate(Sender: TObject);
     Procedure JvPlugInDestroy(Sender : TObject);
@@ -33,6 +39,7 @@ Type
     FMainApp        : ITSTOApplication;
     FPluginPath     : String;
     FPluginFileName : String;
+    FInitialized    : Boolean;
 
     FPluginSettings : Record
       Enabled    : Boolean;
@@ -44,13 +51,17 @@ Type
   Protected
     Property IntfImpl: TInterfaceExImplementor Read GetIntfImpl Implements ITSTOPlugin;
 
+    //ITSTOPlugin
+    Function  GetInitialized() : Boolean;
+
     Function  GetEnabled() : Boolean;
     Procedure SetEnabled(Const AEnabled : Boolean);
 
     Function  GetPluginKind() : TTSTOPluginKind;
     Procedure SetPluginKind(Const ATSTOPluginKind : TTSTOPluginKind);
 
-    Procedure InitPlugin(AMainApplication : ITSTOApplication);
+    Procedure Initialize(AMainApplication : ITSTOApplication);
+    Procedure Finalize();
 
   Public
 
@@ -77,6 +88,11 @@ Begin
   Result := FIntfImpl;
 End;
 
+Function TTSTOPluginDemo.GetInitialized() : Boolean;
+Begin
+  Result := FInitialized;
+End;
+
 Function TTSTOPluginDemo.GetEnabled() : Boolean;
 Begin
   Result := FPluginSettings.Enabled;
@@ -97,14 +113,35 @@ Begin
   FPluginSettings.PluginKind := ATSTOPluginKind;
 End;
 
-Procedure TTSTOPluginDemo.InitPlugin(AMainApplication: ITSTOApplication);
+Procedure TTSTOPluginDemo.Initialize(AMainApplication: ITSTOApplication);
 Begin
   FMainApp := AMainApplication;
 
   FMainApp.AddToolBarButton(Self, SpTbxPluginDemo);
   FMainApp.AddToolBarDropDownButton(Self, SpTbxSubMenu);
+  FMainApp.AddGroupToolBarItem(Self, GrpPluginDemoItems);
+
   FMainApp.AddMenuItem(Self, SpTbxPluginDemo);
   FMainApp.AddSubMenuItem(Self, SpTbxSubMenu);
+  FMainApp.AddGroupMenuItem(Self, GrpPluginDemoItems);
+
+  FInitialized := True;
+End;
+
+Procedure TTSTOPluginDemo.Finalize();
+Begin
+  If FInitialized Then
+  Begin
+    FMainApp.RemoveToolBarItem(Self, SpTbxPluginDemo);
+    FMainApp.RemoveToolBarItem(Self, SpTbxSubMenu);
+    FMainApp.RemoveToolBarItem(Self, GrpPluginDemoItems);
+
+    FMainApp.RemoveMenuItem(Self, SpTbxPluginDemo);
+    FMainApp.RemoveMenuItem(Self, SpTbxSubMenu);
+    FMainApp.RemoveMenuItem(Self, GrpPluginDemoItems);
+
+    FInitialized := False;
+  End;
 End;
 
 procedure TTSTOPluginDemo.JvPlugInConfigure(Sender: TObject);
@@ -128,6 +165,7 @@ begin
 
   FPluginFileName := lFileName;
   FPluginPath     := ExtractFilePath(lFileName);
+  FInitialized    := False;
 end;
 
 Procedure TTSTOPluginDemo.JvPlugInDestroy(Sender: TObject);

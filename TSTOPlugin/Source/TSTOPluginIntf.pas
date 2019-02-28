@@ -13,14 +13,17 @@ Type
 
     Procedure AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
     Procedure AddToolBarDropDownButton(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
+    Procedure AddGroupToolBarItem(Sender : TJvPlugin; AItem : TSpTBXTBGroupItem);
+    Procedure AddToolBarSeparatorItem(Sender : TJvPlugin);
 
     Procedure AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
     Procedure AddSubMenuItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
-{
-    Procedure RemoveToolBarButton(AItem : TSpTbxItem);
-    Procedure AddMenuItem(AItem : TSpTbxItem);
-    Procedure RemoveMenuItem(AItem : TSpTbxItem);
-}
+    Procedure AddGroupMenuItem(Sender : TJvPlugin; AItem : TSpTBXTBGroupItem);
+    Procedure AddMenuSeparatorItem(Sender : TJvPlugin);
+
+    Procedure RemoveToolBarItem(Sender : TJvPlugin; AItem : TTBCustomItem);
+    Procedure RemoveMenuItem(Sender : TJvPlugin; AItem : TTBCustomItem);
+
     Property WorkSpace  : ITSTOWorkSpaceProjectGroupIO Read GetWorkSpace;
 
   End;
@@ -29,16 +32,20 @@ Type
 
   ITSTOPlugin = Interface(IInterfaceEx)
     ['{E20CF1A9-1302-4643-8715-7CE1FC87090B}']
+    Function  GetInitialized() : Boolean;
+
     Function  GetEnabled() : Boolean;
     Procedure SetEnabled(Const AEnabled : Boolean);
 
     Function  GetPluginKind() : TTSTOPluginKind;
     Procedure SetPluginKind(Const ATSTOPluginKind : TTSTOPluginKind);
 
-    Procedure InitPlugin(AMainApplication : ITSTOApplication);
+    Procedure Initialize(AMainApplication : ITSTOApplication);
+    Procedure Finalize();
 
-    Property Enabled    : Boolean         Read GetEnabled    Write SetEnabled;
-    Property PluginKind : TTSTOPluginKind Read GetPluginKind Write SetPluginKind;
+    Property Initialized : Boolean         Read GetInitialized;
+    Property Enabled     : Boolean         Read GetEnabled    Write SetEnabled;
+    Property PluginKind  : TTSTOPluginKind Read GetPluginKind Write SetPluginKind;
 
   End;
 

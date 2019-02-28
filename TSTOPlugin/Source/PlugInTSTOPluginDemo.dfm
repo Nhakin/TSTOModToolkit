@@ -7,6 +7,7 @@ object TSTOPluginDemo: TTSTOPluginDemo
   Description = 'TSTO Basic Plugin'
   Copyright = 'Copyright '#169' 2019 by KahnAbyss; all rights reserved.'
   PluginID = 'TSTOToolKit.PlgTSTOPluginDemo'
+  PluginVersion = '1.0.0.0'
   OnConfigure = JvPlugInConfigure
   Height = 150
   Width = 215
@@ -20,7 +21,7 @@ object TSTOPluginDemo: TTSTOPluginDemo
       OnClick = SpTbxPluginDemoClick
     end
     object SpTbxSubMenu: TSpTBXSubmenuItem
-      Caption = 'Plugin Submenu'
+      Caption = 'Plugin SubMenu'
       ImageIndex = 103
       Images = ilMain
       DropdownCombo = True
@@ -53,6 +54,32 @@ object TSTOPluginDemo: TTSTOPluginDemo
           Images = ilMain
         end
         object SpTBXSeparatorItem2: TSpTBXSeparatorItem
+        end
+        object GrpPluginDemo: TSpTBXTBGroupItem
+          LinkSubitems = GrpPluginDemoItems
+        end
+      end
+    end
+    object GrpPluginDemoItems: TSpTBXTBGroupItem
+      object SpTBXGrpSingleItem: TSpTBXItem
+        Caption = 'Grp Single Item'
+        ImageIndex = 6
+        Images = ilMain
+      end
+      object SpTbxGrpSubMenu: TSpTBXSubmenuItem
+        Caption = 'Grp SubMenu'
+        ImageIndex = 82
+        Images = ilMain
+        DropdownCombo = True
+        object SpTBXGrpSubItem1: TSpTBXItem
+          Caption = 'Item #1'
+          ImageIndex = 3
+          Images = ilMain
+        end
+        object SpTBXGrpSubItem2: TSpTBXItem
+          Caption = 'Item #2'
+          ImageIndex = 4
+          Images = ilMain
         end
       end
     end

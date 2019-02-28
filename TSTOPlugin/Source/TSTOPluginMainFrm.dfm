@@ -11,20 +11,21 @@ object TSTOPluginManager: TTSTOPluginManager
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object ListBox1: TListBox
+  object lbPlugins: TListBox
     Left = 8
     Top = 57
     Width = 163
     Height = 200
     ItemHeight = 13
     TabOrder = 0
-    OnClick = ListBox1Click
+    OnClick = lbPluginsClick
   end
   object cmdLoadPlugins: TSpTBXButton
     Left = 8
-    Top = 263
+    Top = 264
     Width = 75
     Height = 25
     Caption = 'Load Plugins'
@@ -79,6 +80,24 @@ object TSTOPluginManager: TTSTOPluginManager
         LinkSubitems = SpTBXTestMnuItems
       end
     end
+  end
+  object cmdInitPlugin: TSpTBXButton
+    Left = 89
+    Top = 264
+    Width = 75
+    Height = 25
+    Caption = 'Init Plugin'
+    TabOrder = 3
+    OnClick = cmdInitPluginClick
+  end
+  object cmdFinalizePlugin: TSpTBXButton
+    Left = 170
+    Top = 264
+    Width = 75
+    Height = 25
+    Caption = 'Finalize Plugin'
+    TabOrder = 4
+    OnClick = cmdFinalizePluginClick
   end
   object JvPluginManager1: TJvPluginManager
     PluginFolder = '.\Plugin'
