@@ -7,22 +7,14 @@ interface
 Uses JvPlugin, TB2Item, SptbxItem, HsInterfaceEx, TSTOProjectWorkSpace.IO;
 
 Type
+  TUIItemKind = (iikToolBar, iikMainMenu);
+  
   ITSTOApplication = Interface(IInterfaceEx)
     ['{168D6848-663D-4EE2-9599-84B00AAC1ABC}']
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
 
-    Procedure AddToolBarButton(Sender : TJvPlugin; AItem : TSpTbxItem);
-    Procedure AddToolBarDropDownButton(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
-    Procedure AddGroupToolBarItem(Sender : TJvPlugin; AItem : TSpTBXTBGroupItem);
-    Procedure AddToolBarSeparatorItem(Sender : TJvPlugin);
-
-    Procedure AddMenuItem(Sender : TJvPlugin; AItem : TSpTbxItem);
-    Procedure AddSubMenuItem(Sender : TJvPlugin; AItem : TSpTBXSubmenuItem);
-    Procedure AddGroupMenuItem(Sender : TJvPlugin; AItem : TSpTBXTBGroupItem);
-    Procedure AddMenuSeparatorItem(Sender : TJvPlugin);
-
-    Procedure RemoveToolBarItem(Sender : TJvPlugin; AItem : TTBCustomItem);
-    Procedure RemoveMenuItem(Sender : TJvPlugin; AItem : TTBCustomItem);
+    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+    Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
 
     Property WorkSpace  : ITSTOWorkSpaceProjectGroupIO Read GetWorkSpace;
 
