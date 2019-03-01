@@ -28,14 +28,13 @@ Type
     Procedure SetEnabled(Const AEnabled : Boolean);
 
     Function  GetPluginKind() : TTSTOPluginKind;
-    Procedure SetPluginKind(Const ATSTOPluginKind : TTSTOPluginKind);
 
     Procedure Initialize(AMainApplication : ITSTOApplication);
     Procedure Finalize();
 
     Property Initialized : Boolean         Read GetInitialized;
     Property Enabled     : Boolean         Read GetEnabled    Write SetEnabled;
-    Property PluginKind  : TTSTOPluginKind Read GetPluginKind Write SetPluginKind;
+    Property PluginKind  : TTSTOPluginKind Read GetPluginKind;
 
   End;
 

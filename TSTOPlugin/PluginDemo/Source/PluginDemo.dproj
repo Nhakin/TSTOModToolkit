@@ -4,7 +4,7 @@
         <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
         <DCC_DependencyCheckOutputName>..\Bin\Plugins\TSTOPluginDemo\PlgTSTOPluginDemo.dll</DCC_DependencyCheckOutputName>
-        <MainSource>PlgTSTOPluginDemo.dpr</MainSource>
+        <MainSource>PluginDemo.dpr</MainSource>
         <FrameworkType>VCL</FrameworkType>
         <ProjectVersion>18.5</ProjectVersion>
         <Base>True</Base>
@@ -56,7 +56,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <GenDll>true</GenDll>
-        <SanitizedProjectName>PlgTSTOPluginDemo</SanitizedProjectName>
+        <SanitizedProjectName>PluginDemo</SanitizedProjectName>
         <VerInfo_Locale>3084</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Winapi;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
@@ -105,9 +105,8 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
-        <Manifest_File>(None)</Manifest_File>
         <DCC_ExeOutput>..\..\..\..\Bin\Plugins\TSTOPluginDemo</DCC_ExeOutput>
-        <Debugger_HostApplication>..\..\..\Bin\TSTOPlugin.exe</Debugger_HostApplication>
+        <Debugger_HostApplication>..\..\..\..\Bin\TSTOPlugin.exe</Debugger_HostApplication>
     </PropertyGroup>
     <ProjectExtensions>
         <Borland.Personality>Delphi.Personality.12</Borland.Personality>
@@ -153,7 +152,7 @@
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
                 <Source>
-                    <Source Name="MainSource">PlgTSTOPluginDemo.dpr</Source>
+                    <Source Name="MainSource">PluginDemo.dpr</Source>
                 </Source>
             </Delphi.Personality>
             <Platforms>
@@ -164,9 +163,9 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="..\..\..\Bin\Plugins\TSTOPluginDemo\PlgTSTOPluginDemo.dll" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\..\..\..\Bin\Plugins\TSTOPluginDemo\PluginDemo.dll" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>PlgTSTOPluginDemo.dll</RemoteName>
+                        <RemoteName>PluginDemo.dll</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
