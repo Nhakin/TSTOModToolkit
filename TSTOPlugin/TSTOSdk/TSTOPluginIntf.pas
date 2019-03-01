@@ -28,14 +28,27 @@ Type
     Procedure SetEnabled(Const AEnabled : Boolean);
 
     Function  GetPluginKind() : TTSTOPluginKind;
-    Procedure SetPluginKind(Const ATSTOPluginKind : TTSTOPluginKind);
+
+    Function  GetName() : String;
+    Function  GetAuthor() : String;
+    Function  GetCopyright() : String;
+    Function  GetDescription() : String;
+    Function  GetPluginId() : String;
+    Function  GetPluginVersion() : String;
 
     Procedure Initialize(AMainApplication : ITSTOApplication);
     Procedure Finalize();
 
     Property Initialized : Boolean         Read GetInitialized;
     Property Enabled     : Boolean         Read GetEnabled    Write SetEnabled;
-    Property PluginKind  : TTSTOPluginKind Read GetPluginKind Write SetPluginKind;
+    Property PluginKind  : TTSTOPluginKind Read GetPluginKind;
+
+    Property Name          : String Read GetName;
+    Property Author        : String Read GetAuthor;
+    Property Copyright     : String Read GetCopyright;
+    Property Description   : String Read GetDescription;
+    Property PluginId      : String Read GetPluginId;
+    Property PluginVersion : String Read GetPluginVersion;
 
   End;
 

@@ -12,25 +12,53 @@ object TSTOPluginManager: TTSTOPluginManager
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object lbPlugins: TListBox
-    Left = 8
-    Top = 57
-    Width = 163
-    Height = 200
-    ItemHeight = 13
-    TabOrder = 0
-    OnClick = lbPluginsClick
-  end
-  object cmdLoadPlugins: TSpTBXButton
-    Left = 8
-    Top = 264
-    Width = 75
-    Height = 25
-    Caption = 'Load Plugins'
+  object SpTBXExPanel1: TSpTBXExPanel
+    Left = 0
+    Top = 51
+    Width = 391
+    Height = 246
+    Caption = 'SpTBXExPanel1'
+    Align = alClient
     TabOrder = 1
-    OnClick = cmdLoadPluginsClick
+    TBXStyleBackground = True
+    ExplicitTop = 57
+    object lbPlugins: TSpTBXListBox
+      Left = 8
+      Top = 8
+      Width = 163
+      Height = 204
+      TabOrder = 3
+    end
+    object cmdLoadPlugins: TSpTBXButton
+      Left = 8
+      Top = 221
+      Width = 75
+      Height = 25
+      Caption = 'Load Plugins'
+      TabOrder = 0
+      OnClick = cmdLoadPluginsClick
+    end
+    object cmdInitPlugin: TSpTBXButton
+      Left = 89
+      Top = 221
+      Width = 75
+      Height = 25
+      Caption = 'Init Plugin'
+      TabOrder = 1
+      OnClick = cmdInitPluginClick
+    end
+    object cmdFinalizePlugin: TSpTBXButton
+      Left = 170
+      Top = 221
+      Width = 75
+      Height = 25
+      Caption = 'Finalize Plugin'
+      TabOrder = 2
+      OnClick = cmdFinalizePluginClick
+    end
   end
   object SpTBXDock1: TSpTBXDock
     Left = 0
@@ -73,31 +101,15 @@ object TSTOPluginManager: TTSTOPluginManager
       end
       object mnuPlugins: TSpTBXSubmenuItem
         Caption = 'Plugins'
-        LinkSubitems = grpMnuPluginItems
+        object SpTBXTBGroupItem1: TSpTBXTBGroupItem
+          LinkSubitems = grpMnuPluginItems
+        end
       end
       object SpTBXSubmenuItem3: TSpTBXSubmenuItem
         Caption = 'Test'
         LinkSubitems = SpTBXTestMnuItems
       end
     end
-  end
-  object cmdInitPlugin: TSpTBXButton
-    Left = 89
-    Top = 264
-    Width = 75
-    Height = 25
-    Caption = 'Init Plugin'
-    TabOrder = 3
-    OnClick = cmdInitPluginClick
-  end
-  object cmdFinalizePlugin: TSpTBXButton
-    Left = 170
-    Top = 264
-    Width = 75
-    Height = 25
-    Caption = 'Finalize Plugin'
-    TabOrder = 4
-    OnClick = cmdFinalizePluginClick
   end
   object JvPluginManager1: TJvPluginManager
     PluginFolder = '.\Plugin'

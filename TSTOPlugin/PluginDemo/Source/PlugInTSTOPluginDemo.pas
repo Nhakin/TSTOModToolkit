@@ -58,7 +58,13 @@ Type
     Procedure SetEnabled(Const AEnabled : Boolean);
 
     Function  GetPluginKind() : TTSTOPluginKind;
-    Procedure SetPluginKind(Const ATSTOPluginKind : TTSTOPluginKind);
+
+    Function  GetName() : String;
+    Function  GetAuthor() : String;
+    Function  GetCopyright() : String;
+    Function  GetDescription() : String;
+    Function  GetPluginId() : String;
+    Function  GetPluginVersion() : String;
 
     Procedure Initialize(AMainApplication : ITSTOApplication);
     Procedure Finalize();
@@ -108,10 +114,36 @@ Begin
   Result := FPluginSettings.PluginKind;
 End;
 
-Procedure TTSTOPluginDemo.SetPluginKind(Const ATSTOPluginKind : TTSTOPluginKind);
+Function TTSTOPluginDemo.GetName() : String;
 Begin
-  FPluginSettings.PluginKind := ATSTOPluginKind;
+  Result := Self.Name;
 End;
+
+Function TTSTOPluginDemo.GetAuthor() : String;
+Begin
+  Result := Self.Author;
+End;
+
+Function TTSTOPluginDemo.GetCopyright() : String;
+Begin
+  Result := Self.Copyright;
+End;
+
+Function TTSTOPluginDemo.GetDescription() : String;
+Begin
+  Result := Self.Description;
+End;
+
+Function TTSTOPluginDemo.GetPluginId() : String;
+Begin
+  Result := Self.PluginID;
+End;
+
+Function TTSTOPluginDemo.GetPluginVersion() : String;
+Begin
+  Result := Self.PluginVersion;
+End;
+
 
 Procedure TTSTOPluginDemo.Initialize(AMainApplication: ITSTOApplication);
 Begin

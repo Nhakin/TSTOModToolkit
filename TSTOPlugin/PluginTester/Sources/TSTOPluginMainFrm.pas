@@ -7,12 +7,11 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, JvComponentBase, JvPluginManager, JvPlugin, StdCtrls, HsInterfaceEx,
   TB2Item, SpTBXItem, TB2Dock, TB2Toolbar,
-  SpTBXControls, System.ImageList, Vcl.ImgList;
+  SpTBXControls, System.ImageList, Vcl.ImgList, SpTBXExPanel, SpTBXEditors;
 
 type
   TTSTOPluginManager = class(TForm, ITSTOApplication)
     JvPluginManager1: TJvPluginManager;
-    lbPlugins: TListBox;
     SpTBXBItemContainer1: TSpTBXBItemContainer;
     SpTBXTestMnuItems: TSpTBXTBGroupItem;
     SpTBXItem2: TSpTBXItem;
@@ -20,7 +19,6 @@ type
     SpTBXItem3: TSpTBXItem;
     SpTBXItem4: TSpTBXItem;
     grpTbPluginItems: TSpTBXTBGroupItem;
-    cmdLoadPlugins: TSpTBXButton;
     ilToolBar: TImageList;
     grpMnuPluginItems: TSpTBXTBGroupItem;
     SpTBXDock1: TSpTBXDock;
@@ -34,8 +32,12 @@ type
     mnuPlugins: TSpTBXSubmenuItem;
     SpTBXSubmenuItem3: TSpTBXSubmenuItem;
     SpTBXSeparatorItem2: TSpTBXSeparatorItem;
+    SpTBXTBGroupItem1: TSpTBXTBGroupItem;
+    SpTBXExPanel1: TSpTBXExPanel;
+    cmdLoadPlugins: TSpTBXButton;
     cmdInitPlugin: TSpTBXButton;
     cmdFinalizePlugin: TSpTBXButton;
+    lbPlugins: TSpTBXListBox;
 
     procedure lbPluginsClick(Sender: TObject);
     procedure SpTBXItem1Click(Sender: TObject);
@@ -43,6 +45,7 @@ type
     procedure cmdLoadPluginsClick(Sender: TObject);
     procedure cmdInitPluginClick(Sender: TObject);
     procedure cmdFinalizePluginClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
 
   Private
     FWorkSpace : ITSTOWorkSpaceProjectGroupIO;
@@ -70,10 +73,13 @@ type
 
   end;
 
-var
-  TSTOPluginManager: TTSTOPluginManager;
+Var
+  TSTOPluginManager : TTSTOPluginManager;
 
 implementation
+
+Uses
+  SpTBXSkins, SpTBXAdditionalSkins;
 
 {$R *.dfm}
 
@@ -158,8 +164,10 @@ procedure TTSTOPluginManager.cmdLoadPluginsClick(Sender: TObject);
       Repeat
         If (lSr.Attr And faDirectory = faDirectory) And (lSr.Name <> '.') And (lSr.Name <> '..') And (ALvl < 1) Then
           InternalListPlugins(AStartPath + lSr.Name + '\', ALvl + 1)
-        Else If SameText(ExtractFileExt(lSr.Name), '.dll') Then
-          JvPluginManager1.LoadPlugin(AStartPath + lSr.Name, plgDLL);
+        Else If SameText(ExtractFileExt(lSr.Name), '.dll') And (ALvl = 1) Then
+          JvPluginManager1.LoadPlugin(AStartPath + lSr.Name, plgDLL);{
+        Else If SameText(ExtractFileExt(lSr.Name), '.bpl') And (ALvl = 0) Then
+          JvPluginManager1.LoadPlugin(AStartPath + lSr.Name, plgPackage);}
       Until FindNext(lSr) <> 0;
 
       Finally
@@ -168,11 +176,29 @@ procedure TTSTOPluginManager.cmdLoadPluginsClick(Sender: TObject);
   End;
 
 Var X : Integer;
+    lPath : String;
+    lPlugin : ITSTOPlugin;
 begin
-  InternalListPlugins(ExtractFilePath(ParamStr(0)) + 'Plugins\', 0);
+  lPath := ExtractFilePath(ParamStr(0)) + 'Plugins\';
+  If FileExists(lPath + 'PluginManager.bpl') Then
+  Begin
+    JvPluginManager1.LoadPlugin(lPath + 'PluginManager.bpl', plgPackage);
+    If JvPluginManager1.Plugins[JvPluginManager1.PluginCount - 1].GetInterface(ITSTOPlugin, lPlugin) Then
+    Begin
+      JvPluginManager1.Plugins[JvPluginManager1.PluginCount - 1].Configure;
+      lPlugin.Initialize(Self);
+    End;
+  End
+  Else
+    InternalListPlugins(lPath, 0);
 
   For X := 0 To JvPluginManager1.PluginCount - 1 Do
     lbPlugins.AddItem(JvPluginManager1.Plugins[X].Name, JvPluginManager1.Plugins[X]);
+end;
+
+procedure TTSTOPluginManager.FormCreate(Sender: TObject);
+begin
+  SkinManager.SetSkin('WMP11');
 end;
 
 Function TTSTOPluginManager.UniqueComponentName(AComponentName : String) : String;
