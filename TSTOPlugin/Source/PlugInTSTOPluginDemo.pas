@@ -117,13 +117,13 @@ Procedure TTSTOPluginDemo.Initialize(AMainApplication: ITSTOApplication);
 Begin
   FMainApp := AMainApplication;
 
-  FMainApp.AddToolBarButton(Self, SpTbxPluginDemo);
-  FMainApp.AddToolBarDropDownButton(Self, SpTbxSubMenu);
-  FMainApp.AddGroupToolBarItem(Self, GrpPluginDemoItems);
+  FMainApp.AddItem(iikToolBar, Self, SpTbxPluginDemo);
+  FMainApp.AddItem(iikToolBar, Self, SpTbxSubMenu);
+  FMainApp.AddItem(iikToolBar, Self, GrpPluginDemoItems);
 
-  FMainApp.AddMenuItem(Self, SpTbxPluginDemo);
-  FMainApp.AddSubMenuItem(Self, SpTbxSubMenu);
-  FMainApp.AddGroupMenuItem(Self, GrpPluginDemoItems);
+  FMainApp.AddItem(iikMainMenu, Self, SpTbxPluginDemo);
+  FMainApp.AddItem(iikMainMenu, Self, SpTbxSubMenu);
+  FMainApp.AddItem(iikMainMenu, Self, GrpPluginDemoItems);
 
   FInitialized := True;
 End;
@@ -132,13 +132,13 @@ Procedure TTSTOPluginDemo.Finalize();
 Begin
   If FInitialized Then
   Begin
-    FMainApp.RemoveToolBarItem(Self, SpTbxPluginDemo);
-    FMainApp.RemoveToolBarItem(Self, SpTbxSubMenu);
-    FMainApp.RemoveToolBarItem(Self, GrpPluginDemoItems);
-
-    FMainApp.RemoveMenuItem(Self, SpTbxPluginDemo);
-    FMainApp.RemoveMenuItem(Self, SpTbxSubMenu);
-    FMainApp.RemoveMenuItem(Self, GrpPluginDemoItems);
+    FMainApp.RemoveItem(iikToolBar, Self, SpTbxPluginDemo);
+    FMainApp.RemoveItem(iikToolBar, Self, SpTbxSubMenu);
+    FMainApp.RemoveItem(iikToolBar, Self, GrpPluginDemoItems);
+  
+    FMainApp.RemoveItem(iikMainMenu, Self, SpTbxPluginDemo);
+    FMainApp.RemoveItem(iikMainMenu, Self, SpTbxSubMenu);
+    FMainApp.RemoveItem(iikMainMenu, Self, GrpPluginDemoItems);
 
     FInitialized := False;
   End;
