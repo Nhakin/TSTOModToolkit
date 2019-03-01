@@ -60,6 +60,7 @@
         <VerInfo_Locale>3084</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Winapi;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_ExeOutput>..\..\..\..\Bin\Plugins\TSTOPluginDemo</DCC_ExeOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
@@ -68,7 +69,7 @@
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Debugger_HostApplication>Z:\Temp\TSTO\Sources\TSTOPlugin\Bin\TSTOPlugin.exe</Debugger_HostApplication>
-        <Icon_MainIcon>PlgTSTOPluginDemo_Icon.ico</Icon_MainIcon>
+        <Manifest_File>(None)</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <Icon_MainIcon>PlgTSTOPluginDemo_Icon.ico</Icon_MainIcon>
@@ -79,7 +80,6 @@
         <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
-        <DCC_ExeOutput>..\Bin\Plugins\TSTOPluginDemo</DCC_ExeOutput>
         <DCC_DcuOutput>..\Dcu</DCC_DcuOutput>
         <DCC_ObjOutput>..\Dcu</DCC_ObjOutput>
         <DCC_HppOutput>..\Dcu</DCC_HppOutput>
@@ -92,12 +92,11 @@
         <Debugger_HostApplication>..\Bin\TSTOPlugin.exe</Debugger_HostApplication>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <Manifest_File>(None)</Manifest_File>
+        <DCC_ExeOutput>..\..\..\..\Bin\Plugins\TSTOPluginDemo</DCC_ExeOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <Version>7.0</Version>
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
-        <DCC_ExeOutput>..\Bin\Plugins\TSTOPluginDemo</DCC_ExeOutput>
         <DCC_DcuOutput>..\Dcu</DCC_DcuOutput>
         <DCC_ObjOutput>..\Dcu</DCC_ObjOutput>
         <DCC_HppOutput>..\Dcu</DCC_HppOutput>
@@ -107,7 +106,7 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <Manifest_File>(None)</Manifest_File>
-        <DCC_ExeOutput>..\..\..\Bin\Plugins\TSTOPluginDemo</DCC_ExeOutput>
+        <DCC_ExeOutput>..\..\..\..\Bin\Plugins\TSTOPluginDemo</DCC_ExeOutput>
         <Debugger_HostApplication>..\..\..\Bin\TSTOPlugin.exe</Debugger_HostApplication>
     </PropertyGroup>
     <ProjectExtensions>
@@ -149,7 +148,6 @@
                     <VersionInfoKeys Name="Comments"/>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Projects\JediCodeFormatXE10\Output\D12\JCFIdeXE10.bpl">File C:\Projects\JediCodeFormatXE10\Output\D12\JCFIdeXE10.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\DataExplorerDBXPluginEnt260.bpl">DBExpress Enterprise Data Explorer Integration</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -577,29 +575,29 @@
             <Form>TSTOPluginDemo</Form>
             <DesignClass>TJvPlugIn</DesignClass>
         </DCCReference>
-        <DCCReference Include="TSTOPluginIntf.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsClipBoardEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsEncodingEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsEventListEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsFunctionsEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsInterfaceEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsListEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsStreamEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsStringListEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsXmlDocEx.pas"/>
-        <DCCReference Include="TSTOSDK\TSTORGBProgress.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOCustomPatchesIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOHackMasterListIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOHackSettingsIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOProjectIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOSbtpIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOScriptTemplateIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOProjectWorkSpaceIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOCustomPatches.IO.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOHackMasterList.IO.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOProjectWorkSpace.IO.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOSbtp.IO.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOScriptTemplate.IO.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsClipBoardEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsEncodingEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsEventListEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsFunctionsEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsInterfaceEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsListEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsStreamEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsStringListEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsXmlDocEx.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTORGBProgress.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOCustomPatchesIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOHackMasterListIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOHackSettingsIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOProjectIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOSbtpIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOScriptTemplateIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOProjectWorkSpaceIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOCustomPatches.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOHackMasterList.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOProjectWorkSpace.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOSbtp.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOScriptTemplate.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSdk\TSTOPluginIntf.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

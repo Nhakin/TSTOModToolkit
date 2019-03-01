@@ -2,8 +2,6 @@ unit TSTOPluginIntf;
 
 interface
 
-{x$Define MainApp}
-
 Uses JvPlugin, TB2Item, SptbxItem, HsInterfaceEx, TSTOProjectWorkSpace.IO;
 
 Type

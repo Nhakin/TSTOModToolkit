@@ -109,7 +109,7 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
-        <DCC_ExeOutput>..\..\..\Bin</DCC_ExeOutput>
+        <DCC_ExeOutput>..\..\..\..\Bin</DCC_ExeOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
@@ -151,7 +151,6 @@
                     <VersionInfoKeys Name="Comments"/>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Projects\JediCodeFormatXE10\Output\D12\JCFIdeXE10.bpl">File C:\Projects\JediCodeFormatXE10\Output\D12\JCFIdeXE10.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\DataExplorerDBXPluginEnt260.bpl">DBExpress Enterprise Data Explorer Integration</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -653,31 +652,31 @@
         <DCCReference Include="TSTOPluginMainFrm.pas">
             <Form>TSTOPluginManager</Form>
         </DCCReference>
-        <DCCReference Include="TSTOPluginIntf.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsClipBoardEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsEncodingEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsEventListEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsFunctionsEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsInterfaceEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsListEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsStreamEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsStringListEx.pas"/>
-        <DCCReference Include="..\..\HsUnits\HsXmlDocEx.pas"/>
-        <DCCReference Include="TSTOSDK\TSTORGBProgress.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOCustomPatchesIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOHackMasterListIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOHackSettingsIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOProjectIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOSbtpIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOScriptTemplateIntf.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOScriptTemplate.IO.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOProjectWorkSpaceIntf.pas">
+        <DCCReference Include="..\..\..\HsUnits\HsClipBoardEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsEncodingEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsEventListEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsFunctionsEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsInterfaceEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsListEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsStreamEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsStringListEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsXmlDocEx.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTORGBProgress.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOCustomPatchesIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOHackMasterListIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOHackSettingsIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOProjectIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOSbtpIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOScriptTemplateIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOScriptTemplate.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOProjectWorkSpaceIntf.pas">
             <Form>$R *.res</Form>
         </DCCReference>
-        <DCCReference Include="TSTOSDK\TSTOCustomPatches.IO.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOHackMasterList.IO.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOSbtp.IO.pas"/>
-        <DCCReference Include="TSTOSDK\TSTOProjectWorkSpace.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOCustomPatches.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOHackMasterList.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOSbtp.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOProjectWorkSpace.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSdk\TSTOPluginIntf.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -101,7 +101,7 @@ uses
   TSTOZeroIntf in 'ZeroFile\TSTOZeroIntf.pas',
   VTCombos in 'VirtualTree\VTCombos.pas',
   VTEditors in 'VirtualTree\VTEditors.pas',
-  TSTOPluginIntf in 'TSTOPlugin\Source\TSTOPluginIntf.pas';
+  TSTOPluginIntf in 'TSTOPlugin\TSTOSdk\TSTOPluginIntf.pas';
 
 {$R *.res}
 {$R Images.res}
