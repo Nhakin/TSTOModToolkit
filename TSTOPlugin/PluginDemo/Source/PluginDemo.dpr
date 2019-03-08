@@ -25,7 +25,8 @@ uses
   TSTOProjectWorkSpace.IO in '..\..\TSTOSDK\TSTOProjectWorkSpace.IO.pas',
   TSTOSbtp.IO in '..\..\TSTOSDK\TSTOSbtp.IO.pas',
   TSTOScriptTemplate.IO in '..\..\TSTOSDK\TSTOScriptTemplate.IO.pas',
-  TSTOPluginIntf in '..\..\TSTOSdk\TSTOPluginIntf.pas';
+  TSTOPluginIntf in '..\..\TSTOSdk\TSTOPluginIntf.pas',
+  PluginDemoSettingDlg in 'PluginDemoSettingDlg.pas' {DlgPluginDemoSetting};
 
 {$R *.res}
 

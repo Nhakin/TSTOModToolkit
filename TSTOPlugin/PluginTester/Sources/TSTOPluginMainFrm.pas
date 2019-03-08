@@ -7,7 +7,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, JvComponentBase, JvPluginManager, JvPlugin, StdCtrls, HsInterfaceEx,
   TB2Item, SpTBXItem, TB2Dock, TB2Toolbar,
-  SpTBXControls, System.ImageList, Vcl.ImgList, SpTBXExPanel, SpTBXEditors;
+  SpTBXControls, SpTBXExPanel, SpTBXEditors,
+  ImgList, TntStdCtrls;
 
 type
   TTSTOPluginManager = class(TForm, ITSTOApplication)
@@ -64,6 +65,7 @@ type
 
   Protected
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function GetCurrentSkinName() : String;
 
     Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
     Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
@@ -124,6 +126,11 @@ end;
 Function TTSTOPluginManager.GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
 Begin
   Result := FWorkSpace;
+End;
+
+Function TTSTOPluginManager.GetCurrentSkinName() : String;
+Begin
+  Result := SkinManager.CurrentSkinName;
 End;
 
 procedure TTSTOPluginManager.cmdFinalizePluginClick(Sender: TObject);

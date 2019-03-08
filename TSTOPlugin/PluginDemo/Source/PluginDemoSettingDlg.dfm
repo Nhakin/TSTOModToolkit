@@ -1,9 +1,11 @@
-object TSTOPluginManagerDlg: TTSTOPluginManagerDlg
+object DlgPluginDemoSetting: TDlgPluginDemoSetting
   Left = 0
   Top = 0
-  Caption = 'Plugin Manager'
-  ClientHeight = 325
-  ClientWidth = 488
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsSingle
+  Caption = 'Demo Plugin Settings'
+  ClientHeight = 120
+  ClientWidth = 217
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,10 +16,19 @@ object TSTOPluginManagerDlg: TTSTOPluginManagerDlg
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
+  object chkEnabled: TCheckBox
+    Left = 34
+    Top = 48
+    Width = 148
+    Height = 17
+    Caption = 'Enabled'
+    TabOrder = 0
+    OnClick = chkEnabledClick
+  end
   object sptbxDckMain: TSpTBXDock
     Left = 0
     Top = 0
-    Width = 488
+    Width = 217
     Height = 26
     AllowDrag = False
     object sptbxtbMain: TSpTBXToolbar
@@ -40,168 +51,31 @@ object TSTOPluginManagerDlg: TTSTOPluginManagerDlg
       MenuBar = True
     end
   end
-  object SpTBXExPanel1: TSpTBXExPanel
-    Left = 0
-    Top = 26
-    Width = 161
-    Height = 273
-    Align = alLeft
-    TabOrder = 1
-    TBXStyleBackground = True
-    object tvPlugins: TSpTBXVirtualStringTree
-      AlignWithMargins = True
-      Left = 5
-      Top = 5
-      Width = 151
-      Height = 263
-      Align = alClient
-      Header.AutoSizeIndex = 0
-      Header.DefaultHeight = 17
-      Header.Font.Charset = DEFAULT_CHARSET
-      Header.Font.Color = clWindowText
-      Header.Font.Height = -11
-      Header.Font.Name = 'Tahoma'
-      Header.Font.Style = []
-      Header.MainColumn = -1
-      Header.Options = [hoColumnResize, hoDrag, hoOwnerDraw, hoShowSortGlyphs]
-      NodeDataSize = 4
-      TabOrder = 0
-      TreeOptions.PaintOptions = [toHotTrack, toPopupMode, toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
-      OnFocusChanged = tvPluginsFocusChanged
-      OnGetText = tvPluginsGetText
-      OnInitNode = tvPluginsInitNode
-      ExplicitLeft = 39
-      ExplicitTop = 102
-      ExplicitWidth = 200
-      ExplicitHeight = 100
-      Columns = <>
-    end
+  object chkAddMenuItem: TCheckBox
+    Left = 51
+    Top = 71
+    Width = 148
+    Height = 17
+    Caption = 'Add Menu Item'
+    TabOrder = 2
   end
-  object SpTBXStatusBar1: TSpTBXStatusBar
-    Left = 0
-    Top = 299
-    Width = 488
-    Height = 26
+  object chkAddToolBarButton: TCheckBox
+    Left = 51
+    Top = 88
+    Width = 148
+    Height = 17
+    Caption = 'Add ToolBar Button'
+    TabOrder = 3
   end
-  object SpTBXSplitter1: TSpTBXSplitter
-    Left = 161
-    Top = 26
-    Height = 273
-    Cursor = crSizeWE
-  end
-  object SpTBXExPanel2: TSpTBXExPanel
-    Left = 166
-    Top = 26
-    Width = 322
-    Height = 273
-    Align = alClient
-    TabOrder = 4
-    TBXStyleBackground = True
-    object SpTBXGroupBox1: TSpTBXGroupBox
-      AlignWithMargins = True
-      Left = 5
-      Top = 5
-      Width = 312
-      Height = 263
-      Caption = ' Plugin Info '
-      Align = alClient
-      TabOrder = 0
-      TBXStyleBackground = True
-      ExplicitHeight = 265
-      DesignSize = (
-        312
-        263)
-      object SpTBXLabel1: TSpTBXLabel
-        Left = 10
-        Top = 20
-        Width = 43
-        Height = 19
-        Caption = 'Name : '
-      end
-      object EditName: TSpTBXEdit
-        Left = 75
-        Top = 20
-        Width = 227
-        Height = 21
-        Anchors = [akLeft, akTop, akRight]
-        ReadOnly = True
-        TabOrder = 1
-      end
-      object SpTBXLabel2: TSpTBXLabel
-        Left = 10
-        Top = 47
-        Width = 49
-        Height = 19
-        Caption = 'Author : '
-      end
-      object EditAuthor: TSpTBXEdit
-        Left = 75
-        Top = 47
-        Width = 227
-        Height = 21
-        Anchors = [akLeft, akTop, akRight]
-        ReadOnly = True
-        TabOrder = 3
-      end
-      object SpTBXLabel3: TSpTBXLabel
-        Left = 10
-        Top = 74
-        Width = 63
-        Height = 19
-        Caption = 'Copyright : '
-      end
-      object EditCopyright: TSpTBXEdit
-        Left = 75
-        Top = 74
-        Width = 227
-        Height = 21
-        Anchors = [akLeft, akTop, akRight]
-        ReadOnly = True
-        TabOrder = 5
-      end
-      object SpTBXLabel4: TSpTBXLabel
-        Left = 10
-        Top = 101
-        Width = 51
-        Height = 19
-        Caption = 'Version : '
-      end
-      object EditVersion: TSpTBXEdit
-        Left = 75
-        Top = 101
-        Width = 227
-        Height = 21
-        Anchors = [akLeft, akTop, akRight]
-        ReadOnly = True
-        TabOrder = 7
-      end
-      object SpTBXLabel5: TSpTBXLabel
-        Left = 10
-        Top = 128
-        Width = 69
-        Height = 19
-        Caption = 'Description : '
-      end
-      object EditDescription: TSpTBXEdit
-        Left = 10
-        Top = 153
-        Width = 292
-        Height = 75
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        AutoSize = False
-        ReadOnly = True
-        TabOrder = 9
-      end
-      object CmdPluginSetting: TSpTBXButton
-        Left = 227
-        Top = 234
-        Width = 75
-        Height = 25
-        Caption = 'Settings...'
-        Anchors = [akRight, akBottom]
-        Enabled = False
-        TabOrder = 10
-        OnClick = CmdPluginSettingClick
+  object SpTBXBItemContainer1: TSpTBXBItemContainer
+    Left = 58
+    Top = 22
+    object tbPopupMenuItems: TSpTBXSubmenuItem
+      object tbSavePlugins: TSpTBXItem
+        Caption = 'Save'
+        ImageIndex = 0
+        Images = imgToolBar
+        OnClick = tbSavePluginsClick
       end
     end
   end
@@ -209,7 +83,7 @@ object TSTOPluginManagerDlg: TTSTOPluginManagerDlg
     Left = 26
     Top = 20
     Bitmap = {
-      494C0101010078000C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010101007800140010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -347,17 +221,5 @@ object TSTOPluginManagerDlg: TTSTOPluginManagerDlg
       8003000000000000800300000000000080030000000000008003000000000000
       C007000000000000FFFF00000000000000000000000000000000000000000000
       000000000000}
-  end
-  object SpTBXBItemContainer1: TSpTBXBItemContainer
-    Left = 24
-    Top = 72
-    object tbPopupMenuItems: TSpTBXSubmenuItem
-      object tbSavePlugins: TSpTBXItem
-        Caption = 'Save'
-        ImageIndex = 0
-        Images = imgToolBar
-        OnClick = tbSavePluginsClick
-      end
-    end
   end
 end
