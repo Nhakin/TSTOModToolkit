@@ -57,6 +57,7 @@ type
   Private
     Function  UniqueComponentName(AComponentName : String) : String;
     Function  InternalAddPluginItem(Sender : TJvPlugin; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
+
     Procedure InternalRemovePluginItem(AGroup : TSpTBXTBGroupItem; AItemId : NativeInt);
 
   Protected
