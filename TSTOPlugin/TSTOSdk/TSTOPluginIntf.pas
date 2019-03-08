@@ -11,7 +11,8 @@ Type
     ['{168D6848-663D-4EE2-9599-84B00AAC1ABC}']
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
 
-    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
+    Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
     Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
 
     Property WorkSpace  : ITSTOWorkSpaceProjectGroupIO Read GetWorkSpace;

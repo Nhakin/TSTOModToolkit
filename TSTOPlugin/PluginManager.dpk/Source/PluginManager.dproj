@@ -131,6 +131,10 @@
         <DCCReference Include="..\..\TSTOSdk\TSTOSbtpIntf.pas"/>
         <DCCReference Include="..\..\TSTOSdk\TSTOScriptTemplate.IO.pas"/>
         <DCCReference Include="..\..\TSTOSdk\TSTOScriptTemplateIntf.pas"/>
+        <DCCReference Include="DlgTSTOPluginManager.pas">
+            <Form>TSTOPluginManagerDlg</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

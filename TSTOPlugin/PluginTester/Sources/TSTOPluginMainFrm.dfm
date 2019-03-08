@@ -24,7 +24,6 @@ object TSTOPluginManager: TTSTOPluginManager
     Align = alClient
     TabOrder = 1
     TBXStyleBackground = True
-    ExplicitTop = 57
     object lbPlugins: TSpTBXListBox
       Left = 8
       Top = 8

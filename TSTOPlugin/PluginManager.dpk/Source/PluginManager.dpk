@@ -39,6 +39,7 @@ requires
   JvPluginSystem;
 
 contains
+  ShareMem,
   PlgTSTOPluginManager in 'PlgTSTOPluginManager.pas' {TSTOPluginManager: TJvPlugIn},
   TSTOCustomPatches.IO in '..\..\TSTOSdk\TSTOCustomPatches.IO.pas',
   TSTOCustomPatchesIntf in '..\..\TSTOSdk\TSTOCustomPatchesIntf.pas',
@@ -53,6 +54,7 @@ contains
   TSTOSbtp.IO in '..\..\TSTOSdk\TSTOSbtp.IO.pas',
   TSTOSbtpIntf in '..\..\TSTOSdk\TSTOSbtpIntf.pas',
   TSTOScriptTemplate.IO in '..\..\TSTOSdk\TSTOScriptTemplate.IO.pas',
-  TSTOScriptTemplateIntf in '..\..\TSTOSdk\TSTOScriptTemplateIntf.pas';
+  TSTOScriptTemplateIntf in '..\..\TSTOSdk\TSTOScriptTemplateIntf.pas',
+  DlgTSTOPluginManager in 'DlgTSTOPluginManager.pas' {TSTOPluginManagerDlg};
 
 end.

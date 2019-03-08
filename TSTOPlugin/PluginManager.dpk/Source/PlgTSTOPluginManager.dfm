@@ -16,7 +16,7 @@ object TSTOPluginManager: TTSTOPluginManager
   object SpTBXBItemContainer1: TSpTBXBItemContainer
     Left = 80
     Top = 80
-    object grpMenuItem: TSpTBXTBGroupItem
+    object grpPluginManagerMenuItem: TSpTBXTBGroupItem
       object SpTBXSeparatorItem1: TSpTBXSeparatorItem
       end
       object mnuPluginManager: TSpTBXItem

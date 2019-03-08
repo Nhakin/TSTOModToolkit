@@ -65,8 +65,11 @@ type
   Protected
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
 
-    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
-    Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);    
+    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
+    Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+
+    Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
+
   {$EndRegion}
 
   public
@@ -223,7 +226,7 @@ Begin
   If SameText(AItem.ClassName, 'TSpTBXItem') Then
   Begin
     Result := TSpTBXItem.Create(Self);
-    
+
     With TSpTBXItem(Result) Do
     Begin
       Name       := UniqueComponentName(ACommandPrefix + Sender.Name + AItem.Name);
@@ -246,18 +249,18 @@ Begin
       Caption       := AItem.Caption;
       DropdownCombo := TSpTBXSubmenuItem(AItem).DropdownCombo;
       Tag := Integer(AItem);
-    
+
       If Assigned(AItem.LinkSubitems) Then
         lCurItem := AItem.LinkSubitems
       Else
         lCurItem := AItem;
-    
+
       For X := 0 To lCurItem.Count - 1 Do
         If SameText(lCurItem[X].ClassName, 'TSpTBXSeparatorItem') Then
           Result.Add(TSpTBXSeparatorItem.Create(Self))
         Else
           Result.Add(InternalAddPluginItem(Sender, lCurItem[X], ACommandPrefix));
-    End;   
+    End;
   End
   Else If SameText(AItem.ClassName, 'TSpTBXTBGroupItem') Then
   Begin
@@ -273,10 +276,10 @@ Begin
         lCurItem := AItem;
 
       For X := 0 To lCurItem.Count - 1 Do
-      If SameText(lCurItem[X].ClassName, 'TSpTBXSeparatorItem') Then
-        Result.Add(TSpTBXSeparatorItem.Create(Self))
-      Else
-        Result.Add(InternalAddPluginItem(Sender, lCurItem[X], ACommandPrefix));
+        If SameText(lCurItem[X].ClassName, 'TSpTBXSeparatorItem') Then
+          Result.Add(TSpTBXSeparatorItem.Create(Self))
+        Else
+          Result.Add(InternalAddPluginItem(Sender, lCurItem[X], ACommandPrefix));
     End;
   End;
 End;
@@ -300,7 +303,7 @@ Begin
   lGroup.Add(InternalAddPluginItem(Sender, AItem, ''));
 End;
 
-Procedure TTSTOPluginManager.RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);    
+Procedure TTSTOPluginManager.RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
 Var lGroup : TSpTBXTBGroupItem;
 Begin
   Case AItemKind Of
@@ -309,6 +312,11 @@ Begin
   End;
 
   InternalRemovePluginItem(lGroup, Integer(AItem));
+End;
+
+Procedure TTSTOPluginManager.AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem);
+Begin
+  ATrgItem.Add(InternalAddPluginItem(Sender, ASrcItem, ''));
 End;
 
 end.

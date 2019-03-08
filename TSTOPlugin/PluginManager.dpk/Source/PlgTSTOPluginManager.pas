@@ -11,7 +11,7 @@ type
   TTSTOPluginManager = class(TJvPlugIn, ITSTOPlugin)
     JvPluginManager1: TJvPluginManager;
     SpTBXBItemContainer1: TSpTBXBItemContainer;
-    grpMenuItem: TSpTBXTBGroupItem;
+    grpPluginManagerMenuItem: TSpTBXTBGroupItem;
     SpTBXSeparatorItem1: TSpTBXSeparatorItem;
     mnuPluginManager: TSpTBXItem;
 
@@ -56,6 +56,9 @@ Exports
   RegisterPlugin;
 
 implementation
+
+Uses
+  DlgTSTOPluginManager;
 
 {$R *.dfm}
 
@@ -107,17 +110,6 @@ Begin
 End;
 
 Procedure TTSTOPluginManager.Initialize(AMainApplication : ITSTOApplication);
-  Function GetPluginMenu() : TTBItem;
-  Var lMnu : TComponent;
-  Begin
-    Result := Nil;
-
-    lMnu := HostApplication.MainForm.FindComponent('mnuPlugins');
-
-    If Assigned(lMnu) And SameText(lMnu.ClassName, 'TSpTBXSubmenuItem') Then
-      Result := TTBItem(lMnu);
-  End;
-
 Var lMnu    : TComponent;
     lPlugin : ITSTOPlugin;
     X       : Integer;
@@ -132,19 +124,9 @@ Begin
       If JvPluginManager1.Plugins[X].GetInterface(ITSTOPlugin, lPlugin) And lPlugin.Enabled Then
         lPlugin.Initialize(FMainApp);
 
-    lGroup := TSpTBXTBGroupItem.Create(Self);
-    lGroup.Add(TSpTBXSeparatorItem.Create(Self));
-
-    lItem := TSpTBXItem.Create(Self);
-    lItem.Caption := 'Plugin Manager';
-    lItem.OnClick := mnuPluginManagerClick;
-    lGroup.Add(lItem);
-
     lMnu := HostApplication.MainForm.FindComponent('mnuPlugins');
     If Assigned(lMnu) And SameText(lMnu.ClassName, 'TSpTBXSubmenuItem') Then
-      TSpTBXSubmenuItem(lMnu).Add(lGroup)
-    Else
-      ShowMessage('Batarnak');
+      FMainApp.AddItem(Self, grpPluginManagerMenuItem, TTBCustomItem(lMnu));
 
     FInitialized := True;
   End;
@@ -152,7 +134,16 @@ End;
 
 procedure TTSTOPluginManager.mnuPluginManagerClick(Sender: TObject);
 begin
-//
+  With TTSTOPluginManagerDlg.Create(Self) Do
+  Try
+    If ShowModal() = mrOk Then
+    Begin
+
+    End;
+
+    Finally
+      Release();
+  End;
 end;
 
 Procedure TTSTOPluginManager.Finalize();
