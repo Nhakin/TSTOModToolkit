@@ -1,0 +1,60 @@
+package PluginManager;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$RUNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  JvCore,
+  xmlrtl,
+  soaprtl,
+  inet,
+  SpTBXLib_d11,
+  tb2k_d11,
+  JvPluginSystem;
+
+contains
+  ShareMem,
+  PlgTSTOPluginManager in 'PlgTSTOPluginManager.pas' {TSTOPluginManager: TJvPlugIn},
+  TSTOCustomPatches.IO in '..\..\TSTOSdk\TSTOCustomPatches.IO.pas',
+  TSTOCustomPatchesIntf in '..\..\TSTOSdk\TSTOCustomPatchesIntf.pas',
+  TSTOHackMasterList.IO in '..\..\TSTOSdk\TSTOHackMasterList.IO.pas',
+  TSTOHackMasterListIntf in '..\..\TSTOSdk\TSTOHackMasterListIntf.pas',
+  TSTOHackSettingsIntf in '..\..\TSTOSdk\TSTOHackSettingsIntf.pas',
+  TSTOPluginIntf in '..\..\TSTOSdk\TSTOPluginIntf.pas',
+  TSTOProjectIntf in '..\..\TSTOSdk\TSTOProjectIntf.pas',
+  TSTOProjectWorkSpace.IO in '..\..\TSTOSdk\TSTOProjectWorkSpace.IO.pas',
+  TSTOProjectWorkSpaceIntf in '..\..\TSTOSdk\TSTOProjectWorkSpaceIntf.pas',
+  TSTORGBProgress in '..\..\TSTOSdk\TSTORGBProgress.pas',
+  TSTOSbtp.IO in '..\..\TSTOSdk\TSTOSbtp.IO.pas',
+  TSTOSbtpIntf in '..\..\TSTOSdk\TSTOSbtpIntf.pas',
+  TSTOScriptTemplate.IO in '..\..\TSTOSdk\TSTOScriptTemplate.IO.pas',
+  TSTOScriptTemplateIntf in '..\..\TSTOSdk\TSTOScriptTemplateIntf.pas',
+  DlgTSTOPluginManager in 'DlgTSTOPluginManager.pas' {TSTOPluginManagerDlg};
+
+end.

@@ -106,7 +106,7 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <DCC_ExeOutput>..\..\..\..\Bin\Plugins\TSTOPluginManager</DCC_ExeOutput>
-        <Debugger_HostApplication>..\..\..\..\Bin\TSTOPlugin.exe</Debugger_HostApplication>
+        <Debugger_HostApplication>..\..\..\..\Bin\TSTOPluginTester.exe</Debugger_HostApplication>
     </PropertyGroup>
     <ProjectExtensions>
         <Borland.Personality>Delphi.Personality.12</Borland.Personality>

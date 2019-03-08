@@ -9,7 +9,7 @@
         <Projects Include="TSTOPlugin\PluginDemo\Source\PluginDemo.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="TSTOPlugin\PluginManager\Source\PluginManager.dproj">
+        <Projects Include="TSTOPlugin\PluginManager.dpk\Source\PluginManager.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="TSTOPlugin\PluginTester\Sources\TSTOPluginTester.dproj">
@@ -42,13 +42,13 @@
         <MSBuild Projects="TSTOPlugin\PluginDemo\Source\PluginDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="PluginManager">
-        <MSBuild Projects="TSTOPlugin\PluginManager\Source\PluginManager.dproj"/>
+        <MSBuild Projects="TSTOPlugin\PluginManager.dpk\Source\PluginManager.dproj"/>
     </Target>
     <Target Name="PluginManager:Clean">
-        <MSBuild Projects="TSTOPlugin\PluginManager\Source\PluginManager.dproj" Targets="Clean"/>
+        <MSBuild Projects="TSTOPlugin\PluginManager.dpk\Source\PluginManager.dproj" Targets="Clean"/>
     </Target>
     <Target Name="PluginManager:Make">
-        <MSBuild Projects="TSTOPlugin\PluginManager\Source\PluginManager.dproj" Targets="Make"/>
+        <MSBuild Projects="TSTOPlugin\PluginManager.dpk\Source\PluginManager.dproj" Targets="Make"/>
     </Target>
     <Target Name="TSTOPluginTester">
         <MSBuild Projects="TSTOPlugin\PluginTester\Sources\TSTOPluginTester.dproj"/>

@@ -12,7 +12,8 @@ Type
     ['{168D6848-663D-4EE2-9599-84B00AAC1ABC}']
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
 
-    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
+    Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
     Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
 
     Property WorkSpace  : ITSTOWorkSpaceProjectGroupIO Read GetWorkSpace;
@@ -30,6 +31,13 @@ Type
 
     Function  GetPluginKind() : TTSTOPluginKind;
 
+    Function  GetName() : String;
+    Function  GetAuthor() : String;
+    Function  GetCopyright() : String;
+    Function  GetDescription() : String;
+    Function  GetPluginId() : String;
+    Function  GetPluginVersion() : String;
+
     Procedure Initialize(AMainApplication : ITSTOApplication);
     Procedure Finalize();
 
@@ -43,8 +51,9 @@ Type
     Property Enabled     : Boolean         Read GetEnabled    Write SetEnabled;
     Property PluginKind  : TTSTOPluginKind Read GetPluginKind;
 
+    Property Name          : String Read GetName;
     Property Author        : String Read GetAuthor;
-    Property CopyRight     : String Read GetCopyRight;
+    Property Copyright     : String Read GetCopyright;
     Property Description   : String Read GetDescription;
     Property PluginId      : String Read GetPluginId;
     Property PluginVersion : String Read GetPluginVersion;
