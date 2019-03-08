@@ -55,8 +55,9 @@ type
 
   {$Region ' ITSTOApplication '}
   Private
-    Function UniqueComponentName(AComponentName : String) : String;
-    Function  InternalAddPluginItem(AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
+    Function  UniqueComponentName(AComponentName : String) : String;
+    Function  InternalAddPluginItem(Sender : TJvPlugin; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
+
     Procedure InternalRemovePluginItem(AGroup : TSpTBXTBGroupItem; AItemId : NativeInt);
 
   Protected
@@ -190,7 +191,7 @@ Begin
   End;
 End;
 
-Function TTSTOPluginManager.InternalAddPluginItem(AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
+Function TTSTOPluginManager.InternalAddPluginItem(Sender : TJvPlugin; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
 Var lCurItem : TTBCustomItem;
     X : Integer;
 Begin
@@ -218,7 +219,7 @@ Begin
       ImageIndex    := AItem.ImageIndex;
       OnClick       := AItem.OnClick;
       Caption       := AItem.Caption;
-      DropdownCombo := AItem.DropdownCombo;
+      DropdownCombo := TSpTBXSubmenuItem(AItem).DropdownCombo;
       Tag := Integer(AItem);
     
       If Assigned(AItem.LinkSubitems) Then
@@ -230,7 +231,7 @@ Begin
         If SameText(lCurItem[X].ClassName, 'TSpTBXSeparatorItem') Then
           Result.Add(TSpTBXSeparatorItem.Create(Self))
         Else
-          Result.Add(InternalAddPluginItem(lCurItem[X], ACommandPrefix));
+          Result.Add(InternalAddPluginItem(Sender, lCurItem[X], ACommandPrefix));
     End;   
   End
   Else If SameText(AItem.ClassName, 'TSpTBXTBGroupItem') Then
@@ -250,7 +251,7 @@ Begin
       If SameText(lCurItem[X].ClassName, 'TSpTBXSeparatorItem') Then
         Result.Add(TSpTBXSeparatorItem.Create(Self))
       Else
-        Result.Add(InternalAddPluginItem(lCurItem[X], ACommandPrefix));
+        Result.Add(InternalAddPluginItem(Sender, lCurItem[X], ACommandPrefix));
     End;
   End;
 End;
@@ -271,7 +272,7 @@ Begin
     iikMainMenu : lGroup := grpMnuPluginItems;
   End;
 
-  lGroup.Add(InternalAddPluginItem(AItem, ''));
+  lGroup.Add(InternalAddPluginItem(Sender, AItem, ''));
 End;
 
 Procedure TTSTOPluginManager.RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);    
