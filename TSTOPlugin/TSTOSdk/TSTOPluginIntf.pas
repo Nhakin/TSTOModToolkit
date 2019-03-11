@@ -2,7 +2,9 @@ unit TSTOPluginIntf;
 
 interface
 
-Uses Graphics, JvPlugin, TB2Item, HsInterfaceEx, TSTOProjectWorkSpace.IO;
+Uses
+  Graphics, JvPlugin, TB2Item, HsInterfaceEx,
+  TSTORgbProgress, TSTOProjectWorkSpace.IO, TSTOScriptTemplate.IO, TSTOHackMasterList.IO;
 
 Type
   TUIItemKind = (iikToolBar, iikMainMenu);
@@ -10,14 +12,22 @@ Type
   ITSTOApplication = Interface(IInterfaceEx)
     ['{168D6848-663D-4EE2-9599-84B00AAC1ABC}']
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function GetCurrentProject() : ITSTOWorkSpaceProjectIO;
+
     Function GetCurrentSkinName() : String;
     Function GetIcon() : TIcon;
-    
+
     Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
     Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
     Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
 
+    Function CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function CreateScriptTemplates() : ITSTOScriptTemplateHacksIO;
+    Function CreateHackMasterList() : ITSTOHackMasterListIO;
+    Function CreateRgbProgress() : IRgbProgress;
+
     Property WorkSpace       : ITSTOWorkSpaceProjectGroupIO Read GetWorkSpace;
+    Property CurrentProject  : ITSTOWorkSpaceProjectIO      Read GetCurrentProject;
     Property CurrentSkinName : String                       Read GetCurrentSkinName;
     Property Icon            : TIcon                        Read GetIcon;
     

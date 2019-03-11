@@ -37,7 +37,6 @@ requires
 
 contains
   ShareMem,
-  PlgTSTOPluginManagerOld in 'PlgTSTOPluginManagerOld.pas' {TSTOPluginManagerOld: TJvPlugIn},
   TSTOCustomPatches.IO in '..\..\TSTOSdk\TSTOCustomPatches.IO.pas',
   TSTOCustomPatchesIntf in '..\..\TSTOSdk\TSTOCustomPatchesIntf.pas',
   TSTOHackMasterList.IO in '..\..\TSTOSdk\TSTOHackMasterList.IO.pas',

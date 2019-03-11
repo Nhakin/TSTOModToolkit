@@ -3,7 +3,8 @@ unit TSTOPluginMainFrm;
 interface
 
 uses
-  TSTOPluginIntf, TSTOPluginManagerIntf, TSTOProjectWorkSpace.IO,
+  TSTOPluginIntf, TSTOPluginManagerIntf, TSTORGBProgress,
+  TSTOProjectWorkSpace.IO, TSTOHackMasterList.IO, TSTOScriptTemplate.IO,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, JvComponentBase, JvPlugin, StdCtrls, HsInterfaceEx,
   TB2Item, SpTBXItem, TB2Dock, TB2Toolbar,
@@ -66,8 +67,14 @@ type
 
   Protected
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function GetCurrentProject() : ITSTOWorkSpaceProjectIO; Virtual; Abstract;
     Function GetCurrentSkinName() : String;
     Function GetIcon() : TIcon;
+
+    Function CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO; Virtual; Abstract;
+    Function CreateScriptTemplates() : ITSTOScriptTemplateHacksIO; Virtual; Abstract;
+    Function CreateHackMasterList() : ITSTOHackMasterListIO; Virtual; Abstract;
+    Function CreateRgbProgress() : IRgbProgress; Virtual; Abstract;
 
     Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
     Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
