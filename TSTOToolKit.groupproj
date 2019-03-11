@@ -6,10 +6,13 @@
         <Projects Include="TSTOToolKit.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="TSTOPlugin\Source\PlgTSTOPluginDemo.dproj">
+        <Projects Include="TSTOPlugin\PluginDemo\Source\PluginDemo.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="TSTOPlugin\Source\TSTOPlugin.dproj">
+        <Projects Include="TSTOPlugin\PluginManager.dpk\Source\PluginManager.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="TSTOPlugin\PluginTester\Sources\TSTOPluginTester.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -29,32 +32,41 @@
     <Target Name="TSTOToolKit:Make">
         <MSBuild Projects="TSTOToolKit.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PlgTSTOPluginDemo">
-        <MSBuild Projects="TSTOPlugin\Source\PlgTSTOPluginDemo.dproj"/>
+    <Target Name="PluginDemo">
+        <MSBuild Projects="TSTOPlugin\PluginDemo\Source\PluginDemo.dproj"/>
     </Target>
-    <Target Name="PlgTSTOPluginDemo:Clean">
-        <MSBuild Projects="TSTOPlugin\Source\PlgTSTOPluginDemo.dproj" Targets="Clean"/>
+    <Target Name="PluginDemo:Clean">
+        <MSBuild Projects="TSTOPlugin\PluginDemo\Source\PluginDemo.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PlgTSTOPluginDemo:Make">
-        <MSBuild Projects="TSTOPlugin\Source\PlgTSTOPluginDemo.dproj" Targets="Make"/>
+    <Target Name="PluginDemo:Make">
+        <MSBuild Projects="TSTOPlugin\PluginDemo\Source\PluginDemo.dproj" Targets="Make"/>
     </Target>
-    <Target Name="TSTOPlugin">
-        <MSBuild Projects="TSTOPlugin\Source\TSTOPlugin.dproj"/>
+    <Target Name="PluginManager">
+        <MSBuild Projects="TSTOPlugin\PluginManager.dpk\Source\PluginManager.dproj"/>
     </Target>
-    <Target Name="TSTOPlugin:Clean">
-        <MSBuild Projects="TSTOPlugin\Source\TSTOPlugin.dproj" Targets="Clean"/>
+    <Target Name="PluginManager:Clean">
+        <MSBuild Projects="TSTOPlugin\PluginManager.dpk\Source\PluginManager.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="TSTOPlugin:Make">
-        <MSBuild Projects="TSTOPlugin\Source\TSTOPlugin.dproj" Targets="Make"/>
+    <Target Name="PluginManager:Make">
+        <MSBuild Projects="TSTOPlugin\PluginManager.dpk\Source\PluginManager.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="TSTOPluginTester">
+        <MSBuild Projects="TSTOPlugin\PluginTester\Sources\TSTOPluginTester.dproj"/>
+    </Target>
+    <Target Name="TSTOPluginTester:Clean">
+        <MSBuild Projects="TSTOPlugin\PluginTester\Sources\TSTOPluginTester.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TSTOPluginTester:Make">
+        <MSBuild Projects="TSTOPlugin\PluginTester\Sources\TSTOPluginTester.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="TSTOToolKit;PlgTSTOPluginDemo;TSTOPlugin"/>
+        <CallTarget Targets="TSTOToolKit;PluginDemo;PluginManager;TSTOPluginTester"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="TSTOToolKit:Clean;PlgTSTOPluginDemo:Clean;TSTOPlugin:Clean"/>
+        <CallTarget Targets="TSTOToolKit:Clean;PluginDemo:Clean;PluginManager:Clean;TSTOPluginTester:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="TSTOToolKit:Make;PlgTSTOPluginDemo:Make;TSTOPlugin:Make"/>
+        <CallTarget Targets="TSTOToolKit:Make;PluginDemo:Make;PluginManager:Make;TSTOPluginTester:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

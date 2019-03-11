@@ -4,8 +4,8 @@ Interface
 
 Uses
   Windows, Messages, SysUtils, Classes, Dialogs, Forms, Controls,
-  JvPlugin, HsInterfaceEx, TSTOPluginIntf, System.ImageList, Vcl.ImgList,
-  TB2Item, SpTBXItem;
+  JvPlugin, HsInterfaceEx, TSTOPluginIntf, 
+  TB2Item, SpTBXItem, ImgList;
 
 Type
   TTSTOPluginDemo = Class(TJvPlugIn, ITSTOPlugin)
@@ -41,10 +41,9 @@ Type
     FPluginFileName : String;
     FInitialized    : Boolean;
 
-    FPluginSettings : Record
-      Enabled    : Boolean;
-      PluginKind : TTSTOPluginKind;
-    End;
+    FEnabled          : Boolean;
+    FAddMenuItem      : Boolean;
+    FAddToolBarButton : Boolean;
 
     Function GetIntfImpl() : TInterfaceExImplementor;
 
@@ -58,10 +57,18 @@ Type
     Procedure SetEnabled(Const AEnabled : Boolean);
 
     Function  GetPluginKind() : TTSTOPluginKind;
-    Procedure SetPluginKind(Const ATSTOPluginKind : TTSTOPluginKind);
+
+    Function  GetName() : String;
+    Function  GetAuthor() : String;
+    Function  GetCopyright() : String;
+    Function  GetDescription() : String;
+    Function  GetPluginId() : String;
+    Function  GetPluginVersion() : String;
+    Function  GetHaveSettings() : Boolean;
 
     Procedure Initialize(AMainApplication : ITSTOApplication);
     Procedure Finalize();
+    Function  ShowSettings() : Boolean;
 
   Public
 
@@ -74,7 +81,7 @@ Implementation
 {$R *.dfm}
 
 Uses 
-  IniFiles;
+  IniFiles, PluginDemoSettingDlg;
 
 Function RegisterPlugin() : TTSTOPluginDemo;
 Begin
@@ -95,37 +102,79 @@ End;
 
 Function TTSTOPluginDemo.GetEnabled() : Boolean;
 Begin
-  Result := FPluginSettings.Enabled;
+  Result := FEnabled;
 End;
 
 Procedure TTSTOPluginDemo.SetEnabled(Const AEnabled : Boolean);
 Begin
-  FPluginSettings.Enabled := AEnabled;
+  FEnabled := AEnabled;
 End;
 
 Function TTSTOPluginDemo.GetPluginKind() : TTSTOPluginKind;
 Begin
-  Result := FPluginSettings.PluginKind;
+  Result := pkGUI;
 End;
 
-Procedure TTSTOPluginDemo.SetPluginKind(Const ATSTOPluginKind : TTSTOPluginKind);
+Function TTSTOPluginDemo.GetName() : String;
 Begin
-  FPluginSettings.PluginKind := ATSTOPluginKind;
+  Result := Self.Name;
+End;
+
+Function TTSTOPluginDemo.GetAuthor() : String;
+Begin
+  Result := Self.Author;
+End;
+
+Function TTSTOPluginDemo.GetCopyright() : String;
+Begin
+  Result := Self.Copyright;
+End;
+
+Function TTSTOPluginDemo.GetDescription() : String;
+Begin
+  Result := Self.Description;
+End;
+
+Function TTSTOPluginDemo.GetPluginId() : String;
+Begin
+  Result := Self.PluginID;
+End;
+
+Function TTSTOPluginDemo.GetPluginVersion() : String;
+Begin
+  Result := Self.PluginVersion;
+End;
+
+Function TTSTOPluginDemo.GetHaveSettings() : Boolean;
+Begin
+  Result := True;
 End;
 
 Procedure TTSTOPluginDemo.Initialize(AMainApplication: ITSTOApplication);
 Begin
-  FMainApp := AMainApplication;
+  If Not FInitialized Then
+  Begin
+    FMainApp := AMainApplication;
 
-  FMainApp.AddItem(iikToolBar, Self, SpTbxPluginDemo);
-  FMainApp.AddItem(iikToolBar, Self, SpTbxSubMenu);
-  FMainApp.AddItem(iikToolBar, Self, GrpPluginDemoItems);
+    If FEnabled Then
+    Begin
+      If FAddToolBarButton Then
+      Begin
+        FMainApp.AddItem(iikToolBar, Self, SpTbxPluginDemo);
+        FMainApp.AddItem(iikToolBar, Self, SpTbxSubMenu);
+        FMainApp.AddItem(iikToolBar, Self, GrpPluginDemoItems);
+      End;
 
-  FMainApp.AddItem(iikMainMenu, Self, SpTbxPluginDemo);
-  FMainApp.AddItem(iikMainMenu, Self, SpTbxSubMenu);
-  FMainApp.AddItem(iikMainMenu, Self, GrpPluginDemoItems);
+      If FAddMenuItem Then
+      Begin
+        FMainApp.AddItem(iikMainMenu, Self, SpTbxPluginDemo);
+        FMainApp.AddItem(iikMainMenu, Self, SpTbxSubMenu);
+        FMainApp.AddItem(iikMainMenu, Self, GrpPluginDemoItems);
+      End;
+    End;
 
-  FInitialized := True;
+    FInitialized := True;
+  End;
 End;
 
 Procedure TTSTOPluginDemo.Finalize();
@@ -144,13 +193,40 @@ Begin
   End;
 End;
 
+Function TTSTOPluginDemo.ShowSettings() : Boolean;
+Begin
+  Result := False;
+
+  With TDlgPluginDemoSetting.Create(Self) Do
+  Try
+    PluginEnabled    := FEnabled;
+    AddMenuItem      := FAddMenuItem;
+    AddToolBarButton := FAddToolBarButton;
+
+    If ShowModal() = mrOk Then
+    Begin
+      Result := (FEnabled <> PluginEnabled) Or
+                (FAddMenuItem <> AddMenuItem) Or
+                (FAddToolBarButton <> AddToolBarButton);
+
+      FEnabled          := PluginEnabled;
+      FAddMenuItem      := AddMenuItem;
+      FAddToolBarButton := AddToolBarButton;
+    End;
+      
+    Finally
+      Release();
+  End;
+End;
+
 procedure TTSTOPluginDemo.JvPlugInConfigure(Sender: TObject);
 Var lIni : TIniFile;
 begin
   lIni := TIniFile.Create(ChangeFileExt(FPluginFileName, '.cfg'));
   Try
-    FPluginSettings.Enabled := lIni.ReadBool(Self.Name, 'Enabled', True);
-    FPluginSettings.PluginKind := TTSTOPluginKind(lIni.ReadInteger(Self.Name, 'PluginKind', 1));
+    FEnabled          := lIni.ReadBool(Self.Name, 'Enabled', True);
+    FAddMenuItem      := lIni.ReadBool(Self.Name, 'AddMenuItem', True);
+    FAddToolBarButton := lIni.ReadBool(Self.Name, 'AddToolBarButton', True);
 
     Finally
       lIni.Free();
@@ -175,8 +251,9 @@ Begin
 
   lIni := TIniFile.Create(ChangeFileExt(FPluginFileName, '.cfg'));
   Try
-    lIni.WriteBool(Self.Name, 'Enabled', FPluginSettings.Enabled);
-    lIni.WriteInteger(Self.Name, 'PluginKind', Ord(FPluginSettings.PluginKind));
+    lIni.WriteBool(Self.Name, 'Enabled', FEnabled);
+    lIni.WriteBool(Self.Name, 'AddMenuItem', FAddMenuItem);
+    lIni.WriteBool(Self.Name, 'AddToolBarButton', FAddToolBarButton);
 
     Finally
       lIni.Free();

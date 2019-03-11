@@ -1,14 +1,17 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{A62B0428-5926-41EA-9B9A-D6AF996A1E0B}</ProjectGuid>
-        <MainSource>TSTOToolKit.dpr</MainSource>
-        <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
-        <TargetedPlatforms>1</TargetedPlatforms>
-        <AppType>Application</AppType>
+        <ProjectGuid>{8854ADF0-E6CD-4052-924B-BA848E899982}</ProjectGuid>
+        <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+        <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+        <DCC_DependencyCheckOutputName>..\Bin\Plugins\TSTOPluginDemo\PlgTSTOPluginDemo.dll</DCC_DependencyCheckOutputName>
+        <MainSource>PluginManager.dpr</MainSource>
         <FrameworkType>VCL</FrameworkType>
         <ProjectVersion>18.5</ProjectVersion>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Library</AppType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -28,6 +31,12 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Cfg_1)'=='true') or '$(Cfg_1_iOSDevice64)'!=''">
+        <Cfg_1_iOSDevice64>true</Cfg_1_iOSDevice64>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
         <Cfg_1_Win32>true</Cfg_1_Win32>
         <CfgParent>Cfg_1</CfgParent>
@@ -39,12 +48,6 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Cfg_2)'=='true') or '$(Cfg_2_iOSDevice64)'!=''">
-        <Cfg_2_iOSDevice64>true</Cfg_2_iOSDevice64>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
         <Cfg_2_Win32>true</Cfg_2_Win32>
         <CfgParent>Cfg_2</CfgParent>
@@ -52,19 +55,12 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_E>false</DCC_E>
-        <DCC_F>false</DCC_F>
-        <DCC_K>false</DCC_K>
-        <DCC_N>false</DCC_N>
-        <DCC_S>false</DCC_S>
-        <DCC_ImageBase>00400000</DCC_ImageBase>
-        <SanitizedProjectName>TSTOToolKit</SanitizedProjectName>
-        <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;$(DCC_Namespace)</DCC_Namespace>
+        <GenDll>true</GenDll>
+        <SanitizedProjectName>PluginManager</SanitizedProjectName>
         <VerInfo_Locale>3084</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=;CFBundleName=</VerInfo_Keys>
-        <DCC_UnitSearchPath>.\ThirdParty\Abbrevia 5.0\source;.\ThirdParty\AviWriter 2.1;.\ThirdParty\Graphics32 1.9.1;.\ThirdParty\KHexEditor 1.5\source;.\ThirdParty\LMD DockingPack 2014.3\Sources;.\ThirdParty\Oxml 1.9;.\ThirdParty\ScIntilla\DelphiSci 0.50\Source;.\ThirdParty\TBXToolBar\DcuD30;.\ThirdParty\VampyreImaging 0.77.2;.\ThirdParty\VampyreImaging 0.77.2\JpegLib;.\ThirdParty\VampyreImaging 0.77.2\ZLib;.\ThirdParty\VirtualTreeView 6.2\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <DCC_ExeOutput>..\Bin</DCC_ExeOutput>
-        <DCC_DcuOutput>..\Dcu</DCC_DcuOutput>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Winapi;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_ExeOutput>..\..\..\..\Bin\Plugins\TSTOPluginDemo</DCC_ExeOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
@@ -72,232 +68,109 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <Icon_MainIcon>TSTOToolKit_Icon.ico</Icon_MainIcon>
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
-        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <Debugger_HostApplication>Z:\Temp\TSTO\Sources\TSTOPlugin\Bin\TSTOPlugin.exe</Debugger_HostApplication>
+        <Manifest_File>(None)</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <Icon_MainIcon>TSTOToolKit_Icon6.ico</Icon_MainIcon>
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
-        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <Icon_MainIcon>PlgTSTOPluginDemo_Icon.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
-        <DCC_Define>RELEASE;DONT_LINK_TARGA;DONT_LINK_DDS;DONT_LINK_GIF;DONT_LINK_MNG;DONT_LINK_JNG;DONT_LINK_PNM;DONT_LINK_RADHDR;DONT_LINK_EXTRAS;VT60;MainApp;$(DCC_Define)</DCC_Define>
+        <Version>7.0</Version>
         <DCC_DebugInformation>0</DCC_DebugInformation>
-        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_DcuOutput>..\Dcu</DCC_DcuOutput>
+        <DCC_ObjOutput>..\Dcu</DCC_ObjOutput>
+        <DCC_HppOutput>..\Dcu</DCC_HppOutput>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.0.0.5;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
-        <VerInfo_MajorVer>2</VerInfo_MajorVer>
-        <VerInfo_Build>5</VerInfo_Build>
-        <DCC_IMPLICIT_STRING_CAST>false</DCC_IMPLICIT_STRING_CAST>
-        <DCC_IMPLICIT_STRING_CAST_LOSS>false</DCC_IMPLICIT_STRING_CAST_LOSS>
-        <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
-        <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2)'!=''">
-        <DCC_Define>DEBUG;DONT_LINK_TARGA;DONT_LINK_DDS;DONT_LINK_GIF;DONT_LINK_MNG;DONT_LINK_JNG;DONT_LINK_PNM;DONT_LINK_RADHDR;DONT_LINK_EXTRAS;VT60;MainApp;$(DCC_Define)</DCC_Define>
-        <DCC_Optimize>false</DCC_Optimize>
-        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_iOSDevice64)'!=''">
+    <PropertyGroup Condition="'$(Cfg_1_iOSDevice64)'!=''">
         <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <Debugger_HostApplication>..\Bin\TSTOPlugin.exe</Debugger_HostApplication>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_ExeOutput>..\..\..\..\Bin\Plugins\TSTOPluginDemo</DCC_ExeOutput>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <Version>7.0</Version>
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DcuOutput>..\Dcu</DCC_DcuOutput>
+        <DCC_ObjOutput>..\Dcu</DCC_ObjOutput>
+        <DCC_HppOutput>..\Dcu</DCC_HppOutput>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <DCC_ExeOutput>..\..\..\..\Bin\Plugins\TSTOPluginManager</DCC_ExeOutput>
+        <Debugger_HostApplication>..\..\..\..\Bin\TSTOPluginTester.exe</Debugger_HostApplication>
     </PropertyGroup>
-    <ItemGroup>
-        <DelphiCompile Include="$(MainSource)">
-            <MainSource>MainSource</MainSource>
-        </DelphiCompile>
-        <DCCReference Include="CustomPatchFrm.pas">
-            <Form>FrmCustomPatches</Form>
-        </DCCReference>
-        <DCCReference Include="dmImage.pas">
-            <Form>DataModuleImage</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="HackMasterListFrm.pas">
-            <Form>FrmHackMasterList</Form>
-        </DCCReference>
-        <DCCReference Include="HsUnits\HsAlarmEx.pas"/>
-        <DCCReference Include="HsUnits\HsBase64Ex.pas"/>
-        <DCCReference Include="HsUnits\HsBaseConvEx.pas"/>
-        <DCCReference Include="HsUnits\HsCheckSumEx.pas"/>
-        <DCCReference Include="HsUnits\HsClipBoardEx.pas"/>
-        <DCCReference Include="HsUnits\HsEncodingEx.pas"/>
-        <DCCReference Include="HsUnits\HsEventListEx.pas"/>
-        <DCCReference Include="HsUnits\HsFunctionsEx.pas"/>
-        <DCCReference Include="HsUnits\HsHttpEx.pas"/>
-        <DCCReference Include="HsUnits\HsInterfaceEx.pas"/>
-        <DCCReference Include="HsUnits\HsJSonEx.pas"/>
-        <DCCReference Include="HsUnits\HsJSonFormatterEx.pas"/>
-        <DCCReference Include="HsUnits\HsListEx.pas"/>
-        <DCCReference Include="HsUnits\HsStreamEx.pas"/>
-        <DCCReference Include="HsUnits\HsStringListEx.pas"/>
-        <DCCReference Include="HsUnits\HsSuperObjectEx.pas"/>
-        <DCCReference Include="HsUnits\HsXmlDocEx.pas"/>
-        <DCCReference Include="HsUnits\HsZipUtils.pas"/>
-        <DCCReference Include="Vampyre\ImagingRgb.pas"/>
-        <DCCReference Include="IntfReg.pas"/>
-        <DCCReference Include="MainDckFrm.pas">
-            <Form>FrmDckMain</Form>
-        </DCCReference>
-        <DCCReference Include="ProjectGroupSettingFrm.pas">
-            <Form>FrmProjectGroupSettings</Form>
-        </DCCReference>
-        <DCCReference Include="ProjectSettingFrm.pas">
-            <Form>FrmProjectSettings</Form>
-        </DCCReference>
-        <DCCReference Include="RemoveFileFromProjectFrm.pas">
-            <Form>FrmRemoveFileFromProject</Form>
-        </DCCReference>
-        <DCCReference Include="RgbExtractProgress.pas"/>
-        <DCCReference Include="SettingsFrm.pas">
-            <Form>FrmSettings</Form>
-        </DCCReference>
-        <DCCReference Include="SptbFrm.pas">
-            <Form>FrmSbtp</Form>
-        </DCCReference>
-        <DCCReference Include="SuperObject.pas"/>
-        <DCCReference Include="TSTOBCell.pas"/>
-        <DCCReference Include="BCellFile\IO\DataPlugin\TSTOBCell.Bin.pas"/>
-        <DCCReference Include="BCellFile\IO\TSTOBCell.IO.pas"/>
-        <DCCReference Include="BCellFile\IO\DataPlugin\TSTOBCell.Xml.pas"/>
-        <DCCReference Include="BCellFile\TSTOBCellImpl.pas"/>
-        <DCCReference Include="BCellFile\TSTOBCellIntf.pas"/>
-        <DCCReference Include="BsvFile\IO\DataPlugin\TSTOBsv.Bin.pas"/>
-        <DCCReference Include="BsvFile\IO\TSTOBsv.IO.pas"/>
-        <DCCReference Include="BsvFile\IO\DataPlugin\TSTOBsv.Xml.pas"/>
-        <DCCReference Include="BsvFile\TSTOBsvImpl.pas"/>
-        <DCCReference Include="BsvFile\TSTOBsvIntf.pas"/>
-        <DCCReference Include="BsvFile\TSTOBsvIntfReg.pas"/>
-        <DCCReference Include="CustomPatches\IO\TSTOCustomPatches.IO.pas"/>
-        <DCCReference Include="CustomPatches\IO\DataPlugin\TSTOCustomPatches.Xml.pas"/>
-        <DCCReference Include="CustomPatches\TSTOCustomPatchesImpl.pas"/>
-        <DCCReference Include="CustomPatches\TSTOCustomPatchesIntf.pas"/>
-        <DCCReference Include="CustomPatches\TSTOCustomPatchesIntfReg.pas"/>
-        <DCCReference Include="Xml\TSTODlcIndex.pas"/>
-        <DCCReference Include="TSTODownloader.pas"/>
-        <DCCReference Include="HackMasterList\IO\DataPlugin\TSTOHackMasterList.Bin.pas"/>
-        <DCCReference Include="HackMasterList\IO\TSTOHackMasterList.IO.pas"/>
-        <DCCReference Include="HackMasterList\IO\DataPlugin\TSTOHackMasterList.Xml.pas"/>
-        <DCCReference Include="HackMasterList\TSTOHackMasterListImpl.pas"/>
-        <DCCReference Include="HackMasterList\TSTOHackMasterListIntf.pas"/>
-        <DCCReference Include="TSTOHackSettings.pas"/>
-        <DCCReference Include="TSTOModToolKit.pas"/>
-        <DCCReference Include="TSTOPackageList.pas"/>
-        <DCCReference Include="TSTOPatches.pas"/>
-        <DCCReference Include="TSTOProject\IO\DataPlugin\TSTOProject.Bin.pas"/>
-        <DCCReference Include="TSTOProject\IO\DataPlugin\TSTOProject.Xml.pas"/>
-        <DCCReference Include="TSTOProject\TSTOProjectImpl.pas"/>
-        <DCCReference Include="TSTOProject\TSTOProjectIntf.pas"/>
-        <DCCReference Include="WorkSpace\IO\DataPlugin\TSTOProjectWorkSpace.Bin.pas"/>
-        <DCCReference Include="WorkSpace\IO\TSTOProjectWorkSpace.IO.pas"/>
-        <DCCReference Include="WorkSpace\TSTOProjectWorkSpace.Types.pas"/>
-        <DCCReference Include="WorkSpace\IO\DataPlugin\TSTOProjectWorkSpace.Xml.pas"/>
-        <DCCReference Include="WorkSpace\TSTOProjectWorkSpaceImpl.pas"/>
-        <DCCReference Include="WorkSpace\TSTOProjectWorkSpaceIntf.pas"/>
-        <DCCReference Include="WorkSpace\TSTOProjectWorkSpaceIntfReg.pas"/>
-        <DCCReference Include="TSTORessource.pas"/>
-        <DCCReference Include="TSTORgb.pas"/>
-        <DCCReference Include="TSTORgbTrans.pas"/>
-        <DCCReference Include="SbtpFile\IO\DataPlugin\TSTOSbtp.Bin.pas"/>
-        <DCCReference Include="SbtpFile\IO\TSTOSbtp.IO.pas"/>
-        <DCCReference Include="SbtpFile\IO\DataPlugin\TSTOSbtp.JSon.pas"/>
-        <DCCReference Include="SbtpFile\IO\DataPlugin\TSTOSbtp.Xml.pas"/>
-        <DCCReference Include="SbtpFile\IO\DataPlugin\TSTOSbtpEx.JSon.pas"/>
-        <DCCReference Include="SbtpFile\TSTOSbtpImpl.pas"/>
-        <DCCReference Include="SbtpFile\TSTOSbtpIntf.pas"/>
-        <DCCReference Include="SbtpFile\TSTOSbtpIntfReg.pas"/>
-        <DCCReference Include="SbtpFile\TSTOSbtpTypes.pas"/>
-        <DCCReference Include="ScriptTemplates\IO\DataPlugins\TSTOScriptTemplate.Bin.pas"/>
-        <DCCReference Include="ScriptTemplates\IO\TSTOScriptTemplate.IO.pas"/>
-        <DCCReference Include="ScriptTemplates\IO\DataPlugins\TSTOScriptTemplate.Xml.pas"/>
-        <DCCReference Include="ScriptTemplates\TSTOScriptTemplateImpl.pas"/>
-        <DCCReference Include="ScriptTemplates\TSTOScriptTemplateIntf.pas"/>
-        <DCCReference Include="ScriptTemplates\TSTOScriptTemplateIntfReg.pas"/>
-        <DCCReference Include="ScriptTemplates\TSTOScriptTemplateTypes.pas"/>
-        <DCCReference Include="Xml\TSTOStoreMenu.pas"/>
-        <DCCReference Include="Xml\TSTOStoreMenuMaster.pas"/>
-        <DCCReference Include="VirtualTree\TSTOTreeviews.pas"/>
-        <DCCReference Include="Xml\TSTOXmlBaseType.pas"/>
-        <DCCReference Include="ZeroFile\DataPlugin\TSTOZero.Bin.pas"/>
-        <DCCReference Include="ZeroFile\TSTOZeroImpl.pas"/>
-        <DCCReference Include="ZeroFile\TSTOZeroIntf.pas"/>
-        <DCCReference Include="VirtualTree\VTCombos.pas"/>
-        <DCCReference Include="VirtualTree\VTEditors.pas"/>
-        <DCCReference Include="TSTOPlugin\TSTOSdk\TSTOPluginIntf.pas"/>
-        <DCCReference Include="TSTOPlugin\PluginManager.dpk\Source\TSTOPluginManagerIntf.pas"/>
-        <DCCReference Include="AboutFrm.pas">
-            <Form>FrmAbout</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <BuildConfiguration Include="Debug">
-            <Key>Cfg_2</Key>
-            <CfgParent>Base</CfgParent>
-        </BuildConfiguration>
-        <BuildConfiguration Include="Base">
-            <Key>Base</Key>
-        </BuildConfiguration>
-        <BuildConfiguration Include="Release">
-            <Key>Cfg_1</Key>
-            <CfgParent>Base</CfgParent>
-        </BuildConfiguration>
-    </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Delphi.Personality.12</Borland.Personality>
         <Borland.ProjectType/>
         <BorlandProject>
             <Delphi.Personality>
-                <Source>
-                    <Source Name="MainSource">TSTOToolKit.dpr</Source>
-                </Source>
+                <Parameters>
+                    <Parameters Name="UseLauncher">False</Parameters>
+                    <Parameters Name="LoadAllSymbols">True</Parameters>
+                    <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+                    <Parameters Name="HostApplication">Z:\Temp\TSTO\Sources\TSTOPlugin\Bin\TSTOPlugin.exe</Parameters>
+                </Parameters>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+                    <VersionInfo Name="MajorVer">1</VersionInfo>
+                    <VersionInfo Name="MinorVer">0</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">0</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">3084</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName"/>
+                    <VersionInfoKeys Name="FileDescription"/>
+                    <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName"/>
+                    <VersionInfoKeys Name="LegalCopyright"/>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename"/>
+                    <VersionInfoKeys Name="ProductName"/>
+                    <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments"/>
+                </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Projects\JediCodeFormatXE10\Output\D12\JCFIdeXE10.bpl">File C:\Projects\JediCodeFormatXE10\Output\D12\JCFIdeXE10.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\DataExplorerDBXPluginEnt260.bpl">DBExpress Enterprise Data Explorer Integration</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
+                <Source>
+                    <Source Name="MainSource">PluginManager.dpr</Source>
+                </Source>
             </Delphi.Personality>
             <Platforms>
                 <Platform value="iOSDevice64">False</Platform>
                 <Platform value="Linux64">False</Platform>
+                <Platform value="OSX32">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="..\Bin\TSTOToolKit.exe" Configuration="Release" Class="ProjectOutput">
+                <DeployFile LocalName="..\..\..\..\Bin\Plugins\TSTOPluginDemo\PluginManager.dll" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>TSTOToolKit.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="..\Bin\TSTOToolKit.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>TSTOToolKit.exe</RemoteName>
+                        <RemoteName>PluginManager.dll</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                    </Platform>
                     <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="Win32">
@@ -423,7 +296,6 @@
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="Win32">
@@ -432,12 +304,10 @@
                 </DeployClass>
                 <DeployClass Name="DependencyFramework">
                     <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                         <Extensions>.framework</Extensions>
                     </Platform>
                     <Platform Name="OSX64">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                         <Extensions>.framework</Extensions>
                     </Platform>
@@ -446,25 +316,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="DependencyModule">
-                    <Platform Name="iOSDevice32">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="iOSDevice64">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
                     <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                         <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="OSX64">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                         <Extensions>.dylib</Extensions>
                     </Platform>
@@ -487,12 +343,10 @@
                         <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                         <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="OSX64">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                         <Extensions>.dylib</Extensions>
                     </Platform>
@@ -515,11 +369,9 @@
                         <Operation>0</Operation>
                     </Platform>
                     <Platform Name="OSX32">
-                        <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
                         <Operation>0</Operation>
                     </Platform>
                     <Platform Name="OSX64">
-                        <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
                         <Operation>0</Operation>
                     </Platform>
                     <Platform Name="Win32">
@@ -618,35 +470,9 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="ProjectiOSDeviceResourceRules">
-                    <Platform Name="iOSDevice32">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSDevice64">
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="ProjectiOSEntitlements">
-                    <Platform Name="iOSDevice32">
-                        <RemoteDir>..\</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSDevice64">
-                        <RemoteDir>..\</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="ProjectiOSInfoPList">
-                    <Platform Name="iOSDevice32">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSDevice64">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
+                <DeployClass Name="ProjectiOSEntitlements"/>
+                <DeployClass Name="ProjectiOSInfoPList"/>
                 <DeployClass Name="ProjectiOSResource">
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
@@ -658,32 +484,9 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="ProjectOSXDebug">
-                    <Platform Name="OSX64">
-                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="ProjectOSXEntitlements">
-                    <Platform Name="OSX32">
-                        <RemoteDir>..\</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="OSX64">
-                        <RemoteDir>..\</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="ProjectOSXInfoPList">
-                    <Platform Name="OSX32">
-                        <RemoteDir>Contents</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="OSX64">
-                        <RemoteDir>Contents</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
+                <DeployClass Name="ProjectOSXDebug"/>
+                <DeployClass Name="ProjectOSXEntitlements"/>
+                <DeployClass Name="ProjectOSXInfoPList"/>
                 <DeployClass Name="ProjectOSXResource">
                     <Platform Name="OSX32">
                         <RemoteDir>Contents\Resources</RemoteDir>
@@ -712,11 +515,9 @@
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="OSX64">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="Win32">
@@ -756,14 +557,58 @@
                 <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
-                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
-                <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="PlugInPluginManager.pas">
+            <Form>TSTOPluginManager</Form>
+            <DesignClass>TJvPlugIn</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\..\..\HsUnits\HsClipBoardEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsEncodingEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsEventListEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsFunctionsEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsInterfaceEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsListEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsStreamEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsStringListEx.pas"/>
+        <DCCReference Include="..\..\..\HsUnits\HsXmlDocEx.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTORGBProgress.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOCustomPatchesIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOHackMasterListIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOHackSettingsIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOProjectIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOSbtpIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOScriptTemplateIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOProjectWorkSpaceIntf.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOCustomPatches.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOHackMasterList.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOProjectWorkSpace.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOSbtp.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSDK\TSTOScriptTemplate.IO.pas"/>
+        <DCCReference Include="..\..\TSTOSdk\TSTOPluginIntf.pas"/>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
     <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
     <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
     <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
