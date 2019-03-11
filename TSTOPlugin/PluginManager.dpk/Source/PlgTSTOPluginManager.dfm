@@ -5,6 +5,7 @@ object TSTOPluginManager: TTSTOPluginManager
   Description = 'TSTO Plugin Manager'
   Copyright = 'Copyright '#169' 2003-2019 by HellSpawn; all rights reserved.'
   PluginID = 'HellSpawn.TSTOPluginManager.PluginManager'
+  PluginVersion = '1.0.0.1'
   Height = 150
   Width = 215
   object JvPluginManager1: TJvPluginManager

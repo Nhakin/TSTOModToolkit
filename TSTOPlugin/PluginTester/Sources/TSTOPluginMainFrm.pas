@@ -8,7 +8,7 @@ uses
   Dialogs, JvComponentBase, JvPlugin, StdCtrls, HsInterfaceEx,
   TB2Item, SpTBXItem, TB2Dock, TB2Toolbar,
   SpTBXControls, SpTBXExPanel, SpTBXEditors,
-  ImgList, System.ImageList;
+  ImgList, TntStdCtrls;
 
 type
   TTSTOPluginManager = class(TForm, ITSTOApplication)
@@ -67,6 +67,7 @@ type
   Protected
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
     Function GetCurrentSkinName() : String;
+    Function GetIcon() : TIcon;
 
     Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
     Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
@@ -134,6 +135,11 @@ Begin
   Result := SkinManager.CurrentSkinName;
 End;
 
+Function TTSTOPluginManager.GetIcon() : TIcon;
+Begin
+  Result := Application.Icon;
+End;
+
 procedure TTSTOPluginManager.cmdFinalizePluginClick(Sender: TObject);
 Var lPluginIntf : ITSTOPlugin;
     lPlugin     : TJvPlugin;
@@ -169,6 +175,7 @@ end;
 procedure TTSTOPluginManager.cmdLoadPluginsClick(Sender: TObject);
 Var lPath : String;
     lModule : HWnd;
+    X       : Integer;
     lCreatePM : Function(AHostApplication : TApplication; AApplication : ITSTOApplication) : ITSTOPluginManager;
 begin
   lPath := ExtractFilePath(ParamStr(0)) + 'Plugins\';
@@ -180,12 +187,11 @@ begin
       lCreatePM := GetProcAddress(lModule, 'CreatePluginManager');
       If Assigned(lCreatePM) Then
         FPluginM := lCreatePM(Application, Self);
+
+      For X := 0 To FPluginM.Plugins.Count - 1 Do
+        lbPlugins.AddItem(FPluginM.Plugins[X].Name, FPluginM.Plugins[X].InterfaceObject);
     End;
   End;
-(*
-  For X := 0 To JvPluginManager1.PluginCount - 1 Do
-    lbPlugins.AddItem(JvPluginManager1.Plugins[X].Name, JvPluginManager1.Plugins[X]);
-*)
 end;
 
 procedure TTSTOPluginManager.FormCreate(Sender: TObject);

@@ -2,7 +2,7 @@ unit TSTOPluginIntf;
 
 interface
 
-Uses JvPlugin, TB2Item, HsInterfaceEx, TSTOProjectWorkSpace.IO;
+Uses Graphics, JvPlugin, TB2Item, HsInterfaceEx, TSTOProjectWorkSpace.IO;
 
 Type
   TUIItemKind = (iikToolBar, iikMainMenu);
@@ -11,14 +11,16 @@ Type
     ['{168D6848-663D-4EE2-9599-84B00AAC1ABC}']
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
     Function GetCurrentSkinName() : String;
-
+    Function GetIcon() : TIcon;
+    
     Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
     Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
     Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
 
     Property WorkSpace       : ITSTOWorkSpaceProjectGroupIO Read GetWorkSpace;
     Property CurrentSkinName : String                       Read GetCurrentSkinName;
-
+    Property Icon            : TIcon                        Read GetIcon;
+    
   End;
 
   TTSTOPluginKind = (pkScript, pkPatches, pkGUI);
@@ -40,22 +42,31 @@ Type
     Function  GetPluginVersion() : String;
     Function  GetHaveSettings() : Boolean;
 
+    Function  GetMainApp() : ITSTOApplication;
+    Function  GetPluginPath() : String;
+    Function  GetPluginFileName() : String;
+
     Procedure Initialize(AMainApplication : ITSTOApplication);
     Procedure Finalize();
     Function  ShowSettings() : Boolean;
-
+    Function  Execute() : Integer;
+    
     Property Initialized : Boolean         Read GetInitialized;
     Property Enabled     : Boolean         Read GetEnabled    Write SetEnabled;
     Property PluginKind  : TTSTOPluginKind Read GetPluginKind;
 
-    Property Name          : String  Read GetName;
-    Property Author        : String  Read GetAuthor;
-    Property Copyright     : String  Read GetCopyright;
-    Property Description   : String  Read GetDescription;
-    Property PluginId      : String  Read GetPluginId;
-    Property PluginVersion : String  Read GetPluginVersion;
-    Property HaveSettings  : Boolean Read GetHaveSettings;
-    
+    Property Name            : String       Read GetName;
+    Property Author          : String       Read GetAuthor;
+    Property Copyright       : String       Read GetCopyright;
+    Property Description     : String       Read GetDescription;
+    Property PluginId        : String       Read GetPluginId;
+    Property PluginVersion   : String       Read GetPluginVersion;
+    Property HaveSettings    : Boolean      Read GetHaveSettings;
+
+    Property MainApp        : ITSTOApplication Read GetMainApp;
+    Property PluginPath     : String           Read GetPluginPath;
+    Property PluginFileName : String           Read GetPluginFileName;
+
   End;
 
   ITSTOPlugins = Interface(IInterfaceListEx)

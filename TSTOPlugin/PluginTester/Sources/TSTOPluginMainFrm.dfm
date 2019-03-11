@@ -2,7 +2,7 @@ object TSTOPluginManager: TTSTOPluginManager
   Left = 0
   Top = 0
   Caption = 'TSTOPlugin Test'
-  ClientHeight = 297
+  ClientHeight = 304
   ClientWidth = 391
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,16 +19,18 @@ object TSTOPluginManager: TTSTOPluginManager
     Left = 0
     Top = 51
     Width = 391
-    Height = 246
+    Height = 253
     Caption = 'SpTBXExPanel1'
     Align = alClient
     TabOrder = 1
     TBXStyleBackground = True
+    ExplicitHeight = 246
     object lbPlugins: TSpTBXListBox
       Left = 8
       Top = 8
       Width = 163
       Height = 204
+      ItemHeight = 16
       TabOrder = 3
     end
     object cmdLoadPlugins: TSpTBXButton
@@ -147,7 +149,7 @@ object TSTOPluginManager: TTSTOPluginManager
     Left = 224
     Top = 52
     Bitmap = {
-      494C010176007800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101760078000C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000E0010000010020000000000000E0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000948C8C005252520052525200525252005252

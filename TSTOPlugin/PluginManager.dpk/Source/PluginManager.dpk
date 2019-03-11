@@ -1,7 +1,6 @@
 package PluginManager;
 
 {$R *.res}
-{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
@@ -12,19 +11,17 @@ package PluginManager;
 {$LOCALSYMBOLS ON}
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
-{$OPTIMIZATION OFF}
+{$OPTIMIZATION ON}
 {$OVERFLOWCHECKS OFF}
 {$RANGECHECKS OFF}
 {$REFERENCEINFO ON}
 {$SAFEDIVIDE OFF}
-{$STACKFRAMES ON}
+{$STACKFRAMES OFF}
 {$TYPEDADDRESS OFF}
 {$VARSTRINGCHECKS ON}
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DEFINE DEBUG}
-{$ENDIF IMPLICITBUILDING}
 {$RUNONLY}
 {$IMPLICITBUILD ON}
 
@@ -40,7 +37,7 @@ requires
 
 contains
   ShareMem,
-  PlgTSTOPluginManager in 'PlgTSTOPluginManager.pas' {TSTOPluginManager: TJvPlugIn},
+  PlgTSTOPluginManagerOld in 'PlgTSTOPluginManagerOld.pas' {TSTOPluginManagerOld: TJvPlugIn},
   TSTOCustomPatches.IO in '..\..\TSTOSdk\TSTOCustomPatches.IO.pas',
   TSTOCustomPatchesIntf in '..\..\TSTOSdk\TSTOCustomPatchesIntf.pas',
   TSTOHackMasterList.IO in '..\..\TSTOSdk\TSTOHackMasterList.IO.pas',
@@ -65,6 +62,8 @@ contains
   HsFunctionsEx in '..\..\..\HsUnits\HsFunctionsEx.pas',
   HsEventListEx in '..\..\..\HsUnits\HsEventListEx.pas',
   HsEncodingEx in '..\..\..\HsUnits\HsEncodingEx.pas',
-  HsClipBoardEx in '..\..\..\HsUnits\HsClipBoardEx.pas';
+  HsClipBoardEx in '..\..\..\HsUnits\HsClipBoardEx.pas',
+  PlgTSTOCustomPlugin in '..\..\TSTOSdk\PlgTSTOCustomPlugin.pas' {TSTOCustomPlugin: TJvPlugIn},
+  PlgTSTOPluginManager in 'PlgTSTOPluginManager.pas' {TSTOPluginManager: TTSTOCustomPlugin};
 
 end.

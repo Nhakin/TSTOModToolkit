@@ -2,7 +2,6 @@ library PluginDemo;
 
 uses
   ShareMem,
-  PlugInTSTOPluginDemo in 'PlugInTSTOPluginDemo.pas' {TSTOPluginDemo: TJvPlugIn},
   HsClipBoardEx in '..\..\..\HsUnits\HsClipBoardEx.pas',
   HsEncodingEx in '..\..\..\HsUnits\HsEncodingEx.pas',
   HsEventListEx in '..\..\..\HsUnits\HsEventListEx.pas',
@@ -26,7 +25,9 @@ uses
   TSTOSbtp.IO in '..\..\TSTOSDK\TSTOSbtp.IO.pas',
   TSTOScriptTemplate.IO in '..\..\TSTOSDK\TSTOScriptTemplate.IO.pas',
   TSTOPluginIntf in '..\..\TSTOSdk\TSTOPluginIntf.pas',
-  PluginDemoSettingDlg in 'PluginDemoSettingDlg.pas' {DlgPluginDemoSetting};
+  DlgTSTOPluginDemoSettings in 'DlgTSTOPluginDemoSettings.pas' {TSTOPluginDemoSettingsDlg},
+  PlgTSTOCustomPlugin in '..\..\TSTOSdk\PlgTSTOCustomPlugin.pas' {TSTOCustomPlugin: TJvPlugIn},
+  PlgTSTOPluginDemo in 'PlgTSTOPluginDemo.pas' {TSTOPluginDemo: TTSTOCustomPlugin};
 
 {$R *.res}
 

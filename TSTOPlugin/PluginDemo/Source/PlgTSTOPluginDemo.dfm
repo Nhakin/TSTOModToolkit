@@ -1,14 +1,13 @@
 object TSTOPluginDemo: TTSTOPluginDemo
   OldCreateOrder = False
-  OnCreate = JvPlugInCreate
-  OnDestroy = JvPlugInDestroy
+  OnDestroy = TSTOPluginDemoDestroy
   Author = 'KahnAbyss'
   Commands = <>
   Description = 'TSTO Basic Plugin'
   Copyright = 'Copyright '#169' 2019 by KahnAbyss; all rights reserved.'
   PluginID = 'TSTOToolKit.PlgTSTOPluginDemo'
-  PluginVersion = '1.0.0.0'
-  OnConfigure = JvPlugInConfigure
+  PluginVersion = '1.0.0.1'
+  OnConfigure = TSTOPluginDemoConfigure
   Height = 150
   Width = 215
   object SpTBXBItemContainer1: TSpTBXBItemContainer
@@ -29,13 +28,11 @@ object TSTOPluginDemo: TTSTOPluginDemo
         Caption = 'Play'
         ImageIndex = 105
         Images = ilMain
-        OnClick = SpTbxPlayClick
       end
       object SpTbxStop: TSpTBXItem
         Caption = 'Stop'
         ImageIndex = 106
         Images = ilMain
-        OnClick = SpTbxStopClick
       end
       object SpTBXSeparatorItem1: TSpTBXSeparatorItem
       end
@@ -47,11 +44,13 @@ object TSTOPluginDemo: TTSTOPluginDemo
           Caption = 'Play Animation'
           ImageIndex = 82
           Images = ilMain
+          OnClick = SpTbxPlayAnimationClick
         end
         object SpTbxStopAnimation: TSpTBXItem
           Caption = 'Stop Animation'
           ImageIndex = 83
           Images = ilMain
+          OnClick = SpTbxStopAnimationClick
         end
         object SpTBXSeparatorItem2: TSpTBXSeparatorItem
         end
@@ -88,7 +87,7 @@ object TSTOPluginDemo: TTSTOPluginDemo
     Left = 63
     Top = 60
     Bitmap = {
-      494C0101760078000C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010176007800240010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000E0010000010020000000000000E0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000948C8C005252520052525200525252005252

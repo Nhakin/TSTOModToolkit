@@ -3,11 +3,12 @@ unit DlgTSTOPluginManager;
 interface
 
 uses
+  TSTOPluginIntf, TSTOPluginManagerIntf,
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
-  Controls, Forms, Dialogs, TB2Dock, TSTOPluginIntf,
+  Controls, Forms, Dialogs, TB2Dock,
   TB2Toolbar, SpTBXItem, TB2Item, SpTBXDkPanels, SpTBXControls, SpTBXExPanel,
   ImgList, JvPluginManager, VirtualTrees, SpTBXExControls, StdCtrls,
-  SpTBXEditors, System.ImageList;
+  SpTBXEditors;
 
 type
   TTSTOPluginManagerDlg = class(TForm)
@@ -42,27 +43,32 @@ type
       Node: PVirtualNode; Column: TColumnIndex);
     procedure CmdPluginSettingClick(Sender: TObject);
     procedure tvPluginsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
 
   private
-    FPluginManager : TJvPluginManager;
-    FMainApp       : ITSTOApplication;
-    FPlugins       : ITSTOPlugins;
-
+    FMainApp : ITSTOApplication;
+    FPlugins : ITSTOPlugins;
+    FManager : ITSTOPluginManager;
+    
     Function  GetPlugins() : ITSTOPlugins;
     Procedure SetPlugins(APlugins : ITSTOPlugins);
+
+    Procedure SetMainApp(AMainApp : ITSTOApplication);
 
     Procedure SetNodeData(ANode : PVirtualNode; ANodeData : IInterface);
     Function  GetNodeData(ANode : PVirtualNode; AId : TGUID; Var ANodeData) : Boolean; OverLoad;
     Function  GetNodeData(ANode : PVirtualNode; AId : TGUID) : Boolean; OverLoad;
 
   public
-    Property Plugins : ITSTOPlugins     Read GetPlugins Write SetPlugins;
-    Property MainApp : ITSTOApplication Read FMainApp   Write FMainApp;
-    
+    Property Plugins : ITSTOPlugins       Read GetPlugins Write SetPlugins;
+    Property MainApp : ITSTOApplication   Read FMainApp   Write SetMainApp;
+
   end;
 
 implementation
+
+Uses HsStreamEx;
 
 {$R *.dfm}
 
@@ -79,6 +85,15 @@ Begin
   lNodeData := tvPlugins.GetNodeData(ANode);
   Result := Assigned(lNodeData^) And Supports(IInterface(lNodeData^), AId, ANodeData);
 End;
+
+procedure TTSTOPluginManagerDlg.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  If Key = #27 Then
+  Begin
+    Key := #0;
+    Close();
+  End;
+end;
 
 Function TTSTOPluginManagerDlg.GetNodeData(ANode : PVirtualNode; AId : TGUID) : Boolean;
 Var lDummy : IInterface;
@@ -122,7 +137,7 @@ end;
 
 procedure TTSTOPluginManagerDlg.tvPluginsGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
-  var CellText: string);
+  var CellText: WideString);
 Var lNodeData : ITSTOPlugin;
 begin
   If GetNodeData(Node, ITSTOPlugin, lNodeData) Then
@@ -158,6 +173,25 @@ Begin
   End
   Else
     tvPlugins.RootNodeCount := 0;
+End;
+
+Procedure TTSTOPluginManagerDlg.SetMainApp(AMainApp : ITSTOApplication);
+Var lMemStrm : IMemoryStreamEx;
+Begin
+  FMainApp := AMainApp;
+
+  If Assigned(FMainApp) Then
+  Begin
+    lMemStrm := TMemoryStreamEx.Create();
+    Try
+      FMainApp.Icon.SaveToStream(TStream(lMemStrm.InterfaceObject));
+      lMemStrm.Position := 0;
+      Self.Icon.LoadFromStream(TStream(lMemStrm.InterfaceObject));
+
+      Finally
+        lMemStrm := Nil
+    End;
+  End;
 End;
 
 end.

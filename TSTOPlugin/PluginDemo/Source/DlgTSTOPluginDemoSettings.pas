@@ -1,13 +1,14 @@
-unit PluginDemoSettingDlg;
+unit DlgTSTOPluginDemoSettings;
 
 interface
 
 uses
+  TSTOPluginIntf,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, TB2Dock, TB2Toolbar, SpTBXItem, ImgList, TB2Item, StdCtrls;
 
 type
-  TDlgPluginDemoSetting = class(TForm)
+  TTSTOPluginDemoSettingsDlg = class(TForm)
     chkEnabled: TCheckBox;
     SpTBXBItemContainer1: TSpTBXBItemContainer;
     tbPopupMenuItems: TSpTBXSubmenuItem;
@@ -22,6 +23,10 @@ type
     procedure chkEnabledClick(Sender: TObject);
 
   Private
+    FMainApp : ITSTOApplication;
+
+    Procedure SetMainApp(AMainApp : ITSTOApplication);
+
     Function  GetPluginEnabled() : Boolean;
     Procedure SetPluginEnabled(Const APluginEnabled : Boolean);
 
@@ -32,6 +37,8 @@ type
     Procedure SetAddToolBarButton(Const AAddToolBarButton : Boolean);
 
   Public
+    Property MainApp          : ITSTOApplication Read FMainApp Write SetMainApp;
+
     Property PluginEnabled    : Boolean Read GetPluginEnabled    Write SetPluginEnabled;
     Property AddMenuItem      : Boolean Read GetAddMenuItem      Write SetAddMenuItem;
     Property AddToolBarButton : Boolean Read GetAddToolBarButton Write SetAddToolBarButton;
@@ -40,45 +47,69 @@ type
 
 implementation
 
+Uses HsStreamEx;
+
 {$R *.dfm}
 
-procedure TDlgPluginDemoSetting.tbSavePluginsClick(Sender: TObject);
+procedure TTSTOPluginDemoSettingsDlg.tbSavePluginsClick(Sender: TObject);
 begin
   ModalResult := mrOk;
 end;
 
-Function TDlgPluginDemoSetting.GetPluginEnabled() : Boolean;
+Procedure TTSTOPluginDemoSettingsDlg.SetMainApp(AMainApp : ITSTOApplication);
+Var lMemStrm : IMemoryStreamEx;
+Begin
+  FMainApp := AMainApp;
+
+  If Assigned(FMainApp) Then
+  Begin
+    lMemStrm := TMemoryStreamEx.Create();
+    Try
+      FMainApp.Icon.SaveToStream(TStream(lMemStrm.InterfaceObject));
+      lMemStrm.Position := 0;
+      Icon.LoadFromStream(TStream(lMemStrm.InterfaceObject));
+      
+      Finally
+        lMemStrm := Nil;
+    End;
+  End;
+End;
+
+Function TTSTOPluginDemoSettingsDlg.GetPluginEnabled() : Boolean;
 Begin
   Result := chkEnabled.Checked;
 End;
 
-Procedure TDlgPluginDemoSetting.SetPluginEnabled(Const APluginEnabled : Boolean);
+Procedure TTSTOPluginDemoSettingsDlg.SetPluginEnabled(Const APluginEnabled : Boolean);
 Begin
   chkEnabled.Checked := APluginEnabled;
+
+  chkAddMenuItem.Enabled      := APluginEnabled;
+  chkAddToolBarButton.Enabled := APluginEnabled;
 End;
 
-procedure TDlgPluginDemoSetting.chkEnabledClick(Sender: TObject);
+procedure TTSTOPluginDemoSettingsDlg.chkEnabledClick(Sender: TObject);
 begin
   chkAddMenuItem.Enabled      := chkEnabled.Checked;
   chkAddToolBarButton.Enabled := chkEnabled.Checked;
 end;
 
-Function TDlgPluginDemoSetting.GetAddMenuItem() : Boolean;
+Function TTSTOPluginDemoSettingsDlg.GetAddMenuItem() : Boolean;
 Begin
   Result := chkAddMenuItem.Checked;
 End;
 
-Procedure TDlgPluginDemoSetting.SetAddMenuItem(Const AAddMenuItem : Boolean);
+Procedure TTSTOPluginDemoSettingsDlg.SetAddMenuItem(Const AAddMenuItem : Boolean);
 Begin
   chkAddMenuItem.Checked := AAddMenuItem;
 End;
 
-Function TDlgPluginDemoSetting.GetAddToolBarButton() : Boolean;
+Function TTSTOPluginDemoSettingsDlg.GetAddToolBarButton() : Boolean;
 Begin
   Result := chkAddToolBarButton.Checked;
 End;
 
-Procedure TDlgPluginDemoSetting.SetAddToolBarButton(Const AAddToolBarButton : Boolean);
+Procedure TTSTOPluginDemoSettingsDlg.SetAddToolBarButton(Const AAddToolBarButton : Boolean);
 Begin
   chkAddToolBarButton.Checked := AAddToolBarButton;
 End;

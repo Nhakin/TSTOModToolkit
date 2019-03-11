@@ -3,13 +3,13 @@ unit PlgTSTOPluginManager;
 interface
 
 uses
-  HsInterfaceEx, TSTOPluginIntf, TSTOPluginManagerIntf, TSTOCustomPatches.IO, TSTOScriptTemplate.IO,
-  Windows, Messages, SysUtils, Classes, Dialogs, Forms, Controls,
-  JvPlugin, JvComponentBase, JvPluginManager,
-  SpTBXItem, TB2Item, SpTBXSkins, SpTBXAdditionalSkins;
+  TSTOPluginIntf, TSTOPluginManagerIntf, TSTOCustomPatches.IO, TSTOScriptTemplate.IO,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, PlgTSTOCustomPlugin, SpTBXItem, TB2Item, JvComponentBase,
+  JvPluginManager;
 
 type
-  TTSTOPluginManager = class(TJvPlugIn, ITSTOPlugin, ITSTOPluginManager)
+  TTSTOPluginManager = class(TTSTOCustomPlugin, ITSTOPluginManager)
     JvPluginManager1: TJvPluginManager;
     SpTBXBItemContainer1: TSpTBXBItemContainer;
     grpPluginManagerMenuItem: TSpTBXTBGroupItem;
@@ -17,50 +17,27 @@ type
     mnuPluginManager: TSpTBXItem;
 
     procedure mnuPluginManagerClick(Sender: TObject);
-
+        
   Private
-    FIntfImpl    : TInterfaceExImplementor;
-    FMainApp     : ITSTOApplication;
-    FInitialized : Boolean;
-    FPluginList  : ITSTOPlugins;
-    FPlgPatches  : ITSTOPlugins;
-    FPlgScripts  : ITSTOPlugins;
-    
-    Function GetIntfImpl() : TInterfaceExImplementor;
-
-  Protected
-    Property IntfImpl: TInterfaceExImplementor Read GetIntfImpl Implements ITSTOPlugin, ITSTOPluginManager;
-
-    Function  GetInitialized() : Boolean;
-
-    Function  GetEnabled() : Boolean;
-    Procedure SetEnabled(Const AEnabled : Boolean);
-
-    Function  GetPluginKind() : TTSTOPluginKind;
-
-    Function  GetName() : String;
-    Function  GetAuthor() : String;
-    Function  GetCopyright() : String;
-    Function  GetDescription() : String;
-    Function  GetPluginId() : String;
-    Function  GetPluginVersion() : String;
-    Function  GetHaveSettings() : Boolean;
-
-    Procedure Initialize(AMainApplication : ITSTOApplication); ReIntroduce;
-    Procedure Finalize();
-    Function  ShowSettings() : Boolean;
-
-    Function  GetPlugins() : ITSTOPlugins;
-    Function  GetCustomPatchesPlugins() : ITSTOCustomPatchesIO;
-    Function  GetScriptsTemplatePlugins() : ITSTOScriptTemplateHacksIO;
-
+    FPluginList : ITSTOPlugins;
+    FPlgPatches : ITSTOPlugins;
+    FPlgScripts : ITSTOPlugins;
+  
     Procedure RefreshPluginList();
 
-  Public
+  Protected
+    Procedure Initialize(AMainApplication : ITSTOApplication); OverRide;
+    Procedure Finalize(); OverRide;
+
+    Function GetPlugins() : ITSTOPlugins;
+    Function GetCustomPatchesPlugins() : ITSTOCustomPatchesIO;
+    Function GetScriptsTemplatePlugins() : ITSTOScriptTemplateHacksIO;
+
+  public
     Procedure AfterConstruction(); OverRide;
     Procedure BeforeDestruction(); OverRide;
 
-  End;
+  end;
 
 Function CreatePluginManager(AHostApplication : TApplication; AApplication : ITSTOApplication) : ITSTOPluginManager;
 
@@ -70,8 +47,8 @@ Exports
 implementation
 
 Uses
-  DlgTSTOPluginManager;
-
+  JvPlugin, SpTbxSkins, DlgTSTOPluginManager;
+  
 {$R *.dfm}
 
 Function CreatePluginManager(AHostApplication : TApplication; AApplication : ITSTOApplication) : ITSTOPluginManager;
@@ -96,13 +73,6 @@ Begin
   Finalize();
 
   InHerited BeforeDestruction();
-End;
-
-Function TTSTOPluginManager.GetIntfImpl() : TInterfaceExImplementor;
-Begin
-  If Not Assigned(FIntfImpl) Then
-    FIntfImpl := TInterfaceExImplementor.Create(Self, False);
-  Result := FIntfImpl;
 End;
 
 Procedure TTSTOPluginManager.RefreshPluginList();
@@ -145,50 +115,31 @@ Var lMnu    : TComponent;
     X       : Integer;
     lGroup  : TSpTBXTBGroupItem;
 Begin
-  If Not FInitialized Then
+  InHerited Initialize(AMainApplication);
+  
+  If Initialized Then
   Begin
-    FMainApp := AMainApplication;
     FPluginList := TTSTOPlugins.CreatePluginList();
 
     For X := 0 To JvPluginManager1.PluginCount - 1 Do
       If JvPluginManager1.Plugins[X].GetInterface(ITSTOPlugin, lPlugin) Then
       Begin
-        If lPlugin.Enabled Then
-          lPlugin.Initialize(FMainApp);
+        lPlugin.Initialize(MainApp);
         FPluginList.Add(lPlugin);
       End;
 
     lMnu := HostApplication.MainForm.FindComponent('mnuPlugins');
     If Assigned(lMnu) And SameText(lMnu.ClassName, 'TSpTBXSubmenuItem') Then
-      FMainApp.AddItem(Self, grpPluginManagerMenuItem, TTBCustomItem(lMnu));
+      MainApp.AddItem(Self, grpPluginManagerMenuItem, TTBCustomItem(lMnu));
 
-    SkinManager.SetSkin(FMainApp.CurrentSkinName);
-    FInitialized := True;
+    SkinManager.SetSkin(MainApp.CurrentSkinName);
   End;
 End;
 
-procedure TTSTOPluginManager.mnuPluginManagerClick(Sender: TObject);
-begin
-  With TTSTOPluginManagerDlg.Create(Self) Do
-  Try
-    Plugins := FPluginList;
-    MainApp := FMainApp;
-    
-    If ShowModal() = mrOk Then
-    Begin
-
-    End;
-
-    Finally
-      Release();
-  End;
-end;
-
 Procedure TTSTOPluginManager.Finalize();
 Begin
-  If FInitialized Then
+  If Initialized Then
   Begin
-    FMainApp := Nil;
     If Assigned(FPluginList) Then
     Begin
       FPluginList.Clear();
@@ -206,15 +157,27 @@ Begin
       FPlgScripts.Clear();
       FPlgScripts := Nil;
     End;
-
-    FInitialized := False;
   End;
+
+  InHerited Finalize();
 End;
 
-Function TTSTOPluginManager.ShowSettings() : Boolean;
-Begin
-  Result := False;
-End;
+procedure TTSTOPluginManager.mnuPluginManagerClick(Sender: TObject);
+begin
+  With TTSTOPluginManagerDlg.Create(Self) Do
+  Try
+    Plugins := FPluginList;
+    MainApp := Self.MainApp;
+    
+    If ShowModal() = mrOk Then
+    Begin
+
+    End;
+
+    Finally
+      Release();
+  End;
+end;
 
 Function TTSTOPluginManager.GetPlugins() : ITSTOPlugins;
 Begin
@@ -247,61 +210,6 @@ Begin
       FPlgScripts.Add(FPluginList[X]);
 
 //  Result := FPlgScripts;
-End;
-
-Function TTSTOPluginManager.GetInitialized() : Boolean;
-Begin
-  Result := FInitialized;
-End;
-
-Function TTSTOPluginManager.GetEnabled() : Boolean;
-Begin
-  Result := True;
-End;
-
-Procedure TTSTOPluginManager.SetEnabled(Const AEnabled : Boolean);
-Begin
-
-End;
-
-Function TTSTOPluginManager.GetPluginKind() : TTSTOPluginKind;
-Begin
-  Result := pkGUI;
-End;
-
-Function TTSTOPluginManager.GetName() : String;
-Begin
-  Result := Self.Name;
-End;
-
-Function TTSTOPluginManager.GetAuthor() : String;
-Begin
-  Result := Self.Author;
-End;
-
-Function TTSTOPluginManager.GetCopyright() : String;
-Begin
-  Result := Self.Copyright;
-End;
-
-Function TTSTOPluginManager.GetDescription() : String;
-Begin
-  Result := Self.Description;
-End;
-
-Function TTSTOPluginManager.GetPluginId() : String;
-Begin
-  Result := Self.PluginID;
-End;
-
-Function TTSTOPluginManager.GetPluginVersion() : String;
-Begin
-  Result := Self.PluginVersion;
-End;
-
-Function TTSTOPluginManager.GetHaveSettings() : Boolean;
-Begin
-  Result := False;
 End;
 
 end.
