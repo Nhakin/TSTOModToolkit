@@ -26,7 +26,8 @@ uses
   TSTOHackMasterList.IO in '..\..\TSTOSDK\TSTOHackMasterList.IO.pas',
   TSTOSbtp.IO in '..\..\TSTOSDK\TSTOSbtp.IO.pas',
   TSTOProjectWorkSpace.IO in '..\..\TSTOSDK\TSTOProjectWorkSpace.IO.pas',
-  TSTOPluginIntf in '..\..\TSTOSdk\TSTOPluginIntf.pas';
+  TSTOPluginIntf in '..\..\TSTOSdk\TSTOPluginIntf.pas',
+  TSTOPluginManagerIntf in '..\..\PluginManager.dpk\Source\TSTOPluginManagerIntf.pas';
 
 {$R *.res}
 

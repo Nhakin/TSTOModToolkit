@@ -55,17 +55,17 @@ type
     Function  GetScriptsTemplatePlugins() : ITSTOScriptTemplateHacksIO;
 
     Procedure RefreshPluginList();
-    
+
   Public
     Procedure AfterConstruction(); OverRide;
     Procedure BeforeDestruction(); OverRide;
 
   End;
 
-Function RegisterPlugin() : TJvPlugIn; StdCall;
+Function CreatePluginManager(AHostApplication : TApplication; AApplication : ITSTOApplication) : ITSTOPluginManager;
 
 Exports
-  RegisterPlugin;
+  CreatePluginManager;
 
 implementation
 
@@ -74,9 +74,14 @@ Uses
 
 {$R *.dfm}
 
-Function RegisterPlugin() : TJvPlugIn;
+Function CreatePluginManager(AHostApplication : TApplication; AApplication : ITSTOApplication) : ITSTOPluginManager;
+Var lPlug : TJvPlugIn;
 Begin
-  Result := TTSTOPluginManager.Create(nil);
+  lPlug := TTSTOPluginManager.Create(Nil);
+  lPlug.Configure();
+  lPlug.Initialize(Nil, AHostApplication, '');
+  If lPlug.GetInterface(ITSTOPluginManager, Result) Then
+    Result.Initialize(AApplication);
 End;
 
 Procedure TTSTOPluginManager.AfterConstruction();
@@ -139,7 +144,6 @@ Var lMnu    : TComponent;
     lPlugin : ITSTOPlugin;
     X       : Integer;
     lGroup  : TSpTBXTBGroupItem;
-    lItem   : TSpTbxItem;
 Begin
   If Not FInitialized Then
   Begin
@@ -209,7 +213,7 @@ End;
 
 Function TTSTOPluginManager.ShowSettings() : Boolean;
 Begin
-
+  Result := False;
 End;
 
 Function TTSTOPluginManager.GetPlugins() : ITSTOPlugins;

@@ -3,16 +3,15 @@ unit TSTOPluginMainFrm;
 interface
 
 uses
-  TSTOPluginIntf, TSTOProjectWorkSpace.IO,
+  TSTOPluginIntf, TSTOPluginManagerIntf, TSTOProjectWorkSpace.IO,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, JvComponentBase, JvPluginManager, JvPlugin, StdCtrls, HsInterfaceEx,
+  Dialogs, JvComponentBase, JvPlugin, StdCtrls, HsInterfaceEx,
   TB2Item, SpTBXItem, TB2Dock, TB2Toolbar,
   SpTBXControls, SpTBXExPanel, SpTBXEditors,
-  ImgList, TntStdCtrls;
+  ImgList, System.ImageList;
 
 type
   TTSTOPluginManager = class(TForm, ITSTOApplication)
-    JvPluginManager1: TJvPluginManager;
     SpTBXBItemContainer1: TSpTBXBItemContainer;
     SpTBXTestMnuItems: TSpTBXTBGroupItem;
     SpTBXItem2: TSpTBXItem;
@@ -50,7 +49,8 @@ type
 
   Private
     FWorkSpace : ITSTOWorkSpaceProjectGroupIO;
-    FIntfImpl : TInterfaceExImplementor;
+    FIntfImpl  : TInterfaceExImplementor;
+    FPluginM   : ITSTOPluginManager;
 
     Function GetIntfImpl() : TInterfaceExImplementor;
 
@@ -166,44 +166,25 @@ begin
 end;
 
 procedure TTSTOPluginManager.cmdLoadPluginsClick(Sender: TObject);
-  Procedure InternalListPlugins(AStartPath : String; ALvl : Integer);
-  Var lSr : TSearchRec;
-  Begin
-    If FindFirst(AStartPath + '*.*', faAnyFile, lSr) = 0 Then
-    Try
-      Repeat
-        If (lSr.Attr And faDirectory = faDirectory) And (lSr.Name <> '.') And (lSr.Name <> '..') And (ALvl < 1) Then
-          InternalListPlugins(AStartPath + lSr.Name + '\', ALvl + 1)
-        Else If SameText(ExtractFileExt(lSr.Name), '.dll') And (ALvl = 1) Then
-          JvPluginManager1.LoadPlugin(AStartPath + lSr.Name, plgDLL);{
-        Else If SameText(ExtractFileExt(lSr.Name), '.bpl') And (ALvl = 0) Then
-          JvPluginManager1.LoadPlugin(AStartPath + lSr.Name, plgPackage);}
-      Until FindNext(lSr) <> 0;
-
-      Finally
-        FindClose(lSr);
-    End;
-  End;
-
-Var X : Integer;
-    lPath : String;
-    lPlugin : ITSTOPlugin;
+Var lPath : String;
+    lModule : HWnd;
+    lCreatePM : Function(AHostApplication : TApplication; AApplication : ITSTOApplication) : ITSTOPluginManager;
 begin
   lPath := ExtractFilePath(ParamStr(0)) + 'Plugins\';
   If FileExists(lPath + 'PluginManager.bpl') Then
   Begin
-    JvPluginManager1.LoadPlugin(lPath + 'PluginManager.bpl', plgPackage);
-    If JvPluginManager1.Plugins[JvPluginManager1.PluginCount - 1].GetInterface(ITSTOPlugin, lPlugin) Then
+    lModule := LoadPackage(lPath + 'PluginManager.bpl');
+    If lModule <> 0 Then
     Begin
-      JvPluginManager1.Plugins[JvPluginManager1.PluginCount - 1].Configure;
-      lPlugin.Initialize(Self);
+      lCreatePM := GetProcAddress(lModule, 'CreatePluginManager');
+      If Assigned(lCreatePM) Then
+        FPluginM := lCreatePM(Application, Self);
     End;
-  End
-  Else
-    InternalListPlugins(lPath, 0);
-
+  End;
+(*
   For X := 0 To JvPluginManager1.PluginCount - 1 Do
     lbPlugins.AddItem(JvPluginManager1.Plugins[X].Name, JvPluginManager1.Plugins[X]);
+*)
 end;
 
 procedure TTSTOPluginManager.FormCreate(Sender: TObject);

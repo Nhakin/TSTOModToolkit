@@ -88,6 +88,12 @@ object FrmDckMain: TFrmDckMain
             OnClick = mnuDefaultLayoutClick
           end
         end
+        object mnuPlugins: TSpTBXSubmenuItem
+          Caption = 'Plugins'
+          object SpTBXTBGroupItem4: TSpTBXTBGroupItem
+            LinkSubitems = grpMnuPluginItems
+          end
+        end
         object mnuTools: TSpTBXSubmenuItem
           Caption = 'Tools'
           object mnuDownloadAllIndexes: TSpTBXItem
@@ -110,14 +116,22 @@ object FrmDckMain: TFrmDckMain
             LinkSubitems = tbMiscItems
           end
         end
-        object mnuPlugins: TSpTBXSubmenuItem
-          Caption = 'Plugins'
-          LinkSubitems = grpMnuPluginItems
-        end
         object mnuSkin: TSpTBXSubmenuItem
           Caption = 'Skin'
           Visible = False
           object SpTBXSkinGroupItem1: TSpTBXSkinGroupItem
+          end
+        end
+        object SpTBXSubmenuItem2: TSpTBXSubmenuItem
+          Caption = 'Help'
+          object mnuHelp: TSpTBXItem
+            Caption = 'Help'
+          end
+          object SpTBXSeparatorItem15: TSpTBXSeparatorItem
+          end
+          object mnuAbout: TSpTBXItem
+            Caption = 'About'
+            OnClick = mnuAboutClick
           end
         end
       end
@@ -181,7 +195,7 @@ object FrmDckMain: TFrmDckMain
       3C7A6F6E65206B696E643D2250414E454C222069643D2250616E46696C65496E
       666F222076697369626C653D2231222073697A653D2231323022206473697A65
       3D22302E313836333335343033373236373038222F3E0D0A090909093C7A6F6E
-      65206B696E643D225441425322206163746976657461623D2230222073697A65
+      65206B696E643D225441425322206163746976657461623D2234222073697A65
       3D2235323422206473697A653D22302E38313336363435393632373332393222
       20697373706163653D2231223E0D0A09090909093C7A6F6E65206B696E643D22
       50414E454C222069643D2250616E496E666F222076697369626C653D2231222F
@@ -1986,11 +2000,5 @@ object FrmDckMain: TFrmDckMain
       Caption = 'Delete'
       OnClick = popTvSTVariablesDeleteClick
     end
-  end
-  object JvPluginManager: TJvPluginManager
-    Extension = 'dll'
-    PluginKind = plgDLL
-    Left = 194
-    Top = 252
   end
 end

@@ -27,6 +27,8 @@ object FrmHackMasterList: TFrmHackMasterList
     Align = alLeft
     TabOrder = 1
     Borders = False
+    ExplicitLeft = 1
+    ExplicitTop = 32
   end
   object SpTBXSplitter1: TSpTBXSplitter
     Left = 201
@@ -647,7 +649,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Height = 28
           BiDiMode = bdLeftToRight
           ParentBiDiMode = False
-          TabOrder = 6
+          TabOrder = 5
           OnClick = chkItemAddInStoreClick
         end
         object SpTBXLabel8: TSpTBXLabel
@@ -665,7 +667,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Height = 28
           BiDiMode = bdLeftToRight
           ParentBiDiMode = False
-          TabOrder = 9
+          TabOrder = 8
           OnClick = chkItemOverRideClick
         end
         object EditItemName: TSpTBXEdit
@@ -673,7 +675,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Top = 38
           Width = 371
           Height = 21
-          TabOrder = 2
+          TabOrder = 1
           OnChange = EditItemNameChange
         end
         object EditItemId: TSpTBXEdit
@@ -713,7 +715,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Top = 65
           Width = 371
           Height = 21
-          TabOrder = 3
+          TabOrder = 2
           OnChange = EditItemTypeChange
         end
         object SpTBXLabel11: TSpTBXLabel
@@ -737,7 +739,7 @@ object FrmHackMasterList: TFrmHackMasterList
           Top = 92
           Width = 371
           Height = 21
-          TabOrder = 4
+          TabOrder = 3
           OnChange = EditItemSkinObjectChange
         end
         object SpTBXLabel13: TSpTBXLabel

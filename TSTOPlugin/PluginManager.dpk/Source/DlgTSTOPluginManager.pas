@@ -7,7 +7,7 @@ uses
   Controls, Forms, Dialogs, TB2Dock, TSTOPluginIntf,
   TB2Toolbar, SpTBXItem, TB2Item, SpTBXDkPanels, SpTBXControls, SpTBXExPanel,
   ImgList, JvPluginManager, VirtualTrees, SpTBXExControls, StdCtrls,
-  SpTBXEditors;
+  SpTBXEditors, System.ImageList;
 
 type
   TTSTOPluginManagerDlg = class(TForm)
@@ -38,11 +38,11 @@ type
     procedure tbSavePluginsClick(Sender: TObject);
     procedure tvPluginsInitNode(Sender: TBaseVirtualTree; ParentNode,
       Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure tvPluginsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvPluginsFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
     procedure CmdPluginSettingClick(Sender: TObject);
+    procedure tvPluginsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
 
   private
     FPluginManager : TJvPluginManager;
@@ -122,7 +122,7 @@ end;
 
 procedure TTSTOPluginManagerDlg.tvPluginsGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
-  var CellText: WideString);
+  var CellText: string);
 Var lNodeData : ITSTOPlugin;
 begin
   If GetNodeData(Node, ITSTOPlugin, lNodeData) Then

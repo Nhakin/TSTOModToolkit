@@ -6,15 +6,15 @@ uses
   dmImage, HsStreamEx, HsInterfaceEx, VTEditors,
   TSTOTreeviews, TSTOProject.Xml, TSTOBCell, TSTOProjectWorkSpace.IO,
   TSTOPackageList, TSTORessource, TSTOScriptTemplate.IO, TSTOHackMasterList.IO,
-  TSTOHackSettings, TSTOPluginIntf,
+  TSTOHackSettings, TSTOPluginIntf, TSTOPluginManagerIntf,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, ComCtrls, ToolWin, ActnList,
   StdCtrls, ExtCtrls, KControls, KHexEditor, VirtualTrees,
   LMDDckSite, LMDDckStyleElems, SciLanguageManager, SciScintillaBase,
   SciScintillaMemo, SciScintilla, SciScintillaNPP, SciActions, TB2Item, TB2Dock,
   TB2Toolbar, SpTBXItem, SpTBXSkins, SpTBXAdditionalSkins, SpTBXControls,
-  SpTBXEditors, Mask, System.Actions, SpTBXExPanel, SpTBXDkPanels, SpTBXTabs, ImagingRgb,
-  JvComponentBase, JvPluginManager, JvPlugin;
+  SpTBXEditors, Mask, System.Actions, SpTBXExPanel, SpTBXDkPanels, SpTBXTabs,
+  ImagingRgb, JvPlugin;
 
 Type
   TTSTOCurrentDataType = (dtUnknown, dtXml, dtZeroIndex, dtText, dtRbg, dtBCell, dtBsv3);
@@ -211,12 +211,16 @@ Type
     ScrlImage: TScrollBox;
     ImgResource: TImage;
     mnuHackMasterList: TSpTBXItem;
-    JvPluginManager: TJvPluginManager;
     tbPlugins: TSpTBXTBGroupItem;
     mnuPlugins: TSpTBXSubmenuItem;
     grpMnuPluginItems: TSpTBXTBGroupItem;
     grpTbPluginItems: TSpTBXTBGroupItem;
     SpTBXSeparatorItem14: TSpTBXSeparatorItem;
+    SpTBXTBGroupItem4: TSpTBXTBGroupItem;
+    SpTBXSubmenuItem2: TSpTBXSubmenuItem;
+    mnuAbout: TSpTBXItem;
+    mnuHelp: TSpTBXItem;
+    SpTBXSeparatorItem15: TSpTBXSeparatorItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -289,6 +293,7 @@ Type
     procedure popDiffHackMasterListClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure mnuHackMasterListClick(Sender: TObject);
+    procedure mnuAboutClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -358,6 +363,7 @@ Type
   {$Region ' ITSTOApplication '}
   Private
     FIntfImpl : TInterfaceExImplementor;
+    FPluginM  : ITSTOPluginManager;
 
     Function GetIntfImpl() : TInterfaceExImplementor;
 
@@ -369,9 +375,12 @@ Type
     Property IntfImpl: TInterfaceExImplementor Read GetIntfImpl Implements ITSTOApplication;
 
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function GetCurrentSkinName() : String;
 
-    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
     Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+
+    Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
   {$EndRegion}
   end;
 
@@ -389,7 +398,8 @@ Uses RTTI, RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
   TSTOCustomPatches.IO, TSTOHackMasterList.Xml, TSTOBsv.IO,
   TSTOZero.Bin, TSTOSbtp.IO, TSTOProjectWorkSpaceIntf,
   TSTOProjectWorkSpace.Xml, TSTOProjectWorkSpace.Types,
-  RemoveFileFromProjectFrm, ProjectSettingFrm, ProjectGroupSettingFrm, HackMasterListFrm;
+  RemoveFileFromProjectFrm, ProjectSettingFrm,
+  ProjectGroupSettingFrm, HackMasterListFrm, AboutFrm;
 
 {$R *.dfm}
 
@@ -759,8 +769,6 @@ begin
     FFormSettings.W := Width;
   End;
 
-  LoadPlugins();
-
   FLoaded := False;
   FFormPosLoaded := False;
 end;
@@ -829,6 +837,8 @@ begin
 
     FFormPosLoaded := True;
   End;
+
+  LoadPlugins();
 end;
 
 procedure TFrmDckMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -1075,6 +1085,18 @@ begin
           FTvWorkSpace.EndUpdate();
       End;
     End;
+end;
+
+procedure TFrmDckMain.mnuAboutClick(Sender: TObject);
+begin
+  With TFrmAbout.Create(Self) Do
+  Try
+    PluginList := FPluginM.Plugins;
+    ShowModal();
+
+    Finally
+      Release();
+  End;
 end;
 
 procedure TFrmDckMain.mnuCloseWorkspaceClick(Sender: TObject);
@@ -1512,37 +1534,21 @@ Begin
 End;
 
 Procedure TFrmDckMain.LoadPlugins();
-  Procedure InternalListPlugins(AStartPath : String; ALvl : Integer);
-  Var lSr : TSearchRec;
+Var lPath : String;
+    lModule : HWnd;
+    lCreatePM : Function(AHostApplication : TApplication; AApplication : ITSTOApplication) : ITSTOPluginManager;
+begin
+  lPath := ExtractFilePath(ParamStr(0)) + 'Plugins\';
+  If FileExists(lPath + 'PluginManager.bpl') Then
   Begin
-    If FindFirst(AStartPath + '*.*', faAnyFile, lSr) = 0 Then
-    Try
-      Repeat
-        If (lSr.Attr And faDirectory = faDirectory) And (lSr.Name <> '.') And (lSr.Name <> '..') And (ALvl < 1) Then
-          InternalListPlugins(AStartPath + lSr.Name + '\', ALvl + 1)
-        Else If SameText(ExtractFileExt(lSr.Name), '.dll') Then
-          JvPluginManager.LoadPlugin(AStartPath + lSr.Name, plgDLL);
-      Until FindNext(lSr) <> 0;
-
-      Finally
-        FindClose(lSr);
+    lModule := LoadPackage(lPath + 'PluginManager.bpl');
+    If lModule <> 0 Then
+    Begin
+      lCreatePM := GetProcAddress(lModule, 'CreatePluginManager');
+      If Assigned(lCreatePM) Then
+        FPluginM := lCreatePM(Application, Self);
     End;
   End;
-
-Var X : Integer;
-    lCurPlugin : ITSTOPlugin;
-begin
-  InternalListPlugins(ExtractFilePath(ParamStr(0)) + 'Plugins\', 0);
-
-  For X := JvPluginManager.PluginCount - 1 DownTo 0 Do
-    With JvPluginManager.Plugins[X] Do
-      If GetInterface(ITSTOPlugin, lCurPlugin) Then
-      Begin
-        Configure();
-
-        If lCurPlugin.Enabled And Not lCurPlugin.Initialized Then
-          lCurPlugin.Initialize(Self);
-      End;
 end;
 
 procedure TFrmDckMain.popTvWSApplyModClick(Sender: TObject);
@@ -3029,6 +3035,11 @@ Begin
   Result := FWorkSpace;
 End;
 
+Function TFrmDckMain.GetCurrentSkinName() : String;
+Begin
+  Result := SkinManager.CurrentSkinName;
+End;
+
 Function TFrmDckMain.UniqueComponentName(AComponentName : String) : String;
 Var lIdx : Integer;
 Begin
@@ -3137,6 +3148,11 @@ Begin
   End;
 
   InternalRemovePluginItem(lGroup, Integer(AItem));
+End;
+
+Procedure TFrmDckMain.AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem);
+Begin
+  ATrgItem.Add(InternalAddPluginItem(Sender, ASrcItem, ''));
 End;
 
 {
