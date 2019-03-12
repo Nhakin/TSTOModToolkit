@@ -26,7 +26,8 @@ uses
   HsStringListEx in '..\..\..\HsUnits\HsStringListEx.pas',
   HsXmlDocEx in '..\..\..\HsUnits\HsXmlDocEx.pas',
   PlgTSTOCustomPlugin in '..\..\TSTOSdk\PlgTSTOCustomPlugin.pas' {TSTOCustomPlugin: TJvPlugIn},
-  PlgCustomScriptAndPatches in 'PlgCustomScriptAndPatches.pas' {TSTOCustomScriptPlugin: TJvPlugIn};
+  PlgCustomScriptAndPatches in 'PlgCustomScriptAndPatches.pas' {TSTOCustomScriptPlugin: TTSTOCustomPlugin},
+  DlgCustomScriptAndPatches in 'DlgCustomScriptAndPatches.pas' {Form4};
 
 {$R *.res}
 
