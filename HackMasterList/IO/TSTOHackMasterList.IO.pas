@@ -3,7 +3,7 @@ unit TSTOHackMasterList.IO;
 interface
 
 Uses
-  Classes, HsInterfaceEx, HsStreamEx, RgbExtractProgress,
+  Classes, HsInterfaceEx, HsStreamEx, TSTORgbProgress,
   TSTOHackMasterListIntf, TSTOProject.Xml, TSTOScriptTemplateIntf;
 
 Type

@@ -1,4 +1,4 @@
-unit RgbExtractProgress;
+unit TSTORgbProgress;
 
 interface
 

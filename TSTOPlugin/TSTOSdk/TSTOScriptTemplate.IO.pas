@@ -20,7 +20,11 @@ Type
     Function  GetOnChanged() : TNotifyEvent;
     Procedure SetOnChanged(AOnChanged : TNotifyEvent);
 
-    Property OnChanged : TNotifyEvent Read GetOnChanged Write SetOnChanged;
+    Function  GetOnExecFunc() : TNotifyEvent;
+    Procedure SetOnExecFunc(AOnExeFunc : TNotifyEvent);
+
+    Property OnChanged  : TNotifyEvent Read GetOnChanged  Write SetOnChanged;
+    Property OnExecFunc : TNotifyEvent Read GetOnExecFunc Write SetOnExecFunc;
 
   End;
 

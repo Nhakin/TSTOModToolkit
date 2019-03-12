@@ -1,6 +1,8 @@
 package PluginManager;
 
 {$R *.res}
+{$R *.otares}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
@@ -22,6 +24,7 @@ package PluginManager;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
+{$ENDIF IMPLICITBUILDING}
 {$RUNONLY}
 {$IMPLICITBUILD ON}
 
@@ -63,6 +66,6 @@ contains
   HsEncodingEx in '..\..\..\HsUnits\HsEncodingEx.pas',
   HsClipBoardEx in '..\..\..\HsUnits\HsClipBoardEx.pas',
   PlgTSTOCustomPlugin in '..\..\TSTOSdk\PlgTSTOCustomPlugin.pas' {TSTOCustomPlugin: TJvPlugIn},
-  PlgTSTOPluginManager in 'PlgTSTOPluginManager.pas' {TSTOPluginManager: TTSTOCustomPlugin};
+  PlgTSTOPluginManager in 'PlgTSTOPluginManager.pas' {TSTOPluginManager: TJvPlugIn};
 
 end.

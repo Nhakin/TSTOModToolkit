@@ -25,8 +25,8 @@ uses
   HsStreamEx in '..\..\..\HsUnits\HsStreamEx.pas',
   HsStringListEx in '..\..\..\HsUnits\HsStringListEx.pas',
   HsXmlDocEx in '..\..\..\HsUnits\HsXmlDocEx.pas',
-  PlgCustomScriptAndPatches in 'PlgCustomScriptAndPatches.pas' {TSTOCustomScriptPlugin: TTSTOCustomPlugin},
-  PlgTSTOCustomPlugin in '..\..\TSTOSdk\PlgTSTOCustomPlugin.pas' {TSTOCustomPlugin: TJvPlugIn};
+  PlgTSTOCustomPlugin in '..\..\TSTOSdk\PlgTSTOCustomPlugin.pas' {TSTOCustomPlugin: TJvPlugIn},
+  PlgCustomScriptAndPatches in 'PlgCustomScriptAndPatches.pas' {TSTOCustomScriptPlugin: TJvPlugIn};
 
 {$R *.res}
 

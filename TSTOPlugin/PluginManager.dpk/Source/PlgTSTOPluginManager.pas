@@ -168,7 +168,7 @@ begin
   Try
     Plugins := FPluginList;
     MainApp := Self.MainApp;
-    
+
     If ShowModal() = mrOk Then
     Begin
 

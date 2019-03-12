@@ -30,7 +30,7 @@ uses
   ProjectGroupSettingFrm in 'ProjectGroupSettingFrm.pas' {FrmProjectGroupSettings},
   ProjectSettingFrm in 'ProjectSettingFrm.pas' {FrmProjectSettings},
   RemoveFileFromProjectFrm in 'RemoveFileFromProjectFrm.pas' {FrmRemoveFileFromProject},
-  RgbExtractProgress in 'RgbExtractProgress.pas',
+  TSTORgbProgress in 'TSTORgbProgress.pas',
   SettingsFrm in 'SettingsFrm.pas' {FrmSettings},
   SptbFrm in 'SptbFrm.pas' {FrmSbtp},
   SuperObject in 'SuperObject.pas',

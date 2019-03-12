@@ -133,7 +133,7 @@ Type
 
 implementation
 
-Uses Forms, Dialogs, RgbExtractProgress,
+Uses Forms, Dialogs, TSTORgbProgress,
   HsCheckSumEx, Imaging, ImagingTypes;
 
 Type

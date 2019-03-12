@@ -4,7 +4,7 @@ interface
 
 Uses Classes, HsInterfaceEx, HsXmlDocEx,
   TSTOProject.Xml, TSTOStoreMenuMaster, TSTOStoreMenu,
-  TSTOSbtp.IO, TSTOCustomPatches.IO, TSTOProjectWorkSpace.IO, RgbExtractProgress;
+  TSTOSbtp.IO, TSTOCustomPatches.IO, TSTOProjectWorkSpace.IO, TSTORgbProgress;
 
 Type
   TPatchType = ( tptCost, tptDynamicBuyInfo, tptDynamicSellInfo,

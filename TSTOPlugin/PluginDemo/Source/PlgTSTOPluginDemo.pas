@@ -5,7 +5,7 @@ interface
 uses
   TSTOPluginIntf,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, PlgTSTOCustomPlugin, ImgList, TB2Item, SpTBXItem;
+  Dialogs, PlgTSTOCustomPlugin, ImgList, TB2Item, SpTBXItem, System.ImageList;
 
 type
   TTSTOPluginDemo = class(TTSTOCustomPlugin)

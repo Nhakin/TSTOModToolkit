@@ -1,12 +1,9 @@
-object TSTOCustomScriptPlugin: TTSTOCustomScriptPlugin
-  OldCreateOrder = False
+inherited TSTOCustomScriptPlugin: TTSTOCustomScriptPlugin
+  OldCreateOrder = True
   Author = 'KahnAbyss'
-  Commands = <>
-  Description = 'Additionnal Patches for ToolKit'
+  Description = 'Add more ScriptTemplate functions'
   Copyright = 'Copyright '#169' 2019 by KahnAbyss; all rights reserved.'
-  PluginID = 'TSTOToolKit.PlgCustomScript'
-  PluginVersion = '1.0.0.1'
+  PluginID = 'HellSpawn.plgTSTOCustomScriptPlugin'
+  PluginVersion = 'V1.0.0.1'
   OnConfigure = TTSTOCustomScriptPluginConfigure
-  Height = 150
-  Width = 215
 end

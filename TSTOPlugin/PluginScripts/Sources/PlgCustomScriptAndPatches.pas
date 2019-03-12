@@ -68,20 +68,21 @@ Begin
       Begin
         Name := '%FreeLandUpgrade%';
         VarFunc := 'hmCustom';
-//        OnExecFunc := ExecuteFreeLandUpgrade;
+        OnExecFunc := ExecuteFreeLandUpgrade;
       End;
 
-      If FileExists(MainApp.CurrentProject.SrcPath + 'LandInfo.xml') Then
-      Begin
-        lStrStrm := TStringStreamEx.Create();
-        Try
-          lStrStrm.LoadFromFile(MainApp.CurrentProject.SrcPath + 'LandInfo.xml');
-          TemplateFile := lStrStrm.DataString;
+      If Assigned(MainApp.CurrentProject) Then
+        If FileExists(MainApp.CurrentProject.SrcPath + 'LandInfo.xml') Then
+        Begin
+          lStrStrm := TStringStreamEx.Create();
+          Try
+            lStrStrm.LoadFromFile(MainApp.CurrentProject.SrcPath + 'LandInfo.xml');
+            TemplateFile := lStrStrm.DataString;
 
-          Finally
-            lStrStrm := Nil;
+            Finally
+              lStrStrm := Nil;
+          End;
         End;
-      End;
 
       //FScript.GenenrateScript(MainApp.WorkSpace.HackSettings.HackMasterList);
     End;
@@ -106,7 +107,7 @@ End;
 Function TTSTOCustomScriptPlugin.Execute() : Integer;
 Begin
   Result := -1;
-  
+
 End;
 
 procedure TTSTOCustomScriptPlugin.TTSTOCustomScriptPluginConfigure(Sender: TObject);

@@ -9,6 +9,9 @@
         <Projects Include="TSTOPlugin\PluginDemo\Source\PluginDemo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="TSTOPlugin\PluginScripts\Sources\PluginCustomSciptAndPatches.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="TSTOPlugin\PluginManager.dpk\Source\PluginManager.dproj">
             <Dependencies/>
         </Projects>
@@ -41,6 +44,15 @@
     <Target Name="PluginDemo:Make">
         <MSBuild Projects="TSTOPlugin\PluginDemo\Source\PluginDemo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="PluginCustomSciptAndPatches">
+        <MSBuild Projects="TSTOPlugin\PluginScripts\Sources\PluginCustomSciptAndPatches.dproj"/>
+    </Target>
+    <Target Name="PluginCustomSciptAndPatches:Clean">
+        <MSBuild Projects="TSTOPlugin\PluginScripts\Sources\PluginCustomSciptAndPatches.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PluginCustomSciptAndPatches:Make">
+        <MSBuild Projects="TSTOPlugin\PluginScripts\Sources\PluginCustomSciptAndPatches.dproj" Targets="Make"/>
+    </Target>
     <Target Name="PluginManager">
         <MSBuild Projects="TSTOPlugin\PluginManager.dpk\Source\PluginManager.dproj"/>
     </Target>
@@ -60,13 +72,13 @@
         <MSBuild Projects="TSTOPlugin\PluginTester\Sources\TSTOPluginTester.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="TSTOToolKit;PluginDemo;PluginManager;TSTOPluginTester"/>
+        <CallTarget Targets="TSTOToolKit;PluginDemo;PluginCustomSciptAndPatches;PluginManager;TSTOPluginTester"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="TSTOToolKit:Clean;PluginDemo:Clean;PluginManager:Clean;TSTOPluginTester:Clean"/>
+        <CallTarget Targets="TSTOToolKit:Clean;PluginDemo:Clean;PluginCustomSciptAndPatches:Clean;PluginManager:Clean;TSTOPluginTester:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="TSTOToolKit:Make;PluginDemo:Make;PluginManager:Make;TSTOPluginTester:Make"/>
+        <CallTarget Targets="TSTOToolKit:Make;PluginDemo:Make;PluginCustomSciptAndPatches:Make;PluginManager:Make;TSTOPluginTester:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

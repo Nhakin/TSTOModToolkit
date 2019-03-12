@@ -1,18 +1,13 @@
-object TSTOPluginDemo: TTSTOPluginDemo
-  OldCreateOrder = False
+inherited TSTOPluginDemo: TTSTOPluginDemo
+  OldCreateOrder = True
   OnDestroy = TSTOPluginDemoDestroy
   Author = 'KahnAbyss'
-  Commands = <>
-  Description = 'TSTO Basic Plugin'
   Copyright = 'Copyright '#169' 2019 by KahnAbyss; all rights reserved.'
   PluginID = 'TSTOToolKit.PlgTSTOPluginDemo'
   PluginVersion = '1.0.0.1'
-  OnConfigure = TSTOPluginDemoConfigure
-  Height = 150
-  Width = 215
   object SpTBXBItemContainer1: TSpTBXBItemContainer
-    Left = 64
-    Top = 8
+    Left = 80
+    Top = 16
     object SpTbxPluginDemo: TSpTBXItem
       Caption = 'Plugin Demo'
       ImageIndex = 67
@@ -84,10 +79,10 @@ object TSTOPluginDemo: TTSTOPluginDemo
     end
   end
   object ilMain: TImageList
-    Left = 63
-    Top = 60
+    Left = 79
+    Top = 68
     Bitmap = {
-      494C010176007800240010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010176007800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000E0010000010020000000000000E0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000948C8C005252520052525200525252005252

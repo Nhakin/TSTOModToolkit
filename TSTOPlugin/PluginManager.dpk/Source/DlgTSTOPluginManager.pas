@@ -8,7 +8,7 @@ uses
   Controls, Forms, Dialogs, TB2Dock,
   TB2Toolbar, SpTBXItem, TB2Item, SpTBXDkPanels, SpTBXControls, SpTBXExPanel,
   ImgList, JvPluginManager, VirtualTrees, SpTBXExControls, StdCtrls,
-  SpTBXEditors;
+  SpTBXEditors, System.ImageList;
 
 type
   TTSTOPluginManagerDlg = class(TForm)
@@ -42,15 +42,15 @@ type
     procedure tvPluginsFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
     procedure CmdPluginSettingClick(Sender: TObject);
-    procedure tvPluginsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure tvPluginsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
 
   private
     FMainApp : ITSTOApplication;
     FPlugins : ITSTOPlugins;
     FManager : ITSTOPluginManager;
-    
+
     Function  GetPlugins() : ITSTOPlugins;
     Procedure SetPlugins(APlugins : ITSTOPlugins);
 
@@ -61,14 +61,14 @@ type
     Function  GetNodeData(ANode : PVirtualNode; AId : TGUID) : Boolean; OverLoad;
 
   public
-    Property Plugins : ITSTOPlugins       Read GetPlugins Write SetPlugins;
-    Property MainApp : ITSTOApplication   Read FMainApp   Write SetMainApp;
+    Property Plugins : ITSTOPlugins     Read GetPlugins Write SetPlugins;
+    Property MainApp : ITSTOApplication Read FMainApp   Write SetMainApp;
 
   end;
 
 implementation
 
-Uses HsStreamEx;
+Uses SpTbxSkins, HsStreamEx;
 
 {$R *.dfm}
 
@@ -137,13 +137,12 @@ end;
 
 procedure TTSTOPluginManagerDlg.tvPluginsGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
-  var CellText: WideString);
+  var CellText: string);
 Var lNodeData : ITSTOPlugin;
 begin
   If GetNodeData(Node, ITSTOPlugin, lNodeData) Then
     CellText := lNodeData.Name;
 end;
-
 procedure TTSTOPluginManagerDlg.tvPluginsInitNode(Sender: TBaseVirtualTree;
   ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
@@ -191,6 +190,8 @@ Begin
       Finally
         lMemStrm := Nil
     End;
+
+    SkinManager.SetSkin(FMainApp.CurrentSkinName);
   End;
 End;
 

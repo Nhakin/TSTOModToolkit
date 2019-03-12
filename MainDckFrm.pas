@@ -4,7 +4,7 @@ interface
 
 uses
   dmImage, HsStreamEx, HsInterfaceEx, VTEditors,
-  TSTOTreeviews, TSTOProject.Xml, TSTOBCell, TSTOProjectWorkSpace.IO,
+  TSTORgbProgress, TSTOTreeviews, TSTOProject.Xml, TSTOBCell, TSTOProjectWorkSpace.IO,
   TSTOPackageList, TSTORessource, TSTOScriptTemplate.IO, TSTOHackMasterList.IO,
   TSTOHackSettings, TSTOPluginIntf, TSTOPluginManagerIntf,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
@@ -375,13 +375,22 @@ Type
     Property IntfImpl: TInterfaceExImplementor Read GetIntfImpl Implements ITSTOApplication;
 
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function GetCurrentProject() : ITSTOWorkSpaceProjectIO;
+
     Function GetCurrentSkinName() : String;
+    Function GetIcon() : TIcon;
 
     Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
     Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
 
+    Function CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function CreateScriptTemplates() : ITSTOScriptTemplateHacksIO;
+    Function CreateHackMasterList() : ITSTOHackMasterListIO;
+    Function CreateRgbProgress() : IRgbProgress;
+
     Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
   {$EndRegion}
+
   end;
 
 var
@@ -393,7 +402,7 @@ Uses RTTI, RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
   Imaging, ImagingTypes, HsBase64Ex,
   HsJSonFormatterEx, HsXmlDocEx, HsZipUtils, HsFunctionsEx,
   HsCheckSumEx, HsStringListEx, SciSupport, System.Character,
-  SettingsFrm, CustomPatchFrm, SptbFrm, RgbExtractProgress, ImagingClasses,
+  SettingsFrm, CustomPatchFrm, SptbFrm, ImagingClasses,
   TSTORgb, TSTOModToolKit, TSTODownloader, TSTOFunctions,
   TSTOCustomPatches.IO, TSTOHackMasterList.Xml, TSTOBsv.IO,
   TSTOZero.Bin, TSTOSbtp.IO, TSTOProjectWorkSpaceIntf,
@@ -3035,9 +3044,25 @@ Begin
   Result := FWorkSpace;
 End;
 
+Function TFrmDckMain.GetCurrentProject() : ITSTOWorkSpaceProjectIO;
+Var lNode : PVirtualNode;
+Begin
+  lNode := FTvWorkSpace.GetFirstSelected();
+
+  If Assigned(lNode) Then
+    FTvWorkSpace.GetNodeData(lNode, ITSTOWorkSpaceProjectIO, Result)
+  Else
+    Result := Nil;
+End;
+
 Function TFrmDckMain.GetCurrentSkinName() : String;
 Begin
   Result := SkinManager.CurrentSkinName;
+End;
+
+Function TFrmDckMain.GetIcon() : TIcon;
+Begin
+  Result := Application.Icon;
 End;
 
 Function TFrmDckMain.UniqueComponentName(AComponentName : String) : String;
@@ -3153,6 +3178,26 @@ End;
 Procedure TFrmDckMain.AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem);
 Begin
   ATrgItem.Add(InternalAddPluginItem(Sender, ASrcItem, ''));
+End;
+
+Function TFrmDckMain.CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+Begin
+  Result := TTSTOWorkSpaceProjectGroupIO.CreateProjectGroup();
+End;
+
+Function TFrmDckMain.CreateScriptTemplates() : ITSTOScriptTemplateHacksIO;
+Begin
+  Result := TTSTOScriptTemplateHacksIO.CreateScriptTemplateHacks();
+End;
+
+Function TFrmDckMain.CreateHackMasterList() : ITSTOHackMasterListIO;
+Begin
+  Result := TTSTOHackMasterListIO.CreateHackMasterList();
+End;
+
+Function TFrmDckMain.CreateRgbProgress() : IRgbProgress;
+Begin
+  Result := TRgbProgress.CreateRgbProgress();
 End;
 
 {

@@ -88,12 +88,6 @@ object FrmDckMain: TFrmDckMain
             OnClick = mnuDefaultLayoutClick
           end
         end
-        object mnuPlugins: TSpTBXSubmenuItem
-          Caption = 'Plugins'
-          object SpTBXTBGroupItem4: TSpTBXTBGroupItem
-            LinkSubitems = grpMnuPluginItems
-          end
-        end
         object mnuTools: TSpTBXSubmenuItem
           Caption = 'Tools'
           object mnuDownloadAllIndexes: TSpTBXItem
@@ -114,6 +108,12 @@ object FrmDckMain: TFrmDckMain
           end
           object mnuToolMisc: TSpTBXTBGroupItem
             LinkSubitems = tbMiscItems
+          end
+        end
+        object mnuPlugins: TSpTBXSubmenuItem
+          Caption = 'Plugins'
+          object SpTBXTBGroupItem4: TSpTBXTBGroupItem
+            LinkSubitems = grpMnuPluginItems
           end
         end
         object mnuSkin: TSpTBXSubmenuItem

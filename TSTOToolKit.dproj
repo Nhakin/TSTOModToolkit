@@ -165,7 +165,7 @@
         <DCCReference Include="RemoveFileFromProjectFrm.pas">
             <Form>FrmRemoveFileFromProject</Form>
         </DCCReference>
-        <DCCReference Include="RgbExtractProgress.pas"/>
+        <DCCReference Include="TSTORgbProgress.pas"/>
         <DCCReference Include="SettingsFrm.pas">
             <Form>FrmSettings</Form>
         </DCCReference>
@@ -280,6 +280,12 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
+                <DeployFile LocalName="TSTOPlugin\PluginScripts\Sources\PluginCustomSciptAndPatches.dpr" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="..\Bin\TSTOToolKit.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>TSTOToolKit.exe</RemoteName>
