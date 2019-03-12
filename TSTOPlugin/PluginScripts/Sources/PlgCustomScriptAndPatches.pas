@@ -9,8 +9,6 @@ uses
 
 type
   TTSTOCustomScriptPlugin = class(TTSTOCustomPlugin)
-    procedure TTSTOCustomScriptPluginConfigure(Sender: TObject);
-
   Private
     FScriptTemplates : ITSTOScriptTemplateHacksIO;
 
@@ -33,7 +31,7 @@ Function RegisterPlugin() : TTSTOCustomScriptPlugin; StdCall;
 
 implementation
 
-Uses HsInterfaceEx, HsStreamEx, HsXmlDocEx;
+Uses SpTbxSkins, SpTbxAdditionalSkins, HsInterfaceEx, HsStreamEx, HsXmlDocEx;
 
 {$R *.dfm}
 
@@ -61,31 +59,34 @@ Begin
   Begin
     FScriptTemplates := MainApp.CreateScriptTemplates();
 
-    With FScriptTemplates.Add() Do
+    If Assigned(FScriptTemplates) Then
     Begin
-      Name := 'Free Land Upgrade';
-      With Variables.Add() Do
+      With FScriptTemplates.Add() Do
       Begin
-        Name := '%FreeLandUpgrade%';
-        VarFunc := 'hmCustom';
-        OnExecFunc := ExecuteFreeLandUpgrade;
-      End;
-
-      If Assigned(MainApp.CurrentProject) Then
-        If FileExists(MainApp.CurrentProject.SrcPath + 'LandInfo.xml') Then
+        Name := 'Free Land Upgrade';
+        With Variables.Add() Do
         Begin
-          lStrStrm := TStringStreamEx.Create();
-          Try
-            lStrStrm.LoadFromFile(MainApp.CurrentProject.SrcPath + 'LandInfo.xml');
-            TemplateFile := lStrStrm.DataString;
-
-            Finally
-              lStrStrm := Nil;
-          End;
+          Name := '%FreeLandUpgrade%';
+          VarFunc := 'hmCustom';
+          OnExecFunc := ExecuteFreeLandUpgrade;
         End;
 
-      //FScript.GenenrateScript(MainApp.WorkSpace.HackSettings.HackMasterList);
+        If Assigned(MainApp.CurrentProject) Then
+          If FileExists(MainApp.CurrentProject.SrcPath + 'LandInfo.xml') Then
+          Begin
+            lStrStrm := TStringStreamEx.Create();
+            Try
+              lStrStrm.LoadFromFile(MainApp.CurrentProject.SrcPath + 'LandInfo.xml');
+              TemplateFile := lStrStrm.DataString;
+
+              Finally
+                lStrStrm := Nil;
+            End;
+          End;
+      End;
     End;
+
+    SkinManager.SetSkin(MainApp.CurrentSkinName);
   End;
 End;
 
@@ -107,14 +108,7 @@ End;
 Function TTSTOCustomScriptPlugin.Execute() : Integer;
 Begin
   Result := -1;
-
 End;
-
-procedure TTSTOCustomScriptPlugin.TTSTOCustomScriptPluginConfigure(Sender: TObject);
-begin
-  inherited;
-  //
-end;
 
 Procedure TTSTOCustomScriptPlugin.ExecuteFreeLandUpgrade(Sender : TObject);
 Var lVariable : ITSTOScriptTemplateVariableIO;
@@ -123,7 +117,8 @@ Var lVariable : ITSTOScriptTemplateVariableIO;
     lStrs : TStringList;
     X, Y : Integer;
 Begin
-  If Supports(Sender, ITSTOScriptTemplateVariableIO, lVariable) Then
+  If Assigned(FScriptTemplates) And Assigned(MainApp.CurrentProject) And
+     Supports(Sender, ITSTOScriptTemplateVariableIO, lVariable) Then
   Begin
     lIdx := FScriptTemplates.IndexOf(lVariable As IInterfaceEx);
     If lIdx > -1 Then
@@ -168,7 +163,7 @@ Begin
             If Assigned(lNodes.First) And Assigned(lNodes.First.OwnerDocument) Then
               lStrs.Text := FormatXmlData(lNodes.First.OwnerDocument.Xml.Text);
 
-            lStrs.SaveToFile(ExtractFilePath(ExcludeTrailingBackSlash(MainApp.CurrentProject.SrcPath)) + '1.src\LandInfo.xml');
+            lStrs.SaveToFile(MainApp.CurrentProject.CustomModPath + 'LandInfo.xml');
 
             Finally
               lStrs.Free();

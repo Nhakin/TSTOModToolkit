@@ -2,9 +2,12 @@ inherited TSTOPluginDemo: TTSTOPluginDemo
   OldCreateOrder = True
   OnDestroy = TSTOPluginDemoDestroy
   Author = 'KahnAbyss'
+  Commands = <>
   Copyright = 'Copyright '#169' 2019 by KahnAbyss; all rights reserved.'
   PluginID = 'TSTOToolKit.PlgTSTOPluginDemo'
   PluginVersion = '1.0.0.1'
+  Height = 100
+  Width = 136
   object SpTBXBItemContainer1: TSpTBXBItemContainer
     Left = 80
     Top = 16
@@ -82,7 +85,7 @@ inherited TSTOPluginDemo: TTSTOPluginDemo
     Left = 79
     Top = 68
     Bitmap = {
-      494C010176007800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010176007800080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000E0010000010020000000000000E0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000948C8C005252520052525200525252005252

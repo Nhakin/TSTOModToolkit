@@ -47,7 +47,7 @@ Exports
 implementation
 
 Uses
-  JvPlugin, SpTbxSkins, DlgTSTOPluginManager;
+  JvPlugin, SpTbxSkins, SpTbxAdditionalSkins, DlgTSTOPluginManager;
   
 {$R *.dfm}
 
@@ -113,10 +113,9 @@ Procedure TTSTOPluginManager.Initialize(AMainApplication : ITSTOApplication);
 Var lMnu    : TComponent;
     lPlugin : ITSTOPlugin;
     X       : Integer;
-    lGroup  : TSpTBXTBGroupItem;
 Begin
   InHerited Initialize(AMainApplication);
-  
+
   If Initialized Then
   Begin
     FPluginList := TTSTOPlugins.CreatePluginList();

@@ -12,9 +12,11 @@ Type
   ITSTOApplication = Interface(IInterfaceEx)
     ['{168D6848-663D-4EE2-9599-84B00AAC1ABC}']
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+
     Function GetCurrentProject() : ITSTOWorkSpaceProjectIO;
 
     Function GetCurrentSkinName() : String;
+
     Function GetIcon() : TIcon;
 
     Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
@@ -30,7 +32,7 @@ Type
     Property CurrentProject  : ITSTOWorkSpaceProjectIO      Read GetCurrentProject;
     Property CurrentSkinName : String                       Read GetCurrentSkinName;
     Property Icon            : TIcon                        Read GetIcon;
-    
+
   End;
 
   TTSTOPluginKind = (pkScript, pkPatches, pkGUI);

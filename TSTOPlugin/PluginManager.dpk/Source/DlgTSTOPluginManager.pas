@@ -8,7 +8,7 @@ uses
   Controls, Forms, Dialogs, TB2Dock,
   TB2Toolbar, SpTBXItem, TB2Item, SpTBXDkPanels, SpTBXControls, SpTBXExPanel,
   ImgList, JvPluginManager, VirtualTrees, SpTBXExControls, StdCtrls,
-  SpTBXEditors, System.ImageList;
+  SpTBXEditors;
 
 type
   TTSTOPluginManagerDlg = class(TForm)
@@ -44,7 +44,7 @@ type
     procedure CmdPluginSettingClick(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure tvPluginsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
 
   private
     FMainApp : ITSTOApplication;
@@ -68,7 +68,7 @@ type
 
 implementation
 
-Uses SpTbxSkins, HsStreamEx;
+Uses HsStreamEx;
 
 {$R *.dfm}
 
@@ -137,12 +137,13 @@ end;
 
 procedure TTSTOPluginManagerDlg.tvPluginsGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
-  var CellText: string);
+  var CellText: WideString);
 Var lNodeData : ITSTOPlugin;
 begin
   If GetNodeData(Node, ITSTOPlugin, lNodeData) Then
     CellText := lNodeData.Name;
 end;
+
 procedure TTSTOPluginManagerDlg.tvPluginsInitNode(Sender: TBaseVirtualTree;
   ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
@@ -155,8 +156,6 @@ Begin
 End;
 
 Procedure TTSTOPluginManagerDlg.SetPlugins(APlugins : ITSTOPlugins);
-Var X : Integer;
-    lPlgIntf : ITSTOPlugin;
 Begin
   FPlugins := APlugins;
 
@@ -190,8 +189,6 @@ Begin
       Finally
         lMemStrm := Nil
     End;
-
-    SkinManager.SetSkin(FMainApp.CurrentSkinName);
   End;
 End;
 

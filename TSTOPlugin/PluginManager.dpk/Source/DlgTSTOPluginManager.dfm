@@ -56,7 +56,6 @@ object TSTOPluginManagerDlg: TTSTOPluginManagerDlg
       Top = 5
       Width = 151
       Height = 263
-      Version = '6.2.5.918'
       Align = alClient
       Header.AutoSizeIndex = 0
       Header.DefaultHeight = 17
@@ -65,7 +64,6 @@ object TSTOPluginManagerDlg: TTSTOPluginManagerDlg
       Header.Font.Height = -11
       Header.Font.Name = 'Tahoma'
       Header.Font.Style = []
-      Header.Height = 17
       Header.MainColumn = -1
       Header.Options = [hoColumnResize, hoDrag, hoOwnerDraw, hoShowSortGlyphs]
       NodeDataSize = 4
@@ -208,7 +206,7 @@ object TSTOPluginManagerDlg: TTSTOPluginManagerDlg
     Left = 26
     Top = 20
     Bitmap = {
-      494C010101007800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010101007800100010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

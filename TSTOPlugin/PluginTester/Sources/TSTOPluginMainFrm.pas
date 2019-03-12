@@ -9,7 +9,7 @@ uses
   Dialogs, JvComponentBase, JvPlugin, StdCtrls, HsInterfaceEx,
   TB2Item, SpTBXItem, TB2Dock, TB2Toolbar,
   SpTBXControls, SpTBXExPanel, SpTBXEditors,
-  ImgList, System.ImageList;
+  ImgList, TntStdCtrls;
 
 type
   TTSTOPluginManager = class(TForm, ITSTOApplication)
@@ -49,7 +49,6 @@ type
     procedure FormCreate(Sender: TObject);
 
   Private
-    FWorkSpace : ITSTOWorkSpaceProjectGroupIO;
     FIntfImpl  : TInterfaceExImplementor;
     FPluginM   : ITSTOPluginManager;
 
@@ -67,19 +66,18 @@ type
 
   Protected
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
-    Function GetCurrentProject() : ITSTOWorkSpaceProjectIO; Virtual; Abstract;
+    Function GetCurrentProject() : ITSTOWorkSpaceProjectIO;
     Function GetCurrentSkinName() : String;
     Function GetIcon() : TIcon;
 
-    Function CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO; Virtual; Abstract;
-    Function CreateScriptTemplates() : ITSTOScriptTemplateHacksIO; Virtual; Abstract;
-    Function CreateHackMasterList() : ITSTOHackMasterListIO; Virtual; Abstract;
-    Function CreateRgbProgress() : IRgbProgress; Virtual; Abstract;
-
     Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
+    Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
     Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
 
-    Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
+    Function CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function CreateScriptTemplates() : ITSTOScriptTemplateHacksIO;
+    Function CreateHackMasterList() : ITSTOHackMasterListIO;
+    Function CreateRgbProgress() : IRgbProgress;
 
   {$EndRegion}
 
@@ -134,7 +132,12 @@ end;
 
 Function TTSTOPluginManager.GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
 Begin
-  Result := FWorkSpace;
+  Result := Nil;
+End;
+
+Function TTSTOPluginManager.GetCurrentProject() : ITSTOWorkSpaceProjectIO;
+Begin
+  Result := Nil;
 End;
 
 Function TTSTOPluginManager.GetCurrentSkinName() : String;
@@ -319,6 +322,26 @@ End;
 Procedure TTSTOPluginManager.AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem);
 Begin
   ATrgItem.Add(InternalAddPluginItem(Sender, ASrcItem, ''));
+End;
+
+Function TTSTOPluginManager.CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+Begin
+  Result := Nil;
+End;
+
+Function TTSTOPluginManager.CreateScriptTemplates() : ITSTOScriptTemplateHacksIO;
+Begin
+  Result := Nil;
+End;
+
+Function TTSTOPluginManager.CreateHackMasterList() : ITSTOHackMasterListIO;
+Begin
+  Result := Nil;
+End;
+
+Function TTSTOPluginManager.CreateRgbProgress() : IRgbProgress;
+Begin
+  Result := Nil;
 End;
 
 end.
