@@ -1,11 +1,8 @@
-object TSTOPluginDemo: TTSTOPluginDemo
-  OldCreateOrder = False
+inherited TSTOPluginDemo: TTSTOPluginDemo
   OnDestroy = TSTOPluginDemoDestroy
-  Height = 130
-  Width = 137
   object SpTBXBItemContainer1: TSpTBXBItemContainer
-    Left = 48
-    Top = 16
+    Left = 83
+    Top = 23
     object SpTbxPluginDemo: TSpTBXItem
       Caption = 'Plugin Demo'
       ImageIndex = 67
@@ -77,10 +74,10 @@ object TSTOPluginDemo: TTSTOPluginDemo
     end
   end
   object ilMain: TImageList
-    Left = 47
-    Top = 68
+    Left = 82
+    Top = 75
     Bitmap = {
-      494C010176007800100010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010176007800500010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000E0010000010020000000000000E0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000948C8C005252520052525200525252005252

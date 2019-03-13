@@ -30,7 +30,7 @@ object TSTOPluginManager: TTSTOPluginManager
       Width = 163
       Height = 204
       ItemHeight = 16
-      TabOrder = 3
+      TabOrder = 1
     end
     object cmdLoadPlugins: TSpTBXButton
       Left = 8
@@ -40,24 +40,6 @@ object TSTOPluginManager: TTSTOPluginManager
       Caption = 'Load Plugins'
       TabOrder = 0
       OnClick = cmdLoadPluginsClick
-    end
-    object cmdInitPlugin: TSpTBXButton
-      Left = 89
-      Top = 221
-      Width = 75
-      Height = 25
-      Caption = 'Init Plugin'
-      TabOrder = 1
-      OnClick = cmdInitPluginClick
-    end
-    object cmdFinalizePlugin: TSpTBXButton
-      Left = 170
-      Top = 221
-      Width = 75
-      Height = 25
-      Caption = 'Finalize Plugin'
-      TabOrder = 2
-      OnClick = cmdFinalizePluginClick
     end
   end
   object SpTBXDock1: TSpTBXDock
@@ -148,7 +130,7 @@ object TSTOPluginManager: TTSTOPluginManager
     Left = 224
     Top = 52
     Bitmap = {
-      494C010176007800100010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101760078001C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000E0010000010020000000000000E0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000948C8C005252520052525200525252005252

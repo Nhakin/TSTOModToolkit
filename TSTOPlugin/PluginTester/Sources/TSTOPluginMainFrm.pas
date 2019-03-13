@@ -6,7 +6,7 @@ uses
   TSTOPluginIntf, TSTOPluginManagerIntf, TSTORGBProgress,
   TSTOProjectWorkSpace.IO, TSTOHackMasterList.IO, TSTOScriptTemplate.IO,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, JvComponentBase, JvPlugin, StdCtrls, HsInterfaceEx,
+  Dialogs, StdCtrls, HsInterfaceEx,
   TB2Item, SpTBXItem, TB2Dock, TB2Toolbar,
   SpTBXControls, SpTBXExPanel, SpTBXEditors,
   ImgList, TntStdCtrls;
@@ -36,16 +36,10 @@ type
     SpTBXTBGroupItem1: TSpTBXTBGroupItem;
     SpTBXExPanel1: TSpTBXExPanel;
     cmdLoadPlugins: TSpTBXButton;
-    cmdInitPlugin: TSpTBXButton;
-    cmdFinalizePlugin: TSpTBXButton;
     lbPlugins: TSpTBXListBox;
-
-    procedure lbPluginsClick(Sender: TObject);
     procedure SpTBXItem1Click(Sender: TObject);
     procedure SpTBXItem2Click(Sender: TObject);
     procedure cmdLoadPluginsClick(Sender: TObject);
-    procedure cmdInitPluginClick(Sender: TObject);
-    procedure cmdFinalizePluginClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
 
   Private
@@ -103,24 +97,6 @@ Begin
   Result := FIntfImpl;
 End;
 
-procedure TTSTOPluginManager.lbPluginsClick(Sender: TObject);
-Var lPluginIntf : ITSTOPlugin;
-    lPlugin     : TJvPlugin;
-begin
-  lPlugin := TJvPlugin(lbPlugins.Items.Objects[lbPlugins.ItemIndex]);
-  If lPlugin.GetInterface(ITSTOPlugin, lPluginIntf) Then
-  Begin
-    If lPluginIntf.Enabled Then
-    Begin
-      ShowMessage(lPlugin.Name + ' - ' + lPlugin.Copyright);
-    End;{
-    Else
-      JvPluginManager1.UnloadPlugin(ListBox1.ItemIndex);}
-  End
-  Else
-    ShowMessage('ITSTOPlugin not implemented');
-end;
-
 procedure TTSTOPluginManager.SpTBXItem1Click(Sender: TObject);
 begin
   Close();
@@ -155,38 +131,6 @@ Function TTSTOPluginManager.GetHost() : TApplication;
 Begin
   Result := Application;
 End;
-
-procedure TTSTOPluginManager.cmdFinalizePluginClick(Sender: TObject);
-Var lPluginIntf : ITSTOPlugin;
-    lPlugin     : TJvPlugin;
-begin
-  lPlugin := TJvPlugin(lbPlugins.Items.Objects[lbPlugins.ItemIndex]);
-  If lPlugin.GetInterface(ITSTOPlugin, lPluginIntf) Then
-    lPluginIntf.Finalize()
-  Else
-    ShowMessage('ITSTOPlugin not implemented');
-end;
-
-procedure TTSTOPluginManager.cmdInitPluginClick(Sender: TObject);
-Var lPluginIntf : ITSTOPlugin;
-    lPlugin     : TJvPlugin;
-begin
-  lPlugin := TJvPlugin(lbPlugins.Items.Objects[lbPlugins.ItemIndex]);
-  If lPlugin.GetInterface(ITSTOPlugin, lPluginIntf) Then
-  Begin
-    lPlugin.Configure();
-
-    If lPluginIntf.Enabled Then
-    Begin
-      If Not lPluginIntf.Initialized Then
-        lPluginIntf.Initialize(Self);
-    End;{
-    Else
-      JvPluginManager1.UnloadPlugin(ListBox1.ItemIndex);}
-  End
-  Else
-    ShowMessage('ITSTOPlugin not implemented');
-end;
 
 procedure TTSTOPluginManager.cmdLoadPluginsClick(Sender: TObject);
 Var lPath : String;

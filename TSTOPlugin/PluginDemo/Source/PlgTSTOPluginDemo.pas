@@ -57,7 +57,7 @@ type
 
   end;
 
-Function CreateTSTOPlugin(AApplication : ITSTOApplication) : ITSTOPlugin;
+Function CreateTSTOPlugin() : ITSTOPlugin;
 
 implementation
 
@@ -65,7 +65,7 @@ Uses IniFiles, DlgTSTOPluginDemoSettings;
 
 {$R *.dfm}
 
-Function CreateTSTOPlugin(AApplication : ITSTOApplication) : ITSTOPlugin;
+Function CreateTSTOPlugin() : ITSTOPlugin;
 Begin
   Result := TTSTOPluginDemo.Create(Nil);
 End;

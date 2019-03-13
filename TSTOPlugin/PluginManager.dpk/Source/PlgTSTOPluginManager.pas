@@ -80,7 +80,7 @@ End;
 Procedure TTSTOPluginManager.LoadPlugin(Const AFileName : String);
 Var lModule : HWnd;
     X       : Integer;
-    lCreatePlg : Function(AApplication : ITSTOApplication) : ITSTOPlugin;
+    lCreatePlg : Function() : ITSTOPlugin;
     lPlugin : ITSTOPlugin;
 Begin
   If FileExists(AFileName) Then
@@ -91,7 +91,7 @@ Begin
       lCreatePlg := GetProcAddress(lModule, 'CreateTSTOPlugin');
       If Assigned(lCreatePlg) Then
       Begin
-        lPlugin := lCreatePlg(MainApp);
+        lPlugin := lCreatePlg();
         lPlugin.Configure();
         lPlugin.Initialize(MainApp);
         FPluginList.Add(lPlugin);
@@ -126,9 +126,6 @@ Begin
   FPluginList.Clear();
   
   InternalListPlugins(ExtractFilePath(ParamStr(0)) + 'Plugins\', 0);
-
-  For X := 0 To FPluginList.Count - 1 Do
-    FPluginList[X].Configure();
 End;
 
 Procedure TTSTOPluginManager.Initialize(AMainApplication : ITSTOApplication);

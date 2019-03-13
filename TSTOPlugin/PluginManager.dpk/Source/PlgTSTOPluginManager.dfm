@@ -1,10 +1,7 @@
-object TSTOPluginManager: TTSTOPluginManager
-  OldCreateOrder = False
-  Height = 80
-  Width = 141
+inherited TSTOPluginManager: TTSTOPluginManager
   object SpTBXBItemContainer1: TSpTBXBItemContainer
-    Left = 57
-    Top = 13
+    Left = 83
+    Top = 53
     object grpPluginManagerMenuItem: TSpTBXTBGroupItem
       object SpTBXSeparatorItem1: TSpTBXSeparatorItem
       end

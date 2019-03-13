@@ -7,7 +7,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, TB2Dock,
   TB2Toolbar, SpTBXItem, TB2Item, SpTBXDkPanels, SpTBXControls, SpTBXExPanel,
-  ImgList, JvPluginManager, VirtualTrees, SpTBXExControls, StdCtrls,
+  ImgList, VirtualTrees, SpTBXExControls, StdCtrls,
   SpTBXEditors;
 
 type
@@ -49,7 +49,6 @@ type
   private
     FMainApp : ITSTOApplication;
     FPlugins : ITSTOPlugins;
-    FManager : ITSTOPluginManager;
 
     Function  GetPlugins() : ITSTOPlugins;
     Procedure SetPlugins(APlugins : ITSTOPlugins);

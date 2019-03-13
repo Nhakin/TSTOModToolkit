@@ -3,8 +3,8 @@ unit PlgTSTOCustomPlugin;
 interface
 
 uses
-  TSTOPluginIntf, HsInterfaceEx,
-  Windows, Messages, SysUtils, Classes, Dialogs, Forms, Controls;
+  HsInterfaceEx, TSTOPluginIntf,
+  Windows, SysUtils, Classes;
 
 type
   TTSTOCustomPlugin = Class(TDataModule, ITSTOPlugin)
