@@ -27,13 +27,11 @@ package PluginManager;
 
 requires
   rtl,
-  JvCore,
   xmlrtl,
   soaprtl,
   inet,
   SpTBXLib_d11,
-  tb2k_d11,
-  JvPluginSystem;
+  tb2k_d11;
 
 contains
   ShareMem,

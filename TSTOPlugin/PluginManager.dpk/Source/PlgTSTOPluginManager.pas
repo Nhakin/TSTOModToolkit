@@ -5,12 +5,10 @@ interface
 uses
   TSTOPluginIntf, TSTOPluginManagerIntf, TSTOCustomPatches.IO, TSTOScriptTemplate.IO,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, PlgTSTOCustomPlugin, SpTBXItem, TB2Item, JvComponentBase,
-  JvPluginManager;
+  Dialogs, PlgTSTOCustomPlugin, SpTBXItem, TB2Item;
 
 type
   TTSTOPluginManager = class(TTSTOCustomPlugin, ITSTOPluginManager)
-    JvPluginManager1: TJvPluginManager;
     SpTBXBItemContainer1: TSpTBXBItemContainer;
     grpPluginManagerMenuItem: TSpTBXTBGroupItem;
     SpTBXSeparatorItem1: TSpTBXSeparatorItem;
@@ -24,10 +22,16 @@ type
     FPlgScripts : ITSTOPlugins;
   
     Procedure RefreshPluginList();
+    Procedure LoadPlugin(Const AFileName : String);
 
   Protected
     Procedure Initialize(AMainApplication : ITSTOApplication); OverRide;
     Procedure Finalize(); OverRide;
+
+    Function  GetName() : String; OverRide;
+    Function  GetDescription() : String; OverRide;
+    Function  GetPluginId() : String; OverRide;
+    Function  GetPluginVersion() : String; OverRide;
 
     Function GetPlugins() : ITSTOPlugins;
     Function GetCustomPatchesPlugins() : ITSTOCustomPatchesIO;
@@ -47,24 +51,22 @@ Exports
 implementation
 
 Uses
-  JvPlugin, SpTbxSkins, SpTbxAdditionalSkins, DlgTSTOPluginManager;
-  
+  {SpTbxSkins, SpTbxAdditionalSkins,} DlgTSTOPluginManager;
+
 {$R *.dfm}
 
 Function CreatePluginManager(AHostApplication : TApplication; AApplication : ITSTOApplication) : ITSTOPluginManager;
-Var lPlug : TJvPlugIn;
 Begin
-  lPlug := TTSTOPluginManager.Create(Nil);
-  lPlug.Configure();
-  lPlug.Initialize(Nil, AHostApplication, '');
-  If lPlug.GetInterface(ITSTOPluginManager, Result) Then
-    Result.Initialize(AApplication);
+  Result := TTSTOPluginManager.Create(Nil);
+  Result.Configure();
+  Result.Initialize(AApplication);
 End;
 
 Procedure TTSTOPluginManager.AfterConstruction();
 Begin
   InHerited AfterConstruction();
 
+  FPluginList := TTSTOPlugins.CreatePluginList();
   RefreshPluginList();
 End;
 
@@ -73,6 +75,29 @@ Begin
   Finalize();
 
   InHerited BeforeDestruction();
+End;
+
+Procedure TTSTOPluginManager.LoadPlugin(Const AFileName : String);
+Var lModule : HWnd;
+    X       : Integer;
+    lCreatePlg : Function(AApplication : ITSTOApplication) : ITSTOPlugin;
+    lPlugin : ITSTOPlugin;
+Begin
+  If FileExists(AFileName) Then
+  Begin
+    lModule := SafeLoadLibrary(AFileName);
+    If lModule <> 0 Then
+    Begin
+      lCreatePlg := GetProcAddress(lModule, 'CreateTSTOPlugin');
+      If Assigned(lCreatePlg) Then
+      Begin
+        lPlugin := lCreatePlg(MainApp);
+        lPlugin.Configure();
+        lPlugin.Initialize(MainApp);
+        FPluginList.Add(lPlugin);
+      End;
+    End;
+  End;
 End;
 
 Procedure TTSTOPluginManager.RefreshPluginList();
@@ -85,7 +110,7 @@ Procedure TTSTOPluginManager.RefreshPluginList();
         If (lSr.Attr And faDirectory = faDirectory) And (lSr.Name <> '.') And (lSr.Name <> '..') And (ALvl < 1) Then
           InternalListPlugins(AStartPath + lSr.Name + '\', ALvl + 1)
         Else If SameText(ExtractFileExt(lSr.Name), '.dll') And (ALvl = 1) Then
-          JvPluginManager1.LoadPlugin(AStartPath + lSr.Name, plgDLL);
+          LoadPlugin(AStartPath + lSr.Name);
       Until FindNext(lSr) <> 0;
 
       Finally
@@ -96,17 +121,14 @@ Procedure TTSTOPluginManager.RefreshPluginList();
 Var X : Integer;
     lPlugin : ITSTOPlugin;
 Begin
-  For X := JvPluginManager1.PluginCount - 1 DownTo 0 Do
-  Begin
-    If JvPluginManager1.Plugins[X].GetInterface(ITSTOPlugin, lPlugin) Then
-      lPlugin.Finalize();
-    JvPluginManager1.UnloadPlugin(X);
-  End;
-
+  For X := 0 To FPluginList.Count - 1 Do
+    FPluginList[X].Finalize();
+  FPluginList.Clear();
+  
   InternalListPlugins(ExtractFilePath(ParamStr(0)) + 'Plugins\', 0);
 
-  For X := 0 To JvPluginManager1.PluginCount - 1 Do
-    JvPluginManager1.Plugins[X].Configure();
+  For X := 0 To FPluginList.Count - 1 Do
+    FPluginList[X].Configure();
 End;
 
 Procedure TTSTOPluginManager.Initialize(AMainApplication : ITSTOApplication);
@@ -118,20 +140,9 @@ Begin
 
   If Initialized Then
   Begin
-    FPluginList := TTSTOPlugins.CreatePluginList();
-
-    For X := 0 To JvPluginManager1.PluginCount - 1 Do
-      If JvPluginManager1.Plugins[X].GetInterface(ITSTOPlugin, lPlugin) Then
-      Begin
-        lPlugin.Initialize(MainApp);
-        FPluginList.Add(lPlugin);
-      End;
-
-    lMnu := HostApplication.MainForm.FindComponent('mnuPlugins');
+    lMnu := MainApp.Host.MainForm.FindComponent('mnuPlugins');
     If Assigned(lMnu) And SameText(lMnu.ClassName, 'TSpTBXSubmenuItem') Then
       MainApp.AddItem(Self, grpPluginManagerMenuItem, TTBCustomItem(lMnu));
-
-    SkinManager.SetSkin(MainApp.CurrentSkinName);
   End;
 End;
 
@@ -161,6 +172,26 @@ Begin
   InHerited Finalize();
 End;
 
+Function TTSTOPluginManager.GetName() : String;
+Begin
+  Result := 'TSTOPluginManager';
+End;
+
+Function TTSTOPluginManager.GetDescription() : String;
+Begin
+  Result := 'TSTO Plugin Manager';
+End;
+
+Function TTSTOPluginManager.GetPluginId() : String;
+Begin
+  Result := 'TSTOToolKit.PlgTSTOPluginManager';
+End;
+
+Function TTSTOPluginManager.GetPluginVersion() : String;
+Begin
+  Result := '1.0.0.1';
+End;
+
 procedure TTSTOPluginManager.mnuPluginManagerClick(Sender: TObject);
 begin
   With TTSTOPluginManagerDlg.Create(Self) Do
@@ -168,10 +199,7 @@ begin
     Plugins := FPluginList;
     MainApp := Self.MainApp;
 
-    If ShowModal() = mrOk Then
-    Begin
-
-    End;
+    ShowModal();
 
     Finally
       Release();

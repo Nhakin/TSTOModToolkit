@@ -18,6 +18,11 @@ type
     Function  GetPluginKind() : TTSTOPluginKind; OverRide;
     Function  GetHaveSettings() : Boolean; OverRide;
 
+    Function  GetName() : String; OverRide;
+    Function  GetDescription() : String; OverRide;
+    Function  GetPluginId() : String; OverRide;
+    Function  GetPluginVersion() : String; OverRide;
+        
     Procedure Initialize(AMainApplication : ITSTOApplication); OverRide;
     Procedure Finalize(); OverRide;
     Function  ShowSettings() : Boolean; OverRide;
@@ -27,15 +32,15 @@ type
 
   end;
 
-Function RegisterPlugin() : TTSTOCustomScriptPlugin; StdCall;
+Function CreateTSTOPlugin(AApplication : ITSTOApplication) : ITSTOPlugin;
 
 implementation
 
-Uses SpTbxSkins, SpTbxAdditionalSkins, HsInterfaceEx, HsStreamEx, HsXmlDocEx;
+Uses HsInterfaceEx, HsStreamEx, HsXmlDocEx;
 
 {$R *.dfm}
 
-Function RegisterPlugin() : TTSTOCustomScriptPlugin;
+Function CreateTSTOPlugin(AApplication : ITSTOApplication) : ITSTOPlugin;
 Begin
   Result := TTSTOCustomScriptPlugin.Create(Nil);
 End;
@@ -48,6 +53,26 @@ End;
 Function TTSTOCustomScriptPlugin.GetHaveSettings() : Boolean;
 Begin
   Result := True;
+End;
+
+Function TTSTOCustomScriptPlugin.GetName() : String;
+Begin
+  Result := 'TSTOCustomScriptPlugin';
+End;
+
+Function TTSTOCustomScriptPlugin.GetDescription() : String;
+Begin
+  Result := 'Add more ScriptTemplate functions';
+End;
+
+Function TTSTOCustomScriptPlugin.GetPluginId() : String;
+Begin
+  Result := 'TSTOModToolKit.PlgTSTOCustomScriptPlugin';
+End;
+
+Function TTSTOCustomScriptPlugin.GetPluginVersion() : String;
+Begin
+  Result := '1.0.0.2';
 End;
 
 Procedure TTSTOCustomScriptPlugin.Initialize(AMainApplication : ITSTOApplication);
@@ -85,8 +110,6 @@ Begin
           End;
       End;
     End;
-
-    SkinManager.SetSkin(MainApp.CurrentSkinName);
   End;
 End;
 

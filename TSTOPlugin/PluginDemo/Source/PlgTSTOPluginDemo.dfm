@@ -1,15 +1,10 @@
-inherited TSTOPluginDemo: TTSTOPluginDemo
-  OldCreateOrder = True
+object TSTOPluginDemo: TTSTOPluginDemo
+  OldCreateOrder = False
   OnDestroy = TSTOPluginDemoDestroy
-  Author = 'KahnAbyss'
-  Commands = <>
-  Copyright = 'Copyright '#169' 2019 by KahnAbyss; all rights reserved.'
-  PluginID = 'TSTOToolKit.PlgTSTOPluginDemo'
-  PluginVersion = '1.0.0.1'
-  Height = 100
-  Width = 136
+  Height = 130
+  Width = 137
   object SpTBXBItemContainer1: TSpTBXBItemContainer
-    Left = 80
+    Left = 48
     Top = 16
     object SpTbxPluginDemo: TSpTBXItem
       Caption = 'Plugin Demo'
@@ -82,10 +77,10 @@ inherited TSTOPluginDemo: TTSTOPluginDemo
     end
   end
   object ilMain: TImageList
-    Left = 79
+    Left = 47
     Top = 68
     Bitmap = {
-      494C010176007800080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010176007800100010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000E0010000010020000000000000E0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000948C8C005252520052525200525252005252

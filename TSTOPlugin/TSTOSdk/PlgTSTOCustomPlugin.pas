@@ -4,11 +4,10 @@ interface
 
 uses
   TSTOPluginIntf, HsInterfaceEx,
-  Windows, Messages, SysUtils, Classes, Dialogs, Forms, Controls,
-  JvPlugin;
+  Windows, Messages, SysUtils, Classes, Dialogs, Forms, Controls;
 
 type
-  TTSTOCustomPlugin = class(TJvPlugIn, ITSTOPlugin)
+  TTSTOCustomPlugin = Class(TDataModule, ITSTOPlugin)
   Private
     FMainApp        : ITSTOApplication;
     FPluginPath     : String;
@@ -51,6 +50,7 @@ type
     Function  GetPluginPath() : String;
     Function  GetPluginFileName() : String;
 
+    Procedure Configure(); Virtual;
     Procedure Initialize(AMainApplication : ITSTOApplication); ReIntroduce; Virtual;
     Procedure Finalize(); Virtual;
     Function  ShowSettings() : Boolean; Virtual;
@@ -69,6 +69,9 @@ type
   End;
 
 implementation
+
+Uses
+  SpTbxSkins, SpTbxAdditionalSkins;
 
 {$R *.dfm}
 
@@ -130,32 +133,32 @@ End;
 
 Function TTSTOCustomPlugin.GetName() : String;
 Begin
-  Result := Self.Name;
+  Result := 'TTSTOCustomPlugin';
 End;
 
 Function TTSTOCustomPlugin.GetAuthor() : String;
 Begin
-  Result := Self.Author;
+  Result := 'KahnAbyss';
 End;
 
 Function TTSTOCustomPlugin.GetCopyright() : String;
 Begin
-  Result := Self.Copyright;
+  Result := 'Copyright © 2003-2019 by HellSpawn; all rights reserved.';
 End;
 
 Function TTSTOCustomPlugin.GetDescription() : String;
 Begin
-  Result := Self.Description;
+  Result := 'Plugin Description';
 End;
 
 Function TTSTOCustomPlugin.GetPluginId() : String;
 Begin
-  Result := Self.PluginID;
+  Result := 'TSTOModToolKit.PlgTSTOCustomPlugin';
 End;
 
 Function TTSTOCustomPlugin.GetPluginVersion() : String;
 Begin
-  Result := Self.PluginVersion;
+  Result := '1.0.0.0';
 End;
 
 Function TTSTOCustomPlugin.GetHaveSettings() : Boolean;
@@ -178,6 +181,11 @@ Begin
   Result := FPluginFileName;
 End;
 
+Procedure TTSTOCustomPlugin.Configure();
+Begin
+
+End;
+
 Procedure TTSTOCustomPlugin.Initialize(AMainApplication: ITSTOApplication);
 Begin
   If Not FInitialized Then
@@ -186,7 +194,7 @@ Begin
 
     If Assigned(FMainApp) Then
     Begin
-
+      SkinManager.SetSkin(MainApp.CurrentSkinName);
       FInitialized := True;
     End;
   End;

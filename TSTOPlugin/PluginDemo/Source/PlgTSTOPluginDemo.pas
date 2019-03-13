@@ -27,7 +27,6 @@ type
     SpTBXGrpSubItem2: TSpTBXItem;
     ilMain: TImageList;
 
-    procedure TSTOPluginDemoConfigure(Sender: TObject);
     procedure TSTOPluginDemoDestroy(Sender: TObject);
 
     procedure SpTbxPluginDemoClick(Sender: TObject);
@@ -37,7 +36,7 @@ type
   Private
     FAddMenuItem      : Boolean;
     FAddToolBarButton : Boolean;
-    
+
     Procedure InitUI();
     Procedure LoadSettings();
     Procedure SaveSettings();
@@ -46,13 +45,19 @@ type
     Function  GetPluginKind() : TTSTOPluginKind; OverRide;
     Function  GetHaveSettings() : Boolean; OverRide;
 
+    Function  GetName() : String; OverRide;
+    Function  GetDescription() : String; OverRide;
+    Function  GetPluginId() : String; OverRide;
+    Function  GetPluginVersion() : String; OverRide;
+    
+    Procedure Configure();
     Procedure Initialize(AMainApplication : ITSTOApplication); OverRide;
     Procedure Finalize(); OverRide;
     Function  ShowSettings() : Boolean; OverRide;
 
   end;
 
-Function RegisterPlugin() : TTSTOPluginDemo; StdCall;
+Function CreateTSTOPlugin(AApplication : ITSTOApplication) : ITSTOPlugin;
 
 implementation
 
@@ -60,7 +65,7 @@ Uses IniFiles, DlgTSTOPluginDemoSettings;
 
 {$R *.dfm}
 
-Function RegisterPlugin() : TTSTOPluginDemo; 
+Function CreateTSTOPlugin(AApplication : ITSTOApplication) : ITSTOPlugin;
 Begin
   Result := TTSTOPluginDemo.Create(Nil);
 End;
@@ -68,7 +73,7 @@ End;
 Procedure TTSTOPluginDemo.Initialize(AMainApplication: ITSTOApplication);
 Begin
   InHerited Initialize(AMainApplication);
-  
+
   If Initialized Then
     InitUI();
 End;
@@ -150,32 +155,52 @@ begin
   ShowMessage('Stop Animation');
 end;
 
-procedure TTSTOPluginDemo.TSTOPluginDemoConfigure(Sender: TObject);
+Function TTSTOPluginDemo.GetName() : String;
+Begin
+  Result := 'TSTOPluginDemo';
+End;
+
+Function TTSTOPluginDemo.GetDescription() : String;
+Begin
+  Result := 'Add buttons and menu item to main application';
+End;
+
+Function TTSTOPluginDemo.GetPluginId() : String;
+Begin
+  Result := 'TSTOModToolKit.PlgTSTOPluginDemo';
+End;
+
+Function TTSTOPluginDemo.GetPluginVersion() : String;
+Begin
+  Result := '1.0.0.2';
+End;
+
+procedure TTSTOPluginDemo.Configure();
 begin
   LoadSettings();
 
-  inherited;
+  InHerited;
 end;
 
 procedure TTSTOPluginDemo.TSTOPluginDemoDestroy(Sender: TObject);
 begin
   SaveSettings();
 
-  inherited;
+  InHerited;
 end;
 
 Procedure TTSTOPluginDemo.InitUI();
 Begin
+  MainApp.RemoveItem(iikToolBar, Self, SpTbxPluginDemo);
+  MainApp.RemoveItem(iikToolBar, Self, SpTbxSubMenu);
+  MainApp.RemoveItem(iikToolBar, Self, GrpPluginDemoItems);
+
+  MainApp.RemoveItem(iikMainMenu, Self, SpTbxPluginDemo);
+  MainApp.RemoveItem(iikMainMenu, Self, SpTbxSubMenu);
+  MainApp.RemoveItem(iikMainMenu, Self, GrpPluginDemoItems);
+
   If Enabled Then
   Begin
-    MainApp.RemoveItem(iikToolBar, Self, SpTbxPluginDemo);
-    MainApp.RemoveItem(iikToolBar, Self, SpTbxSubMenu);
-    MainApp.RemoveItem(iikToolBar, Self, GrpPluginDemoItems);
-
-    MainApp.RemoveItem(iikMainMenu, Self, SpTbxPluginDemo);
-    MainApp.RemoveItem(iikMainMenu, Self, SpTbxSubMenu);
-    MainApp.RemoveItem(iikMainMenu, Self, GrpPluginDemoItems);
-
     If FAddToolBarButton Then
     Begin
       MainApp.AddItem(iikToolBar, Self, SpTbxPluginDemo);

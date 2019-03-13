@@ -3,7 +3,7 @@ unit TSTOPluginIntf;
 interface
 
 Uses
-  Graphics, JvPlugin, TB2Item, HsInterfaceEx,
+  Forms, Graphics, Classes, TB2Item, HsInterfaceEx,
   TSTORgbProgress, TSTOProjectWorkSpace.IO, TSTOScriptTemplate.IO, TSTOHackMasterList.IO;
 
 Type
@@ -19,9 +19,11 @@ Type
 
     Function GetIcon() : TIcon;
 
-    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
-    Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
-    Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+    Function GetHost() : TApplication;
+
+    Procedure AddItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem); OverLoad;
+    Procedure AddItem(Sender : TComponent; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
+    Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem);
 
     Function CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
     Function CreateScriptTemplates() : ITSTOScriptTemplateHacksIO;
@@ -32,7 +34,8 @@ Type
     Property CurrentProject  : ITSTOWorkSpaceProjectIO      Read GetCurrentProject;
     Property CurrentSkinName : String                       Read GetCurrentSkinName;
     Property Icon            : TIcon                        Read GetIcon;
-
+    Property Host            : TApplication                 Read GetHost;
+    
   End;
 
   TTSTOPluginKind = (pkScript, pkPatches, pkGUI);
@@ -58,6 +61,7 @@ Type
     Function  GetPluginPath() : String;
     Function  GetPluginFileName() : String;
 
+    Procedure Configure();
     Procedure Initialize(AMainApplication : ITSTOApplication);
     Procedure Finalize();
     Function  ShowSettings() : Boolean;

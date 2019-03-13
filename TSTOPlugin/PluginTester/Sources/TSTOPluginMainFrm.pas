@@ -60,7 +60,7 @@ type
   {$Region ' ITSTOApplication '}
   Private
     Function  UniqueComponentName(AComponentName : String) : String;
-    Function  InternalAddPluginItem(Sender : TJvPlugin; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
+    Function  InternalAddPluginItem(Sender : TComponent; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
 
     Procedure InternalRemovePluginItem(AGroup : TSpTBXTBGroupItem; AItemId : NativeInt);
 
@@ -69,10 +69,11 @@ type
     Function GetCurrentProject() : ITSTOWorkSpaceProjectIO;
     Function GetCurrentSkinName() : String;
     Function GetIcon() : TIcon;
+    Function GetHost() : TApplication;
 
-    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
-    Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
-    Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+    Procedure AddItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem); OverLoad;
+    Procedure AddItem(Sender : TComponent; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
+    Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem);
 
     Function CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
     Function CreateScriptTemplates() : ITSTOScriptTemplateHacksIO;
@@ -150,6 +151,11 @@ Begin
   Result := Application.Icon;
 End;
 
+Function TTSTOPluginManager.GetHost() : TApplication;
+Begin
+  Result := Application;
+End;
+
 procedure TTSTOPluginManager.cmdFinalizePluginClick(Sender: TObject);
 Var lPluginIntf : ITSTOPlugin;
     lPlugin     : TJvPlugin;
@@ -224,7 +230,7 @@ Begin
   End;
 End;
 
-Function TTSTOPluginManager.InternalAddPluginItem(Sender : TJvPlugin; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
+Function TTSTOPluginManager.InternalAddPluginItem(Sender : TComponent; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
 Var lCurItem : TTBCustomItem;
     X : Integer;
 Begin
@@ -297,7 +303,7 @@ Begin
       AGroup.Remove(AGroup[X]);
 End;
 
-Procedure TTSTOPluginManager.AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+Procedure TTSTOPluginManager.AddItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem);
 Var lGroup : TSpTBXTBGroupItem;
 Begin
   Case AItemKind Of
@@ -308,7 +314,7 @@ Begin
   lGroup.Add(InternalAddPluginItem(Sender, AItem, ''));
 End;
 
-Procedure TTSTOPluginManager.RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+Procedure TTSTOPluginManager.RemoveItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem);
 Var lGroup : TSpTBXTBGroupItem;
 Begin
   Case AItemKind Of
@@ -319,7 +325,7 @@ Begin
   InternalRemovePluginItem(lGroup, Integer(AItem));
 End;
 
-Procedure TTSTOPluginManager.AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem);
+Procedure TTSTOPluginManager.AddItem(Sender : TComponent; ASrcItem, ATrgItem : TTBCustomItem);
 Begin
   ATrgItem.Add(InternalAddPluginItem(Sender, ASrcItem, ''));
 End;

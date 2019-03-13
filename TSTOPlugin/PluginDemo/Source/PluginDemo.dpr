@@ -32,7 +32,7 @@ uses
 {$R *.res}
 
 exports
-  RegisterPlugin;
+  CreateTSTOPlugin;
 
 begin
 end.
