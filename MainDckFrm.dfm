@@ -110,10 +110,28 @@ object FrmDckMain: TFrmDckMain
             LinkSubitems = tbMiscItems
           end
         end
+        object mnuPlugins: TSpTBXSubmenuItem
+          Caption = 'Plugins'
+          object SpTBXTBGroupItem4: TSpTBXTBGroupItem
+            LinkSubitems = grpMnuPluginItems
+          end
+        end
         object mnuSkin: TSpTBXSubmenuItem
           Caption = 'Skin'
           Visible = False
           object SpTBXSkinGroupItem1: TSpTBXSkinGroupItem
+          end
+        end
+        object SpTBXSubmenuItem2: TSpTBXSubmenuItem
+          Caption = 'Help'
+          object mnuHelp: TSpTBXItem
+            Caption = 'Help'
+          end
+          object SpTBXSeparatorItem15: TSpTBXSeparatorItem
+          end
+          object mnuAbout: TSpTBXItem
+            Caption = 'About'
+            OnClick = mnuAboutClick
           end
         end
       end
@@ -148,6 +166,11 @@ object FrmDckMain: TFrmDckMain
           ImageIndex = 35
           Visible = False
           OnClick = SpTBXItem3Click
+        end
+        object SpTBXSeparatorItem14: TSpTBXSeparatorItem
+        end
+        object tbPlugins: TSpTBXTBGroupItem
+          LinkSubitems = grpTbPluginItems
         end
       end
     end
@@ -1928,6 +1951,10 @@ object FrmDckMain: TFrmDckMain
       object SpTBXTBGroupItem3: TSpTBXTBGroupItem
         LinkSubitems = popTvWSProjectSrcFolderItems
       end
+    end
+    object grpMnuPluginItems: TSpTBXTBGroupItem
+    end
+    object grpTbPluginItems: TSpTBXTBGroupItem
     end
   end
   object popTvWS: TSpTBXPopupMenu

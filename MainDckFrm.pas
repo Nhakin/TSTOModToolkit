@@ -4,16 +4,17 @@ interface
 
 uses
   dmImage, HsStreamEx, HsInterfaceEx, VTEditors,
-  TSTOTreeviews, TSTOProject.Xml, TSTOBCell, TSTOProjectWorkSpace.IO,
+  TSTORgbProgress, TSTOTreeviews, TSTOProject.Xml, TSTOBCell, TSTOProjectWorkSpace.IO,
   TSTOPackageList, TSTORessource, TSTOScriptTemplate.IO, TSTOHackMasterList.IO,
-  TSTOHackSettings,
+  TSTOHackSettings, TSTOPluginIntf, TSTOPluginManagerIntf,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, ComCtrls, ToolWin, ActnList,
   StdCtrls, ExtCtrls, KControls, KHexEditor, VirtualTrees,
   LMDDckSite, LMDDckStyleElems, SciLanguageManager, SciScintillaBase,
   SciScintillaMemo, SciScintilla, SciScintillaNPP, SciActions, TB2Item, TB2Dock,
   TB2Toolbar, SpTBXItem, SpTBXSkins, SpTBXAdditionalSkins, SpTBXControls,
-  SpTBXEditors, Mask, System.Actions, SpTBXExPanel, SpTBXDkPanels, SpTBXTabs, ImagingRgb;
+  SpTBXEditors, Mask, System.Actions, SpTBXExPanel, SpTBXDkPanels, SpTBXTabs,
+  ImagingRgb, JvPlugin;
 
 Type
   TTSTOCurrentDataType = (dtUnknown, dtXml, dtZeroIndex, dtText, dtRbg, dtBCell, dtBsv3);
@@ -32,7 +33,7 @@ Type
 
 (******************************************************************************)
 
-  TFrmDckMain = class(TForm)
+  TFrmDckMain = class(TForm, ITSTOApplication)
     dckMgr: TLMDDockManager;
 
     SciLangMgr: TSciLanguageManager;
@@ -210,6 +211,16 @@ Type
     ScrlImage: TScrollBox;
     ImgResource: TImage;
     mnuHackMasterList: TSpTBXItem;
+    tbPlugins: TSpTBXTBGroupItem;
+    mnuPlugins: TSpTBXSubmenuItem;
+    grpMnuPluginItems: TSpTBXTBGroupItem;
+    grpTbPluginItems: TSpTBXTBGroupItem;
+    SpTBXSeparatorItem14: TSpTBXSeparatorItem;
+    SpTBXTBGroupItem4: TSpTBXTBGroupItem;
+    SpTBXSubmenuItem2: TSpTBXSubmenuItem;
+    mnuAbout: TSpTBXItem;
+    mnuHelp: TSpTBXItem;
+    SpTBXSeparatorItem15: TSpTBXSeparatorItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -282,6 +293,7 @@ Type
     procedure popDiffHackMasterListClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure mnuHackMasterListClick(Sender: TObject);
+    procedure mnuAboutClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -346,6 +358,37 @@ Type
 
     Procedure ApplyMod(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
     Procedure ValidateHackMasterList(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
+    Procedure LoadPlugins();
+
+  {$Region ' ITSTOApplication '}
+  Private
+    FIntfImpl : TInterfaceExImplementor;
+    FPluginM  : ITSTOPluginManager;
+
+    Function GetIntfImpl() : TInterfaceExImplementor;
+
+    Function  UniqueComponentName(AComponentName : String) : String;
+    Function  InternalAddPluginItem(Sender : TComponent; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
+    Procedure InternalRemovePluginItem(AGroup : TSpTBXTBGroupItem; AItemId : NativeInt);
+
+  Protected
+    Property IntfImpl: TInterfaceExImplementor Read GetIntfImpl Implements ITSTOApplication;
+
+    Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function GetCurrentProject() : ITSTOWorkSpaceProjectIO;
+    Function GetCurrentSkinName() : String;
+    Function GetIcon() : TIcon;
+    Function GetHost() : TApplication;
+
+    Procedure AddItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem); OverLoad;
+    Procedure AddItem(Sender : TComponent; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
+    Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem);
+
+    Function CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+    Function CreateScriptTemplates() : ITSTOScriptTemplateHacksIO;
+    Function CreateHackMasterList() : ITSTOHackMasterListIO;
+    Function CreateRgbProgress() : IRgbProgress;
+  {$EndRegion}
 
   end;
 
@@ -358,12 +401,13 @@ Uses RTTI, RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
   Imaging, ImagingTypes, HsBase64Ex,
   HsJSonFormatterEx, HsXmlDocEx, HsZipUtils, HsFunctionsEx,
   HsCheckSumEx, HsStringListEx, SciSupport, System.Character,
-  SettingsFrm, CustomPatchFrm, SptbFrm, RgbExtractProgress, ImagingClasses,
+  SettingsFrm, CustomPatchFrm, SptbFrm, ImagingClasses,
   TSTORgb, TSTOModToolKit, TSTODownloader, TSTOFunctions,
   TSTOCustomPatches.IO, TSTOHackMasterList.Xml, TSTOBsv.IO,
   TSTOZero.Bin, TSTOSbtp.IO, TSTOProjectWorkSpaceIntf,
   TSTOProjectWorkSpace.Xml, TSTOProjectWorkSpace.Types,
-  RemoveFileFromProjectFrm, ProjectSettingFrm, ProjectGroupSettingFrm, HackMasterListFrm;
+  RemoveFileFromProjectFrm, ProjectSettingFrm,
+  ProjectGroupSettingFrm, HackMasterListFrm, AboutFrm;
 
 {$R *.dfm}
 
@@ -801,6 +845,8 @@ begin
 
     FFormPosLoaded := True;
   End;
+
+  LoadPlugins();
 end;
 
 procedure TFrmDckMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -871,14 +917,14 @@ end;
 procedure TFrmDckMain.sptbxMainMenuMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  If ([ssCtrl, ssAlt, ssShift, ssRight] * Shift  = Shift) And (Button = mbRight) Then
+  If ([ssCtrl, ssAlt, ssShift, ssRight] = Shift) Then
     mnuSkin.Visible := Not mnuSkin.Visible;
 end;
 
 procedure TFrmDckMain.sptbxtbMainMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  If ([ssCtrl, ssAlt, ssShift, ssRight] * Shift  = Shift) And (Button = mbRight) Then
+  If ([ssCtrl, ssAlt, ssShift, ssRight] = Shift) Then
   Begin
     FTvDlcServer.IsDebugMode      := Not FTvDlcServer.IsDebugMode;
     FTvWorkSpace.IsDebugMode      := Not FTvWorkSpace.IsDebugMode;
@@ -1047,6 +1093,18 @@ begin
           FTvWorkSpace.EndUpdate();
       End;
     End;
+end;
+
+procedure TFrmDckMain.mnuAboutClick(Sender: TObject);
+begin
+  With TFrmAbout.Create(Self) Do
+  Try
+    PluginList := FPluginM.Plugins;
+    ShowModal();
+
+    Finally
+      Release();
+  End;
 end;
 
 procedure TFrmDckMain.mnuCloseWorkspaceClick(Sender: TObject);
@@ -1236,7 +1294,7 @@ begin
       FTvWorkSpace.DeleteNode(lNode);
 
       lSrcFolder.FileList.Remove(lSrcFile);
-      tbSaveWorkSpace.Enabled := True;
+//      tbSaveWorkSpace.Enabled := True;
     End;
   End;
 end;
@@ -1482,6 +1540,24 @@ Begin
     End;
   End;
 End;
+
+Procedure TFrmDckMain.LoadPlugins();
+Var lPath : String;
+    lModule : HWnd;
+    lCreatePM : Function(AHostApplication : TApplication; AApplication : ITSTOApplication) : ITSTOPluginManager;
+begin
+  lPath := ExtractFilePath(ParamStr(0)) + 'Plugins\';
+  If FileExists(lPath + 'PluginManager.bpl') Then
+  Begin
+    lModule := LoadPackage(lPath + 'PluginManager.bpl');
+    If lModule <> 0 Then
+    Begin
+      lCreatePM := GetProcAddress(lModule, 'CreatePluginManager');
+      If Assigned(lCreatePM) Then
+        FPluginM := lCreatePM(Application, Self);
+    End;
+  End;
+end;
 
 procedure TFrmDckMain.popTvWSApplyModClick(Sender: TObject);
 Var lProject : ITSTOWorkSpaceProjectIO;
@@ -2954,6 +3030,180 @@ begin
       FTvDlcServer.EndUpdate();
   End;
 end;
+
+Function TFrmDckMain.GetIntfImpl() : TInterfaceExImplementor;
+Begin
+  If Not Assigned(FIntfImpl) Then
+    FIntfImpl := TInterfaceExImplementor.Create(Self, False);
+  Result := FIntfImpl;
+End;
+
+Function TFrmDckMain.GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+Begin
+  Result := FWorkSpace;
+End;
+
+Function TFrmDckMain.GetCurrentProject() : ITSTOWorkSpaceProjectIO;
+Var lNode : PVirtualNode;
+Begin
+  lNode := FTvWorkSpace.GetFirstSelected();
+
+  If Assigned(lNode) Then
+    FTvWorkSpace.GetNodeData(lNode, ITSTOWorkSpaceProjectIO, Result)
+  Else
+    Result := Nil;
+End;
+
+Function TFrmDckMain.GetCurrentSkinName() : String;
+Begin
+  Result := SkinManager.CurrentSkinName;
+End;
+
+Function TFrmDckMain.GetIcon() : TIcon;
+Begin
+  Result := Application.Icon;
+End;
+
+Function TFrmDckMain.GetHost() : TApplication;
+Begin
+  Result := Application;
+End;
+
+Function TFrmDckMain.UniqueComponentName(AComponentName : String) : String;
+Var lIdx : Integer;
+Begin
+  Result := AComponentName;
+
+  If Assigned(FindComponent(Result)) Then
+  Begin
+    lIdx := 2;
+    Repeat
+      Result := AComponentName + IntToStr(lIdx);
+      Inc(lIdx);
+    Until Not Assigned(FindComponent(Result));
+  End;
+End;
+
+Function TFrmDckMain.InternalAddPluginItem(Sender : TComponent; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
+Var lCurItem : TTBCustomItem;
+    X : Integer;
+Begin
+  If SameText(AItem.ClassName, 'TSpTBXItem') Then
+  Begin
+    Result := TSpTBXItem.Create(Self);
+
+    With TSpTBXItem(Result) Do
+    Begin
+      Name       := UniqueComponentName(ACommandPrefix + Sender.Name + AItem.Name);
+      Images     := AItem.Images;
+      ImageIndex := AItem.ImageIndex;
+      OnClick    := AItem.OnClick;
+      Caption    := AItem.Caption;
+      Tag        := Integer(AItem);
+    End;
+  End
+  Else If SameText(AItem.ClassName, 'TSpTBXSubmenuItem') Then
+  Begin
+    Result := TSpTBXSubmenuItem.Create(Self);
+    With TSpTBXSubmenuItem(Result) Do
+    Begin
+      Name          := UniqueComponentName(ACommandPrefix + Sender.Name + AItem.Name);
+      Images        := AItem.Images;
+      ImageIndex    := AItem.ImageIndex;
+      OnClick       := AItem.OnClick;
+      Caption       := AItem.Caption;
+      DropdownCombo := TSpTBXSubmenuItem(AItem).DropdownCombo;
+      Tag := Integer(AItem);
+
+      If Assigned(AItem.LinkSubitems) Then
+        lCurItem := AItem.LinkSubitems
+      Else
+        lCurItem := AItem;
+
+      For X := 0 To lCurItem.Count - 1 Do
+        If SameText(lCurItem[X].ClassName, 'TSpTBXSeparatorItem') Then
+          Result.Add(TSpTBXSeparatorItem.Create(Self))
+        Else
+          Result.Add(InternalAddPluginItem(Sender, lCurItem[X], ACommandPrefix));
+    End;
+  End
+  Else If SameText(AItem.ClassName, 'TSpTBXTBGroupItem') Then
+  Begin
+    Result := TSpTBXTBGroupItem.Create(Self);
+    With TSpTBXTBGroupItem(Result) Do
+    Begin
+      Name := UniqueComponentName(ACommandPrefix + Sender.Name + AItem.Name);
+      Tag := Integer(AItem);
+
+      If Assigned(AItem.LinkSubitems) Then
+        lCurItem := AItem.LinkSubitems
+      Else
+        lCurItem := AItem;
+
+      For X := 0 To lCurItem.Count - 1 Do
+      If SameText(lCurItem[X].ClassName, 'TSpTBXSeparatorItem') Then
+        Result.Add(TSpTBXSeparatorItem.Create(Self))
+      Else
+        Result.Add(InternalAddPluginItem(Sender, lCurItem[X], ACommandPrefix));
+    End;
+  End;
+End;
+
+Procedure TFrmDckMain.InternalRemovePluginItem(AGroup : TSpTBXTBGroupItem; AItemId : NativeInt);
+Var X : Integer;
+Begin
+  For X := AGroup.Count - 1 DownTo 0 Do
+    If AGroup[X].Tag = Integer(AItemId) Then
+      AGroup.Remove(AGroup[X]);
+End;
+
+Procedure TFrmDckMain.AddItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem);
+Var lGroup : TSpTBXTBGroupItem;
+Begin
+  Case AItemKind Of
+    iikToolBar : lGroup := grpTbPluginItems;
+    iikMainMenu : lGroup := grpMnuPluginItems;
+  End;
+
+  lGroup.Add(InternalAddPluginItem(Sender, AItem, ''));
+End;
+
+Procedure TFrmDckMain.AddItem(Sender : TComponent; ASrcItem, ATrgItem : TTBCustomItem);
+Begin
+  ATrgItem.Add(InternalAddPluginItem(Sender, ASrcItem, ''));
+End;
+
+Procedure TFrmDckMain.RemoveItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem);
+Var lGroup : TSpTBXTBGroupItem;
+Begin
+  Case AItemKind Of
+    iikToolBar : lGroup := grpTbPluginItems;
+    iikMainMenu : lGroup := grpMnuPluginItems;
+  End;
+
+  InternalRemovePluginItem(lGroup, Integer(AItem));
+End;
+
+Function TFrmDckMain.CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
+Begin
+  Result := TTSTOWorkSpaceProjectGroupIO.CreateProjectGroup();
+End;
+
+Function TFrmDckMain.CreateScriptTemplates() : ITSTOScriptTemplateHacksIO;
+Begin
+  Result := TTSTOScriptTemplateHacksIO.CreateScriptTemplateHacks();
+End;
+
+Function TFrmDckMain.CreateHackMasterList() : ITSTOHackMasterListIO;
+Begin
+  Result := TTSTOHackMasterListIO.CreateHackMasterList();
+End;
+
+Function TFrmDckMain.CreateRgbProgress() : IRgbProgress;
+Begin
+  Result := TRgbProgress.CreateRgbProgress();
+End;
+
 {
 http://www.xnxx.com/video-611oyc9/two_lesbians_teens_licking_pussy_and_fuck_with_a_dildo#_tabComments
 }

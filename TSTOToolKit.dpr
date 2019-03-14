@@ -1,6 +1,7 @@
 program TSTOToolKit;
 
 uses
+  ShareMem,
   Forms,
   CustomPatchFrm in 'CustomPatchFrm.pas' {FrmCustomPatches},
   dmImage in 'dmImage.pas' {DataModuleImage: TDataModule},
@@ -29,7 +30,7 @@ uses
   ProjectGroupSettingFrm in 'ProjectGroupSettingFrm.pas' {FrmProjectGroupSettings},
   ProjectSettingFrm in 'ProjectSettingFrm.pas' {FrmProjectSettings},
   RemoveFileFromProjectFrm in 'RemoveFileFromProjectFrm.pas' {FrmRemoveFileFromProject},
-  RgbExtractProgress in 'RgbExtractProgress.pas',
+  TSTORgbProgress in 'TSTORgbProgress.pas',
   SettingsFrm in 'SettingsFrm.pas' {FrmSettings},
   SptbFrm in 'SptbFrm.pas' {FrmSbtp},
   SuperObject in 'SuperObject.pas',
@@ -99,7 +100,10 @@ uses
   TSTOZeroImpl in 'ZeroFile\TSTOZeroImpl.pas',
   TSTOZeroIntf in 'ZeroFile\TSTOZeroIntf.pas',
   VTCombos in 'VirtualTree\VTCombos.pas',
-  VTEditors in 'VirtualTree\VTEditors.pas';
+  VTEditors in 'VirtualTree\VTEditors.pas',
+  TSTOPluginIntf in 'TSTOPlugin\TSTOSdk\TSTOPluginIntf.pas',
+  TSTOPluginManagerIntf in 'TSTOPlugin\PluginManager.dpk\Source\TSTOPluginManagerIntf.pas',
+  AboutFrm in 'AboutFrm.pas' {FrmAbout};
 
 {$R *.res}
 {$R Images.res}

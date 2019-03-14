@@ -2,7 +2,7 @@ unit TSTOScriptTemplate.IO;
 
 interface
 
-Uses Classes, HsStreamEx, RgbExtractProgress,
+Uses Classes, HsStreamEx, TSTORgbProgress,
   TSTOScriptTemplateIntf, TSTOHackMasterList.IO;
 
 Type
@@ -20,7 +20,11 @@ Type
     Function  GetOnChanged() : TNotifyEvent;
     Procedure SetOnChanged(AOnChanged : TNotifyEvent);
 
-    Property OnChanged : TNotifyEvent Read GetOnChanged Write SetOnChanged;
+    Function  GetOnExecFunc() : TNotifyEvent;
+    Procedure SetOnExecFunc(AOnExeFunc : TNotifyEvent);
+
+    Property OnChanged  : TNotifyEvent Read GetOnChanged  Write SetOnChanged;
+    Property OnExecFunc : TNotifyEvent Read GetOnExecFunc Write SetOnExecFunc;
 
   End;
 
@@ -132,7 +136,8 @@ Type
 
   TTSTOScriptTemplateVariableIO = Class(TTSTOScriptTemplateVariable, ITSTOScriptTemplateVariableIO)
   Private
-    FOnChanged : TNotifyEvent;
+    FOnChanged  : TNotifyEvent;
+    FOnExecFunc : TNotifyEvent;
 
   Protected
     Procedure SetName(Const AName : WideString); OverRide;
@@ -140,6 +145,9 @@ Type
 
     Function  GetOnChanged() : TNotifyEvent;
     Procedure SetOnChanged(AOnChanged : TNotifyEvent);
+
+    Function  GetOnExecFunc() : TNotifyEvent;
+    Procedure SetOnExecFunc(AOnExeFunc : TNotifyEvent);
 
   End;
 
@@ -355,6 +363,16 @@ Begin
   FOnChanged := AOnChanged;
 End;
 
+Function TTSTOScriptTemplateVariableIO.GetOnExecFunc() : TNotifyEvent;
+Begin
+  Result := FOnExecFunc;
+End;
+
+Procedure TTSTOScriptTemplateVariableIO.SetOnExecFunc(AOnExeFunc : TNotifyEvent);
+Begin
+  FOnExecFunc := AOnExeFunc;
+End;
+
 Procedure TTSTOScriptTemplateVariablesIO.Assign(ASource : IInterface);
 Var X : Integer;
 Begin
@@ -504,37 +522,47 @@ Begin
     lLst.Text := GetTemplateFile();
     For X := 0 To lVars.Count - 1 Do
     Begin
-      lVar.Text := '';
+      If SameText(lVars[X].VarFunc, 'hmBuildCustom') And Assigned(lVars[X].OnExecFunc) Then
+        lVars[X].OnExecFunc(Self)
+      Else
+      Begin
+        lVar.Text := '';
 
-      If SameText(lVars[X].VarFunc, 'hmBuildStoreMenu') Then
-        lVar.Text := AHackMasterList.BuildStoreMenu(lSettings, AProgress)
-      Else If SameText(lVars[X].VarFunc, 'hmBuildInventoryMenu') Then
-        lVar.Text := AHackMasterList.BuildInventoryMenu(lSettings, AProgress)
-      Else If SameText(lVars[X].VarFunc, 'hmBuildStoreItems') Then
-        lVar.Text := AHackMasterList.BuildStoreItems(lSettings, AProgress)
-      Else If SameText(lVars[X].VarFunc, 'hmBuildStoreReqs') Then
-        lVar.Text := AHackMasterList.BuildStoreRequirements(AProgress)
-      Else If SameText(lVars[X].VarFunc, 'hmBuildDeleteBadItems') Then
-        lVar.Text := AHackMasterList.BuildDeleteBadItems(AProgress)
-      Else If SameText(lVars[X].VarFunc, 'hmBuildFreeItems') Then
-        lVar.Text := AHackMasterList.BuildFreeItems(AProgress)
-      Else If SameText(lVars[X].VarFunc, 'hmBuildUniqueItems') Then
-        lVar.Text := AHackMasterList.BuildUniqueItems(AProgress)
-      Else If SameText(lVars[X].VarFunc, 'hmBuildReqsItems') Then
-        lVar.Text := AHackMasterList.BuildReqsItems(AProgress)
-      Else If SameText(lVars[X].VarFunc, 'hmBuildNonSellableItems') Then
-        lVar.Text := AHackMasterList.BuildNonSellableItems(AProgress)
-      Else If SameText(lVars[X].VarFunc, 'hmBuildCharacterSkins') Then
-        lVar.Text := AHackMasterList.BuildCharacterSkins()
-      Else If SameText(lVars[X].VarFunc, 'hmBuildBuildingSkins') Then
-        lVar.Text := AHackMasterList.BuildBuildingSkins()
-      Else If SameText(lVars[X].VarFunc, 'hmBuildNPCCharacters') Then
-        lVar.Text := AHackMasterList.BuildNPCCharacters();
+        If SameText(lVars[X].VarFunc, 'hmBuildStoreMenu') Then
+          lVar.Text := AHackMasterList.BuildStoreMenu(lSettings, AProgress)
+        Else If SameText(lVars[X].VarFunc, 'hmBuildInventoryMenu') Then
+          lVar.Text := AHackMasterList.BuildInventoryMenu(lSettings, AProgress)
+        Else If SameText(lVars[X].VarFunc, 'hmBuildStoreItems') Then
+          lVar.Text := AHackMasterList.BuildStoreItems(lSettings, AProgress)
+        Else If SameText(lVars[X].VarFunc, 'hmBuildStoreReqs') Then
+          lVar.Text := AHackMasterList.BuildStoreRequirements(AProgress)
+        Else If SameText(lVars[X].VarFunc, 'hmBuildDeleteBadItems') Then
+          lVar.Text := AHackMasterList.BuildDeleteBadItems(AProgress)
+        Else If SameText(lVars[X].VarFunc, 'hmBuildFreeItems') Then
+          lVar.Text := AHackMasterList.BuildFreeItems(AProgress)
+        Else If SameText(lVars[X].VarFunc, 'hmBuildUniqueItems') Then
+          lVar.Text := AHackMasterList.BuildUniqueItems(AProgress)
+        Else If SameText(lVars[X].VarFunc, 'hmBuildReqsItems') Then
+          lVar.Text := AHackMasterList.BuildReqsItems(AProgress)
+        Else If SameText(lVars[X].VarFunc, 'hmBuildNonSellableItems') Then
+          lVar.Text := AHackMasterList.BuildNonSellableItems(AProgress)
+        Else If SameText(lVars[X].VarFunc, 'hmBuildCharacterSkins') Then
+          lVar.Text := AHackMasterList.BuildCharacterSkins()
+        Else If SameText(lVars[X].VarFunc, 'hmBuildBuildingSkins') Then
+          lVar.Text := AHackMasterList.BuildBuildingSkins()
+        Else If SameText(lVars[X].VarFunc, 'hmBuildNPCCharacters') Then
+          lVar.Text := AHackMasterList.BuildNPCCharacters();
 
-      lLst.Text := StringReplace(lLst.Text, lVars[X].Name, lVar.Text, [rfReplaceAll, rfIgnoreCase]);
+        lLst.Text := StringReplace(lLst.Text, lVars[X].Name, lVar.Text, [rfReplaceAll, rfIgnoreCase]);
+      End;
     End;
 
-    Result := FormatXmlData(lLst.Text);
+    Try
+      Result := FormatXmlData(lLst.Text);
+
+      Except
+        Result := '';
+    End;
 
     Finally
       lLst := Nil;

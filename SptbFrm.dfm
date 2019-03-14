@@ -104,6 +104,7 @@ object FrmSbtp: TFrmSbtp
       Header.Font.Name = 'Tahoma'
       Header.Font.Style = []
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
+      PopupMenu = popTV
       TabOrder = 0
       OnFocusChanged = vstSbtpFileFocusChanged
       OnGetText = vstSbtpFileGetText
@@ -197,5 +198,21 @@ object FrmSbtp: TFrmSbtp
         OnClick = tbLoadXmlClick
       end
     end
+    object popTvtems: TSpTBXTBGroupItem
+      object popAdd: TSpTBXItem
+        Caption = 'Add'
+        OnClick = popAddClick
+      end
+      object popDelete: TSpTBXItem
+        Caption = 'Delete'
+        OnClick = popDeleteClick
+      end
+    end
+  end
+  object popTV: TSpTBXPopupMenu
+    OnPopup = popTVPopup
+    LinkSubitems = popTvtems
+    Left = 53
+    Top = 170
   end
 end

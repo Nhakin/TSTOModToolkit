@@ -86,18 +86,18 @@ Type
     ['{4B61686E-29A0-2112-BD8B-8ED5119A24C6}']
     Function  Seek(Offset: Longint; Origin: Word) : Longint; Overload;
     Function  Seek(Const Offset: Int64; Origin: TSeekOrigin) : Int64; Overload;
-    Procedure ReadBuffer(Var Buffer; Count: NativeInt);
-    Procedure WriteBuffer(Const Buffer; Count: NativeInt);
+    Procedure ReadBuffer(Var Buffer; Count : {$If CompilerVersion >= 32}NativeInt{$Else}Integer{$IfEnd});
+    Procedure WriteBuffer(Const Buffer; Count : {$If CompilerVersion >= 32}NativeInt{$Else}Integer{$IfEnd});
     Function  Read(Var Buffer; Count: Longint) : Longint;
     Function  Write(Const Buffer; Count: Longint) : Longint;
     Function  CopyFrom(Source: TStream; Count: Int64) : Int64; OverLoad;
     Function  CopyFrom(Source: IStreamEx; Count: Int64) : Int64; OverLoad;
-    Function  ReadComponent({$If CompilerVersion > 21}Const {$EndIf}Instance: TComponent) : TComponent;
-    Function  ReadComponentRes({$If CompilerVersion > 21}Const {$EndIf}Instance: TComponent) : TComponent;
-    Procedure WriteComponent({$If CompilerVersion > 21}Const {$EndIf}Instance: TComponent);
-    Procedure WriteComponentRes(Const ResName: String; {$If CompilerVersion > 21}Const {$EndIf}Instance: TComponent);
-    Procedure WriteDescendent({$If CompilerVersion > 21}Const {$EndIf}Instance, Ancestor: TComponent);
-    Procedure WriteDescendentRes(Const ResName: String; {$If CompilerVersion > 21}Const {$EndIf}Instance, Ancestor: TComponent);
+    Function  ReadComponent({$If CompilerVersion > 21}Const {$IfEnd}Instance: TComponent) : TComponent;
+    Function  ReadComponentRes({$If CompilerVersion > 21}Const {$IfEnd}Instance: TComponent) : TComponent;
+    Procedure WriteComponent({$If CompilerVersion > 21}Const {$IfEnd}Instance: TComponent);
+    Procedure WriteComponentRes(Const ResName: String; {$If CompilerVersion > 21}Const {$IfEnd}Instance: TComponent);
+    Procedure WriteDescendent({$If CompilerVersion > 21}Const {$IfEnd}Instance, Ancestor: TComponent);
+    Procedure WriteDescendentRes(Const ResName: String; {$If CompilerVersion > 21}Const {$IfEnd}Instance, Ancestor: TComponent);
     Procedure WriteResourceHeader(Const ResName: String; Out FixupInfo: Integer);
     Procedure FixupResourceHeader(FixupInfo: Integer);
     Procedure ReadResHeader();
@@ -371,7 +371,7 @@ Type
     Procedure WriteString(Const AString : String); OverLoad;
     Procedure WriteString(Const AString : String; Const AWriteLen : Boolean); OverLoad;
 
-    Constructor Create(); OverLoad; {$If CompilerVersion < 20}OverRide;{$EndIf}
+    Constructor Create(); OverLoad; {$If CompilerVersion < 20}OverRide;{$IfEnd}
     Constructor Create(Const AString : String); OverLoad;
     {$If CompilerVersion > 18.5}
     Constructor Create(Const AString : RawByteString); OverLoad;
@@ -1376,7 +1376,7 @@ Procedure TBytesStreamEx.LoadFromStream(Stream : IStreamEx);
 Begin
   InHerited LoadFromStream(TStream(Stream.InterfaceObject));
 End;
-{$EndIf}
+{$IfEnd}
 
 Function TBytesStreamEx.GetBytes() : TBytes;
 Begin
@@ -1400,7 +1400,7 @@ End;
       FImpl := TStreamIO.Create(Self);
     Result := FImpl;
   End;
-  {$EndIf}
+  {$IfEnd}
 Function TBytesStreamEx.GetIO() : IStreamIO;
 Begin
   If Not Assigned(FImpl) Then

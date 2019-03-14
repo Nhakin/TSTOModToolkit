@@ -8,6 +8,8 @@ Uses Windows, Classes, HsStreamEx, HsInterfaceEx,
 Type
   ITSTOWorkSpaceProjectSrcFilesIO = Interface(ITSTOWorkSpaceProjectSrcFiles)
     ['{4B61686E-29A0-2112-83D8-AF14FA400832}']
+    Function Remove(Const Item : ITSTOWorkSpaceProjectSrcFile) : Integer;
+
     Function  GetOnChange() : TNotifyEvent;
     Procedure SetOnChange(AOnChange : TNotifyEvent);
 
@@ -129,9 +131,15 @@ Type
   End;
 
   TTSTOWorkSpaceProjectSrcFilesIO = Class(TTSTOWorkSpaceProjectSrcFiles, ITSTOWorkSpaceProjectSrcFilesIO)
+  Private
+    FOnChange : TNotifyEvent;
+
   Protected
-    Function  GetOnChange() : TNotifyEvent; Virtual; Abstract;
-    Procedure SetOnChange(AOnChange : TNotifyEvent); Virtual; Abstract;
+    Function Remove(Const Item : ITSTOWorkSpaceProjectSrcFile) : Integer;
+
+    Procedure DoChanged(Sender : TObject);
+    Function  GetOnChange() : TNotifyEvent;
+    Procedure SetOnChange(AOnChange : TNotifyEvent);
 
   End;
 
@@ -263,6 +271,28 @@ Begin
 End;
 
 (******************************************************************************)
+
+Function TTSTOWorkSpaceProjectSrcFilesIO.Remove(Const Item : ITSTOWorkSpaceProjectSrcFile) : Integer;
+Begin
+  InHerited Remove(Item As IInterfaceEx);
+  DoChanged(Self);
+End;
+
+Procedure TTSTOWorkSpaceProjectSrcFilesIO.DoChanged(Sender : TObject);
+Begin
+  If Assigned(FOnChange) Then
+    FOnChange(Sender);
+End;
+
+Function TTSTOWorkSpaceProjectSrcFilesIO.GetOnChange() : TNotifyEvent;
+Begin
+  Result := FOnChange;
+End;
+
+Procedure TTSTOWorkSpaceProjectSrcFilesIO.SetOnChange(AOnChange : TNotifyEvent);
+Begin
+  FOnChange := AOnChange;
+End;
 
 Function TTSTOWorkSpaceProjectSrcFoldersIO.GetItemClass() : TInterfacedObjectExClass;
 Begin

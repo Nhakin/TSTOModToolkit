@@ -7,19 +7,19 @@ Uses {$If CompilerVersion < 18.5}HsStreamEx{$Else}SysUtils{$IfEnd}, HsInterfaceE
 Type
   IBCellSubItem = Interface(IInterfaceEx)
     ['{4B61686E-29A0-2112-8346-E191F686FC84}']
-    Function  GetString1() : String;
-    Procedure SetString1(Const AString1 : String);
+    Function  GetString1() : AnsiString;
+    Procedure SetString1(Const AString1 : AnsiString);
 
-    Function  GetString2() : String;
-    Procedure SetString2(Const AString2 : String);
+    Function  GetString2() : AnsiString;
+    Procedure SetString2(Const AString2 : AnsiString);
 
     Function  GetPadding() : TBytes;
 
     Procedure Assign(ASource : IInterface);
 
-    Property String1 : String Read GetString1 Write SetString1;
-    Property String2 : String Read GetString2 Write SetString2;
-    Property Padding : TBytes Read GetPadding;
+    Property String1 : AnsiString Read GetString1 Write SetString1;
+    Property String2 : AnsiString Read GetString2 Write SetString2;
+    Property Padding : TBytes     Read GetPadding;
 
 
   End;
@@ -40,8 +40,8 @@ Type
 
   IBCellItem = Interface(IInterfaceEx)
     ['{4B61686E-29A0-2112-8D45-FEEC8868D302}']
-    Function  GetRgbFileName() : String;
-    Procedure SetRgbFileName(Const ARgbFileName : String);
+    Function  GetRgbFileName() : AnsiString;
+    Procedure SetRgbFileName(Const ARgbFileName : AnsiString);
 
     Function  GetxDiffs() : Double;
     Procedure SetxDiffs(Const AxDiffs : Double);
@@ -52,7 +52,7 @@ Type
 
     Procedure Assign(ASource : IInterface);
 
-    Property RgbFileName : String         Read GetRgbFileName  Write SetRgbFileName;
+    Property RgbFileName : AnsiString     Read GetRgbFileName  Write SetRgbFileName;
     Property xDiffs      : Double         Read GetxDiffs       Write SetxDiffs;
     Property NbSubItems  : Word           Read GetNbSubItems;
     Property SubItems    : IBCellSubItems Read GetSubItems;
@@ -75,8 +75,8 @@ Type
 
   ITSTOBCellFile = Interface(IInterfaceEx)
     ['{4B61686E-29A0-2112-8A07-3772A4BD0D2F}']
-    Function  GetFileSig() : String;
-    Procedure SetFileSig(Const AFileSig : String);
+    Function  GetFileSig() : AnsiString;
+    Procedure SetFileSig(Const AFileSig : AnsiString);
 
     Function  GetNbItem() : Word;
 
@@ -84,7 +84,7 @@ Type
 
     Procedure Assign(ASource : IInterface);
     
-    Property FileSig : String      Read GetFileSig Write SetFileSig;
+    Property FileSig : AnsiString  Read GetFileSig Write SetFileSig;
     Property NbItem  : Word        Read GetNbItem;
     Property Items   : IBCellItems Read GetItems;
 

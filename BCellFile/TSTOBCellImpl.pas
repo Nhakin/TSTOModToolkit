@@ -15,17 +15,21 @@ Type
   Protected
     Procedure Created(); OverRide;
 
-    Function  GetString1() : String;
-    Procedure SetString1(Const AString1 : String);
+    Function  GetString1() : AnsiString;
+    Procedure SetString1(Const AString1 : AnsiString);
 
-    Function  GetString2() : String;
-    Procedure SetString2(Const AString2 : String);
+    Function  GetString2() : AnsiString;
+    Procedure SetString2(Const AString2 : AnsiString);
 
     Function  GetPadding() : TBytes;
 
     Procedure Clear();
 
     Procedure Assign(ASource : IInterface); ReIntroduce;
+
+    Property String1 : AnsiString Read GetString1 Write SetString1;
+    Property String2 : AnsiString Read GetString2 Write SetString2;
+    Property Padding : TBytes     Read GetPadding;
 
   End;
 
@@ -53,8 +57,8 @@ Type
     Procedure Created(); OverRide;
     Function  GetSubItemClass() : TBCellSubItemsClass; Virtual;
 
-    Function  GetRgbFileName() : String; Virtual;
-    Procedure SetRgbFileName(Const ARgbFileName : String);
+    Function  GetRgbFileName() : AnsiString; Virtual;
+    Procedure SetRgbFileName(Const ARgbFileName : AnsiString);
 
     Function  GetxDiffs() : Double; Virtual;
     Procedure SetxDiffs(Const AxDiffs : Double); Virtual;
@@ -88,15 +92,15 @@ Type
   TBCellItemsClass = Class Of TBCellItems;
   TTSTOBCellFile = Class(TInterfacedObjectEx, ITSTOBCellFile)
   Private
-    FFileSig : String;
+    FFileSig : AnsiString;
     FItems   : IBCellItems;
 
   Protected
     Procedure Created(); OverRide;
     Function GetItemClass() : TBCellItemsClass; Virtual;
 
-    Function  GetFileSig() : String; Virtual;
-    Procedure SetFileSig(Const AFileSig : String); Virtual;
+    Function  GetFileSig() : AnsiString; Virtual;
+    Procedure SetFileSig(Const AFileSig : AnsiString); Virtual;
 
     Function  GetNbItem() : Word; Virtual;
 
@@ -144,22 +148,22 @@ Begin
     Raise EConvertError.CreateResFmt(@SAssignError, ['Unsupported Interface', ClassName]);
 End;
 
-Function TBCellSubItem.GetString1() : String;
+Function TBCellSubItem.GetString1() : AnsiString;
 Begin
   Result := FString1;
 End;
 
-Procedure TBCellSubItem.SetString1(Const AString1 : String);
+Procedure TBCellSubItem.SetString1(Const AString1 : AnsiString);
 Begin
   FString1 := AString1;
 End;
 
-Function TBCellSubItem.GetString2() : String;
+Function TBCellSubItem.GetString2() : AnsiString;
 Begin
   Result := FString2;
 End;
 
-Procedure TBCellSubItem.SetString2(Const AString2 : String);
+Procedure TBCellSubItem.SetString2(Const AString2 : AnsiString);
 Begin
   FString2 := AString2;
 End;
@@ -247,12 +251,12 @@ Begin
     Raise EConvertError.CreateResFmt(@SAssignError, ['Unsupported Interface', ClassName]);
 End;
 
-Function TBCellItem.GetRgbFileName() : String;
+Function TBCellItem.GetRgbFileName() : AnsiString;
 Begin
   Result := FRgbFileName;
 End;
 
-Procedure TBCellItem.SetRgbFileName(Const ARgbFileName : String);
+Procedure TBCellItem.SetRgbFileName(Const ARgbFileName : AnsiString);
 Begin
   FRgbFileName := ARgbFileName;
 End;
@@ -354,12 +358,12 @@ Begin
     Raise EConvertError.CreateResFmt(@SAssignError, ['Unsupported Interface', ClassName]);
 End;
 
-Function TTSTOBCellFile.GetFileSig() : String;
+Function TTSTOBCellFile.GetFileSig() : AnsiString;
 Begin
-  Result := Copy(FFileSig, 1, Length(FFileSig) - 1);
+  Result := AnsiString(Copy(FFileSig, 1, Length(FFileSig) - 1));
 End;
 
-Procedure TTSTOBCellFile.SetFileSig(Const AFileSig : String);
+Procedure TTSTOBCellFile.SetFileSig(Const AFileSig : AnsiString);
 Begin
   FFileSig := AFileSig + #1;
 End;

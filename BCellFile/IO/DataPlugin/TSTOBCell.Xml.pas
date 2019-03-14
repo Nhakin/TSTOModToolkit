@@ -7,20 +7,20 @@ Uses HsXmlDocEx;
 Type
   IXmlBCellSubItem = Interface(IXmlNodeEx)
     ['{4B61686E-29A0-2112-9B19-535D51173040}']
-    Function  GetString1() : String;
-    Procedure SetString1(Const AString1 : String);
+    Function  GetString1() : AnsiString;
+    Procedure SetString1(Const AString1 : AnsiString);
 
-    Function  GetString2() : String;
-    Procedure SetString2(Const AString2 : String);
+    Function  GetString2() : AnsiString;
+    Procedure SetString2(Const AString2 : AnsiString);
 
-    Function  GetPadding() : String;
-    Procedure SetPadding(Const APadding : String);
+    Function  GetPadding() : AnsiString;
+    Procedure SetPadding(Const APadding : AnsiString);
 
     Procedure Assign(ASource : IInterface);
 
-    Property String1 : String Read GetString1 Write SetString1;
-    Property String2 : String Read GetString2 Write SetString2;
-    Property Padding : String Read GetPadding Write SetPadding;
+    Property String1 : AnsiString Read GetString1 Write SetString1;
+    Property String2 : AnsiString Read GetString2 Write SetString2;
+    Property Padding : AnsiString Read GetPadding Write SetPadding;
 
   End;
 
@@ -38,8 +38,8 @@ Type
 
   IXmlBCellItem = Interface(IXmlNodeEx)
     ['{4B61686E-29A0-2112-99AB-52EEAD7778B3}']
-    Function  GetRgbFileName() : String;
-    Procedure SetRgbFileName(Const ARgbFileName : String);
+    Function  GetRgbFileName() : AnsiString;
+    Procedure SetRgbFileName(Const ARgbFileName : AnsiString);
 
     Function  GetxDiffs() : Double;
     Procedure SetxDiffs(Const AxDiffs : Double);
@@ -49,7 +49,7 @@ Type
 
     Procedure Assign(ASource : IInterface);
     
-    Property RgbFileName : String            Read GetRgbFileName Write SetRgbFileName;
+    Property RgbFileName : AnsiString        Read GetRgbFileName Write SetRgbFileName;
     Property xDiffs      : Double            Read GetxDiffs      Write SetxDiffs;
     Property NbSubItems  : Word              Read GetNbSubItems;
     Property SubItems    : IXmlBCellSubItems Read GetSubItems;
@@ -70,15 +70,15 @@ Type
 
   IXmlTSTOBCellFile = Interface(IXmlNodeEx)
     ['{4B61686E-29A0-2112-BBC3-CFECCD00C965}']
-    Function  GetFileSig() : String;
-    Procedure SetFileSig(Const AFileSig : String);
+    Function  GetFileSig() : AnsiString;
+    Procedure SetFileSig(Const AFileSig : AnsiString);
 
     Function  GetNbItem() : Word;
     Function  GetItems() : IXmlBCellItems;
 
     Procedure Assign(ASource : IInterface);  
     
-    Property FileSig : String         Read GetFileSig Write SetFileSig;
+    Property FileSig : AnsiString     Read GetFileSig Write SetFileSig;
     Property NbItem  : Word           Read GetNbItem;
     Property Items   : IXmlBCellItems Read GetItems;
 
@@ -104,14 +104,14 @@ Type
   Protected
     Property SubItemImpl : IBCellSubItem Read GetImplementor;
 
-    Function  GetString1() : String;
-    Procedure SetString1(Const AString1 : String);
+    Function  GetString1() : AnsiString;
+    Procedure SetString1(Const AString1 : AnsiString);
 
-    Function  GetString2() : String;
-    Procedure SetString2(Const AString2 : String);
+    Function  GetString2() : AnsiString;
+    Procedure SetString2(Const AString2 : AnsiString);
 
-    Function  GetPadding() : String;
-    Procedure SetPadding(Const APadding : String);
+    Function  GetPadding() : AnsiString;
+    Procedure SetPadding(Const APadding : AnsiString);
 
     Function GetPaddingAsTBytes() : TBytes;
     Function IBCellSubItem.GetPadding = GetPaddingAsTBytes;
@@ -153,8 +153,8 @@ Type
   Protected
     Property ItemImpl : IBCellItem Read GetImplementor;
 
-    Function  GetRgbFileName() : String;
-    Procedure SetRgbFileName(Const ARgbFileName : String);
+    Function  GetRgbFileName() : AnsiString;
+    Procedure SetRgbFileName(Const ARgbFileName : AnsiString);
 
     Function  GetxDiffs() : Double;
     Procedure SetxDiffs(Const AxDiffs : Double);
@@ -202,8 +202,8 @@ Type
   Protected
     Property BCellImpl : ITSTOBCellFile Read GetImplementor;
 
-    Function  GetFileSig() : String; Virtual;
-    Procedure SetFileSig(Const AFileSig : String); Virtual;
+    Function  GetFileSig() : AnsiString; Virtual;
+    Procedure SetFileSig(Const AFileSig : AnsiString); Virtual;
 
     Function  GetNbItem() : Word; Virtual;
 
@@ -278,41 +278,41 @@ Begin
     Raise EConvertError.CreateResFmt(@SAssignError, ['Unsupported Interface', ClassName]);
 End;
 
-Function TXmlBCellSubItem.GetString1() : String;
+Function TXmlBCellSubItem.GetString1() : AnsiString;
 Begin
-  Result := ChildNodes['String1'].AsString;
+  Result := AnsiString(ChildNodes['String1'].AsString);
 End;
 
-Procedure TXmlBCellSubItem.SetString1(Const AString1 : String);
+Procedure TXmlBCellSubItem.SetString1(Const AString1 : AnsiString);
 Begin
   If IsImplementorOf(SubItemImpl) Then
-    ChildNodes['String1'].AsString := AString1
+    ChildNodes['String1'].AsString := WideString(AString1)
   Else
     SubItemImpl.String1 := AString1;
 End;
 
-Function TXmlBCellSubItem.GetString2() : String;
+Function TXmlBCellSubItem.GetString2() : AnsiString;
 Begin
-  Result := ChildNodes['String2'].AsString;
+  Result := AnsiString(ChildNodes['String2'].AsString);
 End;
 
-Procedure TXmlBCellSubItem.SetString2(Const AString2 : String);
+Procedure TXmlBCellSubItem.SetString2(Const AString2 : AnsiString);
 Begin
   If IsImplementorOf(SubItemImpl) Then
-    ChildNodes['String2'].AsString := AString2
+    ChildNodes['String2'].AsString := WideString(AString2)
   Else
     SubItemImpl.String2 := AString2;
 End;
 
-Function TXmlBCellSubItem.GetPadding() : String;
+Function TXmlBCellSubItem.GetPadding() : AnsiString;
 Begin
-  Result := ChildNodes['Padding'].AsString;
+  Result := AnsiString(ChildNodes['Padding'].AsString);
 End;
 
-Procedure TXmlBCellSubItem.SetPadding(Const APadding : String);
+Procedure TXmlBCellSubItem.SetPadding(Const APadding : AnsiString);
 Begin
   If IsImplementorOf(SubItemImpl) Then
-    ChildNodes['Padding'].AsString := APadding
+    ChildNodes['Padding'].AsString := WideString(APadding)
   Else
     Raise Exception.Create('Todo : TXmlBCellSubItem.SetPadding');
 End;
@@ -457,15 +457,15 @@ Begin
     Raise EConvertError.CreateResFmt(@SAssignError, ['Unsupported Interface', ClassName]);
 End;
 
-Function TXmlBCellItem.GetRgbFileName() : String;
+Function TXmlBCellItem.GetRgbFileName() : AnsiString;
 Begin
-  Result := ChildNodes['RgbFileName'].AsString;
+  Result := AnsiString(ChildNodes['RgbFileName'].AsString);
 End;
 
-Procedure TXmlBCellItem.SetRgbFileName(Const ARgbFileName : String);
+Procedure TXmlBCellItem.SetRgbFileName(Const ARgbFileName : AnsiString);
 Begin
   If IsImplementorOf(ItemImpl) Then
-    ChildNodes['RgbFileName'].AsString := ARgbFileName
+    ChildNodes['RgbFileName'].AsString := WideString(ARgbFileName)
   Else
     ItemImpl.RgbFileName := ARgbFileName;
 End;
@@ -610,15 +610,15 @@ Begin
     Raise EConvertError.CreateResFmt(@SAssignError, ['Unsupported Interface', ClassName]);
 End;
 
-Function TXmlTSTOBCellFileImpl.GetFileSig() : String;
+Function TXmlTSTOBCellFileImpl.GetFileSig() : AnsiString;
 Begin
-  Result := ChildNodes['FileSig'].AsString;
+  Result := AnsiString(ChildNodes['FileSig'].AsString);
 End;
 
-Procedure TXmlTSTOBCellFileImpl.SetFileSig(Const AFileSig : String);
+Procedure TXmlTSTOBCellFileImpl.SetFileSig(Const AFileSig : AnsiString);
 Begin
   If IsImplementorOf(BCellImpl) Then
-    ChildNodes['FileSig'].AsString := AFileSig
+    ChildNodes['FileSig'].AsString := WideString(AFileSig)
   Else
     BCellImpl.FileSig := AFileSig;
 End;
