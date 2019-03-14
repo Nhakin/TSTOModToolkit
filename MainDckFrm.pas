@@ -368,7 +368,7 @@ Type
     Function GetIntfImpl() : TInterfaceExImplementor;
 
     Function  UniqueComponentName(AComponentName : String) : String;
-    Function  InternalAddPluginItem(Sender : TJvPlugin; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
+    Function  InternalAddPluginItem(Sender : TComponent; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
     Procedure InternalRemovePluginItem(AGroup : TSpTBXTBGroupItem; AItemId : NativeInt);
 
   Protected
@@ -376,19 +376,18 @@ Type
 
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
     Function GetCurrentProject() : ITSTOWorkSpaceProjectIO;
-
     Function GetCurrentSkinName() : String;
     Function GetIcon() : TIcon;
+    Function GetHost() : TApplication;
 
-    Procedure AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem); OverLoad;
-    Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+    Procedure AddItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem); OverLoad;
+    Procedure AddItem(Sender : TComponent; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
+    Procedure RemoveItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem);
 
     Function CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
     Function CreateScriptTemplates() : ITSTOScriptTemplateHacksIO;
     Function CreateHackMasterList() : ITSTOHackMasterListIO;
     Function CreateRgbProgress() : IRgbProgress;
-
-    Procedure AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
   {$EndRegion}
 
   end;
@@ -3065,6 +3064,11 @@ Begin
   Result := Application.Icon;
 End;
 
+Function TFrmDckMain.GetHost() : TApplication;
+Begin
+  Result := Application;
+End;
+
 Function TFrmDckMain.UniqueComponentName(AComponentName : String) : String;
 Var lIdx : Integer;
 Begin
@@ -3080,7 +3084,7 @@ Begin
   End;
 End;
 
-Function TFrmDckMain.InternalAddPluginItem(Sender : TJvPlugin; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
+Function TFrmDckMain.InternalAddPluginItem(Sender : TComponent; AItem : TTBCustomItem; ACommandPrefix : String) : TTBCustomItem;
 Var lCurItem : TTBCustomItem;
     X : Integer;
 Begin
@@ -3153,7 +3157,7 @@ Begin
       AGroup.Remove(AGroup[X]);
 End;
 
-Procedure TFrmDckMain.AddItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+Procedure TFrmDckMain.AddItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem);
 Var lGroup : TSpTBXTBGroupItem;
 Begin
   Case AItemKind Of
@@ -3164,7 +3168,12 @@ Begin
   lGroup.Add(InternalAddPluginItem(Sender, AItem, ''));
 End;
 
-Procedure TFrmDckMain.RemoveItem(AItemKind : TUIItemKind; Sender : TJvPlugin; AItem : TTBCustomItem);
+Procedure TFrmDckMain.AddItem(Sender : TComponent; ASrcItem, ATrgItem : TTBCustomItem);
+Begin
+  ATrgItem.Add(InternalAddPluginItem(Sender, ASrcItem, ''));
+End;
+
+Procedure TFrmDckMain.RemoveItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem);
 Var lGroup : TSpTBXTBGroupItem;
 Begin
   Case AItemKind Of
@@ -3173,11 +3182,6 @@ Begin
   End;
 
   InternalRemovePluginItem(lGroup, Integer(AItem));
-End;
-
-Procedure TFrmDckMain.AddItem(Sender : TJvPlugin; ASrcItem, ATrgItem : TTBCustomItem);
-Begin
-  ATrgItem.Add(InternalAddPluginItem(Sender, ASrcItem, ''));
 End;
 
 Function TFrmDckMain.CreateWorkSpace() : ITSTOWorkSpaceProjectGroupIO;

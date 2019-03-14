@@ -8,7 +8,7 @@ uses
   Controls, Forms, Dialogs, TB2Dock,
   TB2Toolbar, SpTBXItem, TB2Item, SpTBXDkPanels, SpTBXControls, SpTBXExPanel,
   ImgList, VirtualTrees, SpTBXExControls, StdCtrls,
-  SpTBXEditors;
+  SpTBXEditors, System.ImageList;
 
 type
   TTSTOPluginManagerDlg = class(TForm)
@@ -44,7 +44,7 @@ type
     procedure CmdPluginSettingClick(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure tvPluginsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
 
   private
     FMainApp : ITSTOApplication;
@@ -136,7 +136,7 @@ end;
 
 procedure TTSTOPluginManagerDlg.tvPluginsGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
-  var CellText: WideString);
+  var CellText: string);
 Var lNodeData : ITSTOPlugin;
 begin
   If GetNodeData(Node, ITSTOPlugin, lNodeData) Then
