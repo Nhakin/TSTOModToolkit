@@ -12,6 +12,8 @@ type
   Private
     FScriptTemplates : ITSTOScriptTemplateHacksIO;
 
+    Function  GetFreeLandUpgradeScript(Sender : TObject) : String;
+    Procedure PreviewFreeLandUpgrade(Sender : TObject);
     Procedure ExecuteFreeLandUpgrade(Sender : TObject);
 
   Protected
@@ -22,7 +24,7 @@ type
     Function  GetDescription() : String; OverRide;
     Function  GetPluginId() : String; OverRide;
     Function  GetPluginVersion() : String; OverRide;
-        
+
     Procedure Initialize(AMainApplication : ITSTOApplication); OverRide;
     Procedure Finalize(); OverRide;
     Function  ShowSettings() : Boolean; OverRide;
@@ -36,7 +38,7 @@ Function CreateTSTOPlugin() : ITSTOPlugin;
 
 implementation
 
-Uses HsInterfaceEx, HsStreamEx, HsXmlDocEx;
+Uses SciScintillaNPP, HsInterfaceEx, HsStreamEx, HsStringListEx, HsXmlDocEx;
 
 {$R *.dfm}
 
@@ -93,7 +95,9 @@ Begin
         Begin
           Name := '%FreeLandUpgrade%';
           VarFunc := 'hmCustom';
-          OnExecFunc := ExecuteFreeLandUpgrade;
+
+          OnExecute := ExecuteFreeLandUpgrade;
+          OnPreview := PreviewFreeLandUpgrade;
         End;
 
         If Assigned(MainApp.CurrentProject) Then
@@ -133,13 +137,15 @@ Begin
   Result := -1;
 End;
 
-Procedure TTSTOCustomScriptPlugin.ExecuteFreeLandUpgrade(Sender : TObject);
+Function TTSTOCustomScriptPlugin.GetFreeLandUpgradeScript(Sender : TObject) : String;
 Var lVariable : ITSTOScriptTemplateVariableIO;
     lIdx : Integer;
     lNodes : IXmlNodeListEx;
     lStrs : TStringList;
     X, Y : Integer;
 Begin
+  Result := '';
+
   If Assigned(FScriptTemplates) And Assigned(MainApp.CurrentProject) And
      Supports(Sender, ITSTOScriptTemplateVariableIO, lVariable) Then
   Begin
@@ -181,21 +187,41 @@ Begin
               lStrs.Free();
           End;
 
-          lStrs := TStringList.Create();
-          Try
-            If Assigned(lNodes.First) And Assigned(lNodes.First.OwnerDocument) Then
-              lStrs.Text := FormatXmlData(lNodes.First.OwnerDocument.Xml.Text);
-
-            lStrs.SaveToFile(MainApp.CurrentProject.CustomModPath + 'LandInfo.xml');
-
-            Finally
-              lStrs.Free();
-          End;
+          If Assigned(lNodes.First) And Assigned(lNodes.First.OwnerDocument) Then
+            Result := FormatXmlData(lNodes.First.OwnerDocument.Xml.Text);
 
           Finally
             lNodes := Nil;
         End;
       End;
+    End;
+  End;
+End;
+
+Procedure TTSTOCustomScriptPlugin.PreviewFreeLandUpgrade(Sender : TObject);
+Var lEdit : TScintillaNPP;
+    lCmp  : TComponent;
+Begin
+  lCmp := MainApp.Host.MainForm.FindComponent('EditScriptTemplate');
+  If Assigned(lCmp) And SameText(lCmp.ClassName, 'TScintillaNPP') Then
+  Begin
+    lEdit := lCmp As TScintillaNPP;
+    lEdit.Lines.Text := GetFreeLandUpgradeScript(Sender);
+  End;
+End;
+
+Procedure TTSTOCustomScriptPlugin.ExecuteFreeLandUpgrade(Sender : TObject);
+Var lStrs : IHsStringListEx;
+Begin
+  If Assigned(FScriptTemplates) And Assigned(MainApp.CurrentProject) Then
+  Begin
+    lStrs := THsStringListEx.CreateList();
+    Try
+      lStrs.Text := GetFreeLandUpgradeScript(Sender);
+      lStrs.SaveToFile(MainApp.CurrentProject.CustomModPath + 'LandInfo.xml');
+
+      Finally
+        lStrs := Nil;
     End;
   End;
 End;

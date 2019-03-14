@@ -67,7 +67,6 @@ Begin
   InHerited AfterConstruction();
 
   FPluginList := TTSTOPlugins.CreatePluginList();
-  RefreshPluginList();
 End;
 
 Procedure TTSTOPluginManager.BeforeDestruction();
@@ -140,6 +139,8 @@ Begin
     lMnu := MainApp.Host.MainForm.FindComponent('mnuPlugins');
     If Assigned(lMnu) And SameText(lMnu.ClassName, 'TSpTBXSubmenuItem') Then
       MainApp.AddItem(Self, grpPluginManagerMenuItem, TTBCustomItem(lMnu));
+
+    RefreshPluginList();
   End;
 End;
 

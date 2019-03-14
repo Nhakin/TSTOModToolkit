@@ -9,7 +9,7 @@ uses
   Dialogs, StdCtrls, HsInterfaceEx,
   TB2Item, SpTBXItem, TB2Dock, TB2Toolbar,
   SpTBXControls, SpTBXExPanel, SpTBXEditors,
-  ImgList, System.ImageList;
+  ImgList, TntStdCtrls;
 
 type
   TTSTOPluginManager = class(TForm, ITSTOApplication)

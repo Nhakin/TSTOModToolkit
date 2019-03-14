@@ -1,4 +1,5 @@
 inherited TSTOPluginManager: TTSTOPluginManager
+  OldCreateOrder = True
   object SpTBXBItemContainer1: TSpTBXBItemContainer
     Left = 83
     Top = 53

@@ -1,8 +1,9 @@
 inherited TSTOPluginDemo: TTSTOPluginDemo
+  OldCreateOrder = True
   OnDestroy = TSTOPluginDemoDestroy
   object SpTBXBItemContainer1: TSpTBXBItemContainer
     Left = 83
-    Top = 23
+    Top = 25
     object SpTbxPluginDemo: TSpTBXItem
       Caption = 'Plugin Demo'
       ImageIndex = 67
@@ -18,6 +19,7 @@ inherited TSTOPluginDemo: TTSTOPluginDemo
         Caption = 'Play'
         ImageIndex = 105
         Images = ilMain
+        OnClick = SpTbxPlayClick
       end
       object SpTbxStop: TSpTBXItem
         Caption = 'Stop'
@@ -51,33 +53,36 @@ inherited TSTOPluginDemo: TTSTOPluginDemo
     end
     object GrpPluginDemoItems: TSpTBXTBGroupItem
       object SpTBXGrpSingleItem: TSpTBXItem
-        Caption = 'Grp Single Item'
+        Caption = 'List missing resources'
         ImageIndex = 6
         Images = ilMain
+        OnClick = SpTBXGrpSingleItemClick
       end
       object SpTbxGrpSubMenu: TSpTBXSubmenuItem
         Caption = 'Grp SubMenu'
         ImageIndex = 82
         Images = ilMain
         DropdownCombo = True
-        object SpTBXGrpSubItem1: TSpTBXItem
-          Caption = 'Item #1'
+        object SpTBXFreeFarm: TSpTBXItem
+          Caption = 'Free Farm & Selectors'
           ImageIndex = 3
           Images = ilMain
+          OnClick = SpTBXFreeFarmClick
         end
-        object SpTBXGrpSubItem2: TSpTBXItem
-          Caption = 'Item #2'
+        object SpTbxOldStoreMenu: TSpTBXItem
+          Caption = 'Store menu for old TSTO'
           ImageIndex = 4
           Images = ilMain
+          OnClick = SpTbxOldStoreMenuClick
         end
       end
     end
   end
   object ilMain: TImageList
     Left = 82
-    Top = 75
+    Top = 77
     Bitmap = {
-      494C010176007800500010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010176007800580010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000E0010000010020000000000000E0
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000948C8C005252520052525200525252005252
