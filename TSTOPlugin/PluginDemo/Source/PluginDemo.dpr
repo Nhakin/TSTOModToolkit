@@ -27,7 +27,8 @@ uses
   TSTOPluginIntf in '..\..\TSTOSdk\TSTOPluginIntf.pas',
   DlgTSTOPluginDemoSettings in 'DlgTSTOPluginDemoSettings.pas' {TSTOPluginDemoSettingsDlg},
   PlgTSTOCustomPlugin in '..\..\TSTOSdk\PlgTSTOCustomPlugin.pas' {TSTOCustomPlugin: TJvPlugIn},
-  PlgTSTOPluginDemo in 'PlgTSTOPluginDemo.pas' {TSTOPluginDemo: TTSTOCustomPlugin};
+  PlgTSTOPluginDemo in 'PlgTSTOPluginDemo.pas' {TSTOPluginDemo: TTSTOCustomPlugin},
+  HsIniFilesEx in '..\..\..\HsUnits\HsIniFilesEx.pas';
 
 {$R *.res}
 

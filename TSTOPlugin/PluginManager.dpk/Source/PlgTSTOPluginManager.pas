@@ -5,7 +5,7 @@ interface
 uses
   TSTOPluginIntf, TSTOPluginManagerIntf, TSTOCustomPatches.IO, TSTOScriptTemplate.IO,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, PlgTSTOCustomPlugin, SpTBXItem, TB2Item;
+  Dialogs, PlgTSTOCustomPlugin, SpTBXItem, TB2Item, ImgList;
 
 type
   TTSTOPluginManager = class(TTSTOCustomPlugin, ITSTOPluginManager)
@@ -13,6 +13,7 @@ type
     grpPluginManagerMenuItem: TSpTBXTBGroupItem;
     SpTBXSeparatorItem1: TSpTBXSeparatorItem;
     mnuPluginManager: TSpTBXItem;
+    ilMain: TImageList;
 
     procedure mnuPluginManagerClick(Sender: TObject);
         

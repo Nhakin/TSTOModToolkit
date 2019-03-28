@@ -38,7 +38,8 @@ Function CreateTSTOPlugin() : ITSTOPlugin;
 
 implementation
 
-Uses SciScintillaNPP, HsInterfaceEx, HsStreamEx, HsStringListEx, HsXmlDocEx;
+Uses
+  SciScintillaNPP, HsInterfaceEx, HsStreamEx, HsStringListEx, HsXmlDocEx;
 
 {$R *.dfm}
 

@@ -1,31 +1,30 @@
-object TSTOPluginManagerDlg: TTSTOPluginManagerDlg
+object TSTOVintageScriptSettingsDlg: TTSTOVintageScriptSettingsDlg
   Left = 0
   Top = 0
-  Caption = 'Plugin Manager'
-  ClientHeight = 325
-  ClientWidth = 488
+  BorderIcons = [biSystemMenu]
+  Caption = 'Settings...'
+  ClientHeight = 423
+  ClientWidth = 547
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  KeyPreview = True
   OldCreateOrder = False
-  Position = poScreenCenter
+  Position = poOwnerFormCenter
   OnCreate = FormCreate
-  OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 13
   object sptbxDckMain: TSpTBXDock
     Left = 0
     Top = 0
-    Width = 488
-    Height = 26
+    Width = 547
+    Height = 51
     AllowDrag = False
     object sptbxtbMain: TSpTBXToolbar
       Left = 0
-      Top = 0
+      Top = 25
       Align = alTop
       CloseButton = False
       DockPos = 0
@@ -42,148 +41,239 @@ object TSTOPluginManagerDlg: TTSTOPluginManagerDlg
       Customizable = False
       MenuBar = True
     end
+    object SpTBXToolbar1: TSpTBXToolbar
+      Left = 0
+      Top = 0
+      TabOrder = 1
+      Visible = False
+      Caption = 'SpTBXToolbar1'
+      object SpTBXSubmenuItem3: TSpTBXSubmenuItem
+        Caption = 'Cliss'
+        LinkSubitems = SpTBXSubmenuItem4
+      end
+    end
   end
-  object PanTv: TSpTBXExPanel
+  object SpTBXExPanel1: TSpTBXExPanel
     Left = 0
-    Top = 26
-    Width = 161
-    Height = 273
-    Align = alLeft
-    TabOrder = 1
-    TBXStyleBackground = True
-  end
-  object SpTBXStatusBar1: TSpTBXStatusBar
-    Left = 0
-    Top = 299
-    Width = 488
-    Height = 26
-  end
-  object SpTBXSplitter1: TSpTBXSplitter
-    Left = 161
-    Top = 26
-    Height = 273
-    Cursor = crSizeWE
-  end
-  object SpTBXExPanel2: TSpTBXExPanel
-    Left = 166
-    Top = 26
-    Width = 322
-    Height = 273
+    Top = 51
+    Width = 547
+    Height = 372
+    Caption = 'SpTBXExPanel1'
     Align = alClient
-    TabOrder = 4
+    TabOrder = 1
+    Borders = False
     TBXStyleBackground = True
-    object SpTBXGroupBox1: TSpTBXGroupBox
-      AlignWithMargins = True
-      Left = 5
-      Top = 5
-      Width = 312
-      Height = 263
-      Caption = ' Plugin Info '
-      Align = alClient
+    ExplicitTop = 26
+    ExplicitHeight = 397
+    object PanTreeView: TSpTBXExPanel
+      Left = 0
+      Top = 0
+      Width = 149
+      Height = 372
+      Align = alLeft
       TabOrder = 0
+      Borders = False
       TBXStyleBackground = True
-      DesignSize = (
-        312
-        263)
-      object SpTBXLabel1: TSpTBXLabel
-        Left = 10
-        Top = 20
-        Width = 43
-        Height = 19
-        Caption = 'Name : '
-      end
-      object EditName: TSpTBXEdit
-        Left = 75
-        Top = 20
-        Width = 227
-        Height = 21
-        Anchors = [akLeft, akTop, akRight]
-        ReadOnly = True
+      ExplicitHeight = 397
+    end
+    object SpTBXSplitter1: TSpTBXSplitter
+      Left = 149
+      Top = 0
+      Height = 372
+      Cursor = crSizeWE
+      ExplicitHeight = 397
+    end
+    object SpTBXExPanel3: TSpTBXExPanel
+      Left = 154
+      Top = 0
+      Width = 393
+      Height = 372
+      Caption = 'SpTBXExPanel3'
+      Align = alClient
+      TabOrder = 2
+      Borders = False
+      ExplicitHeight = 397
+      object gbFunctionOptions: TSpTBXGroupBox
+        Left = 0
+        Top = 172
+        Width = 393
+        Height = 87
+        Caption = ' Function Options '
+        Align = alTop
         TabOrder = 1
+        object chkFunctionEnabled: TSpTBXCheckBox
+          Left = 11
+          Top = 16
+          Width = 186
+          Height = 21
+          Caption = 'Enabled'
+          AutoSize = False
+          TabOrder = 0
+        end
+        object chkAddInMenu: TSpTBXCheckBox
+          Left = 11
+          Top = 35
+          Width = 186
+          Height = 21
+          Caption = 'Add In Menu'
+          AutoSize = False
+          TabOrder = 1
+        end
+        object chkAddInToolBar: TSpTBXCheckBox
+          Left = 11
+          Top = 53
+          Width = 186
+          Height = 21
+          Caption = 'Add In ToolBar'
+          AutoSize = False
+          TabOrder = 2
+        end
       end
-      object SpTBXLabel2: TSpTBXLabel
-        Left = 10
-        Top = 47
-        Width = 49
-        Height = 19
-        Caption = 'Author : '
-      end
-      object EditAuthor: TSpTBXEdit
-        Left = 75
-        Top = 47
-        Width = 227
-        Height = 21
-        Anchors = [akLeft, akTop, akRight]
-        ReadOnly = True
-        TabOrder = 3
-      end
-      object SpTBXLabel3: TSpTBXLabel
-        Left = 10
-        Top = 74
-        Width = 63
-        Height = 19
-        Caption = 'Copyright : '
-      end
-      object EditCopyright: TSpTBXEdit
-        Left = 75
-        Top = 74
-        Width = 227
-        Height = 21
-        Anchors = [akLeft, akTop, akRight]
-        ReadOnly = True
-        TabOrder = 5
-      end
-      object SpTBXLabel4: TSpTBXLabel
-        Left = 10
-        Top = 101
-        Width = 51
-        Height = 19
-        Caption = 'Version : '
-      end
-      object EditVersion: TSpTBXEdit
-        Left = 75
-        Top = 101
-        Width = 227
-        Height = 21
-        Anchors = [akLeft, akTop, akRight]
-        ReadOnly = True
-        TabOrder = 7
-      end
-      object SpTBXLabel5: TSpTBXLabel
-        Left = 10
-        Top = 128
-        Width = 69
-        Height = 19
-        Caption = 'Description : '
-      end
-      object EditDescription: TSpTBXEdit
-        Left = 10
-        Top = 153
-        Width = 292
-        Height = 75
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        AutoSize = False
-        ReadOnly = True
-        TabOrder = 9
-      end
-      object CmdPluginSetting: TSpTBXButton
-        Left = 227
-        Top = 234
-        Width = 75
-        Height = 25
-        Caption = 'Settings...'
-        Anchors = [akRight, akBottom]
-        Enabled = False
-        TabOrder = 10
-        OnClick = CmdPluginSettingClick
+      object gbGlobalOptions: TSpTBXGroupBox
+        Left = 0
+        Top = 0
+        Width = 393
+        Height = 172
+        Caption = ' Global Options '
+        Align = alTop
+        TabOrder = 0
+        DesignSize = (
+          393
+          172)
+        object chkEnabled: TSpTBXCheckBox
+          Left = 11
+          Top = 16
+          Width = 186
+          Height = 21
+          Caption = 'Enabled'
+          AutoSize = False
+          TabOrder = 0
+        end
+        object chkUseAppSettings: TSpTBXCheckBox
+          Left = 11
+          Top = 33
+          Width = 186
+          Height = 21
+          Caption = 'Use App Settings'
+          AutoSize = False
+          TabOrder = 1
+        end
+        object SpTBXLabel5: TSpTBXLabel
+          Left = 12
+          Top = 58
+          Width = 91
+          Height = 19
+          Caption = 'Hack Master List :'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+        end
+        object EditHackMasterList: TSpTBXButtonEdit
+          Left = 102
+          Top = 57
+          Width = 282
+          Height = 21
+          Anchors = [akLeft, akTop, akRight]
+          TabOrder = 2
+          EditButton.Left = 259
+          EditButton.Top = 0
+          EditButton.Width = 19
+          EditButton.Height = 17
+          EditButton.Align = alRight
+          EditButton.OnClick = EditHackMasterListSubEditButton0Click
+        end
+        object EditResourcePath: TSpTBXButtonEdit
+          Left = 102
+          Top = 83
+          Width = 282
+          Height = 21
+          Anchors = [akLeft, akTop, akRight]
+          TabOrder = 4
+          EditButton.Left = 259
+          EditButton.Top = 0
+          EditButton.Width = 19
+          EditButton.Height = 17
+          EditButton.Align = alRight
+          EditButton.OnClick = EditResourcePathSubEditButton0Click
+        end
+        object SpTBXLabel6: TSpTBXLabel
+          Left = 12
+          Top = 84
+          Width = 83
+          Height = 19
+          Caption = 'Resource Path :'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+        end
+        object SpTBXLabel7: TSpTBXLabel
+          Left = 12
+          Top = 111
+          Width = 64
+          Height = 19
+          Caption = 'Store Path :'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+        end
+        object EditStorePath: TSpTBXButtonEdit
+          Left = 102
+          Top = 110
+          Width = 282
+          Height = 21
+          Anchors = [akLeft, akTop, akRight]
+          TabOrder = 6
+          EditButton.Left = 259
+          EditButton.Top = 0
+          EditButton.Width = 19
+          EditButton.Height = 17
+          EditButton.Align = alRight
+          EditButton.OnClick = EditStorePathSubEditButton0Click
+        end
+        object SpTBXLabel8: TSpTBXLabel
+          Left = 12
+          Top = 138
+          Width = 65
+          Height = 19
+          Caption = 'Script Path :'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+        end
+        object EditScriptPath: TSpTBXButtonEdit
+          Left = 102
+          Top = 137
+          Width = 282
+          Height = 21
+          Anchors = [akLeft, akTop, akRight]
+          TabOrder = 8
+          EditButton.Left = 259
+          EditButton.Top = 0
+          EditButton.Width = 19
+          EditButton.Height = 17
+          EditButton.Align = alRight
+          EditButton.OnClick = EditScriptPathSubEditButton0Click
+        end
       end
     end
   end
   object imgToolBar: TImageList
     Left = 26
-    Top = 20
+    Top = 22
     Bitmap = {
-      494C010101007800140010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010101007800340010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -323,14 +413,61 @@ object TSTOPluginManagerDlg: TTSTOPluginManagerDlg
       000000000000}
   end
   object SpTBXBItemContainer1: TSpTBXBItemContainer
-    Left = 24
-    Top = 72
+    Left = 58
+    Top = 22
     object tbPopupMenuItems: TSpTBXSubmenuItem
       object tbSavePlugins: TSpTBXItem
         Caption = 'Save'
         ImageIndex = 0
         Images = imgToolBar
         OnClick = tbSavePluginsClick
+      end
+    end
+  end
+  object mnuVintageItems: TSpTBXBItemContainer
+    Left = 221
+    Top = 340
+    object mnuVintagePlugin: TSpTBXSubmenuItem
+      Caption = 'Vintage Scripts'
+      ImageIndex = 0
+      Images = imgToolBar
+      object mnuHelper: TSpTBXSubmenuItem
+        Caption = 'Helper'
+        object mnuListMissingRGBFiles: TSpTBXItem
+          Caption = 'List missing resources'
+        end
+        object mnuBuildSkinStore: TSpTBXItem
+          Caption = 'Build Skin Store'
+        end
+      end
+      object mnuVintageScript: TSpTBXSubmenuItem
+        Caption = 'Vintage Scripts'
+        object mnuFreeFarmAndSelector: TSpTBXItem
+          Caption = 'Free Farm && Selectors'
+        end
+        object mnuOldStoreMenu: TSpTBXItem
+          Caption = 'Store menu for old TSTO'
+        end
+      end
+      object SpTBXSeparatorItem1: TSpTBXSeparatorItem
+      end
+      object mnuPluginSettings: TSpTBXItem
+        Caption = 'Settings'
+      end
+    end
+    object SpTBXSubmenuItem4: TSpTBXSubmenuItem
+      Caption = 'MyVint'
+      object SpTBXSubmenuItem1: TSpTBXSubmenuItem
+        Caption = 'MyHelper'
+        ImageIndex = 0
+        Images = imgToolBar
+        LinkSubitems = mnuHelper
+      end
+      object SpTBXSeparatorItem2: TSpTBXSeparatorItem
+      end
+      object SpTBXSubmenuItem2: TSpTBXSubmenuItem
+        Caption = 'MyVintage'
+        LinkSubitems = mnuVintageScript
       end
     end
   end

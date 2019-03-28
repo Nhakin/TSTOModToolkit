@@ -61,6 +61,7 @@ contains
   HsEncodingEx in '..\..\..\HsUnits\HsEncodingEx.pas',
   HsClipBoardEx in '..\..\..\HsUnits\HsClipBoardEx.pas',
   PlgTSTOCustomPlugin in '..\..\TSTOSdk\PlgTSTOCustomPlugin.pas' {TSTOCustomPluginOld: TDataModule},
-  PlgTSTOPluginManager in 'PlgTSTOPluginManager.pas' {TSTOPluginManager: TTSTOCustomPlugin};
+  PlgTSTOPluginManager in 'PlgTSTOPluginManager.pas' {TSTOPluginManager: TTSTOCustomPlugin},
+  TSTOTreeviews in '..\..\TSTOSdk\TSTOTreeviews.pas';
 
 end.

@@ -7,6 +7,7 @@ Uses
   TSTORgbProgress, TSTOProjectWorkSpace.IO, TSTOScriptTemplate.IO, TSTOHackMasterList.IO;
 
 Type
+  TBeforeApplyModEvent = Procedure(Sender : TObject; Var CanContinue : Boolean);
   TUIItemKind = (iikToolBar, iikMainMenu);
   
   ITSTOApplication = Interface(IInterfaceEx)
@@ -20,6 +21,12 @@ Type
     Function GetIcon() : TIcon;
 
     Function GetHost() : TApplication;
+
+    Function  GetOnBeforeApplyMod() : TBeforeApplyModEvent;
+    Procedure SetOnBeforeApplyMod(AOnBeforeApplyMod : TBeforeApplyModEvent);
+
+    Function  GetOnAfterApplyMod() : TNotifyEvent;
+    Procedure SetOnAfterApplyMod(AOnAfterApplyMod : TNotifyEvent);
 
     Procedure AddItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem); OverLoad;
     Procedure AddItem(Sender : TComponent; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
@@ -35,7 +42,10 @@ Type
     Property CurrentSkinName : String                       Read GetCurrentSkinName;
     Property Icon            : TIcon                        Read GetIcon;
     Property Host            : TApplication                 Read GetHost;
-    
+
+    Property OnBeforeApplyMod : TBeforeApplyModEvent Read GetOnBeforeApplyMod Write SetOnBeforeApplyMod;
+    Property OnAfterApplyMod  : TNotifyEvent         Read GetOnAfterApplyMod  Write SetOnAfterApplyMod;
+
   End;
 
   TTSTOPluginKind = (pkScript, pkPatches, pkGUI);

@@ -20,11 +20,15 @@ Type
     Function  GetOnChanged() : TNotifyEvent;
     Procedure SetOnChanged(AOnChanged : TNotifyEvent);
 
-    Function  GetOnExecFunc() : TNotifyEvent;
-    Procedure SetOnExecFunc(AOnExeFunc : TNotifyEvent);
+    Function  GetOnExecute() : TNotifyEvent;
+    Procedure SetOnExecute(AOnExecute : TNotifyEvent);
 
-    Property OnChanged  : TNotifyEvent Read GetOnChanged  Write SetOnChanged;
-    Property OnExecFunc : TNotifyEvent Read GetOnExecFunc Write SetOnExecFunc;
+    Function  GetOnPreview() : TNotifyEvent;
+    Procedure SetOnPreview(AOnPreview : TNotifyEvent);
+
+    Property OnChanged : TNotifyEvent Read GetOnChanged  Write SetOnChanged;
+    Property OnExecute : TNotifyEvent Read GetOnExecute  Write SetOnExecute;
+    Property OnPreview : TNotifyEvent Read GetOnPreview  Write SetOnPreview;
 
   End;
 
@@ -136,8 +140,9 @@ Type
 
   TTSTOScriptTemplateVariableIO = Class(TTSTOScriptTemplateVariable, ITSTOScriptTemplateVariableIO)
   Private
-    FOnChanged  : TNotifyEvent;
-    FOnExecFunc : TNotifyEvent;
+    FOnChanged : TNotifyEvent;
+    FOnExecute : TNotifyEvent;
+    FOnPreview : TNotifyEvent;
 
   Protected
     Procedure SetName(Const AName : WideString); OverRide;
@@ -146,8 +151,11 @@ Type
     Function  GetOnChanged() : TNotifyEvent;
     Procedure SetOnChanged(AOnChanged : TNotifyEvent);
 
-    Function  GetOnExecFunc() : TNotifyEvent;
-    Procedure SetOnExecFunc(AOnExeFunc : TNotifyEvent);
+    Function  GetOnExecute() : TNotifyEvent;
+    Procedure SetOnExecute(AOnExecute : TNotifyEvent);
+
+    Function  GetOnPreview() : TNotifyEvent;
+    Procedure SetOnPreview(AOnPreview : TNotifyEvent);
 
   End;
 
@@ -363,14 +371,24 @@ Begin
   FOnChanged := AOnChanged;
 End;
 
-Function TTSTOScriptTemplateVariableIO.GetOnExecFunc() : TNotifyEvent;
+Function TTSTOScriptTemplateVariableIO.GetOnExecute() : TNotifyEvent;
 Begin
-  Result := FOnExecFunc;
+  Result := FOnExecute;
 End;
 
-Procedure TTSTOScriptTemplateVariableIO.SetOnExecFunc(AOnExeFunc : TNotifyEvent);
+Procedure TTSTOScriptTemplateVariableIO.SetOnExecute(AOnExecute : TNotifyEvent);
 Begin
-  FOnExecFunc := AOnExeFunc;
+  FOnExecute := AOnExecute;
+End;
+
+Function TTSTOScriptTemplateVariableIO.GetOnPreview() : TNotifyEvent;
+Begin
+  Result := FOnPreview;
+End;
+
+Procedure TTSTOScriptTemplateVariableIO.SetOnPreview(AOnPreview : TNotifyEvent);
+Begin
+  FOnPreview := AOnPreview;
 End;
 
 Procedure TTSTOScriptTemplateVariablesIO.Assign(ASource : IInterface);
@@ -522,8 +540,8 @@ Begin
     lLst.Text := GetTemplateFile();
     For X := 0 To lVars.Count - 1 Do
     Begin
-      If SameText(lVars[X].VarFunc, 'hmBuildCustom') And Assigned(lVars[X].OnExecFunc) Then
-        lVars[X].OnExecFunc(Self)
+      If SameText(lVars[X].VarFunc, 'hmBuildCustom') And Assigned(lVars[X].OnExecute) Then
+        lVars[X].OnPreview(Self)
       Else
       Begin
         lVar.Text := '';

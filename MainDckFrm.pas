@@ -398,7 +398,7 @@ var
 implementation
 
 Uses RTTI, RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
-  Imaging, ImagingTypes, HsBase64Ex,
+  Imaging, HtmlHelpViewer, ImagingTypes, HsBase64Ex,
   HsJSonFormatterEx, HsXmlDocEx, HsZipUtils, HsFunctionsEx,
   HsCheckSumEx, HsStringListEx, SciSupport, System.Character,
   SettingsFrm, CustomPatchFrm, SptbFrm, ImagingClasses,
@@ -1099,7 +1099,9 @@ procedure TFrmDckMain.mnuAboutClick(Sender: TObject);
 begin
   With TFrmAbout.Create(Self) Do
   Try
-    PluginList := FPluginM.Plugins;
+    If Assigned(FPluginM) And Assigned(FPluginM.Plugins) Then
+      PluginList := FPluginM.Plugins;
+
     ShowModal();
 
     Finally

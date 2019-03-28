@@ -276,8 +276,8 @@ Type
 {$EndIf}
 
   Public
-    Procedure SaveToStream(Stream : IStreamEx); OverLoad;
-    Procedure LoadFromStream(Stream : IStreamEx); OverLoad;
+    Procedure SaveToStream(Stream : IStreamEx); ReIntroduce; OverLoad;
+    Procedure LoadFromStream(Stream : IStreamEx); ReIntroduce; OverLoad;
     Procedure SaveToClipBoard(); Virtual;
     Procedure LoadFromClipBoard(); Virtual;
 

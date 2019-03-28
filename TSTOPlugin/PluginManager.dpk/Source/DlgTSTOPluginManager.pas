@@ -3,7 +3,7 @@ unit DlgTSTOPluginManager;
 interface
 
 uses
-  TSTOPluginIntf, TSTOPluginManagerIntf,
+  TSTOTreeviews, TSTOPluginIntf, TSTOPluginManagerIntf,
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, TB2Dock,
   TB2Toolbar, SpTBXItem, TB2Item, SpTBXDkPanels, SpTBXControls, SpTBXExPanel,
@@ -18,11 +18,10 @@ type
     tbSavePlugins: TSpTBXItem;
     sptbxDckMain: TSpTBXDock;
     sptbxtbMain: TSpTBXToolbar;
-    SpTBXExPanel1: TSpTBXExPanel;
+    PanTv: TSpTBXExPanel;
     SpTBXStatusBar1: TSpTBXStatusBar;
     SpTBXSplitter1: TSpTBXSplitter;
     SpTBXExPanel2: TSpTBXExPanel;
-    tvPlugins: TSpTBXVirtualStringTree;
     SpTBXGroupBox1: TSpTBXGroupBox;
     SpTBXLabel1: TSpTBXLabel;
     EditName: TSpTBXEdit;
@@ -37,27 +36,26 @@ type
     CmdPluginSetting: TSpTBXButton;
 
     procedure tbSavePluginsClick(Sender: TObject);
-    procedure tvPluginsInitNode(Sender: TBaseVirtualTree; ParentNode,
-      Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure tvPluginsFocusChanged(Sender: TBaseVirtualTree;
-      Node: PVirtualNode; Column: TColumnIndex);
     procedure CmdPluginSettingClick(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
-    procedure tvPluginsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure FormCreate(Sender: TObject);
 
   private
-    FMainApp : ITSTOApplication;
-    FPlugins : ITSTOPlugins;
+    FMainApp  : ITSTOApplication;
+    FPlugins  : ITSTOPlugins;
+    FTvPlugin : TTSTOBaseTreeView;
 
     Function  GetPlugins() : ITSTOPlugins;
     Procedure SetPlugins(APlugins : ITSTOPlugins);
 
     Procedure SetMainApp(AMainApp : ITSTOApplication);
 
-    Procedure SetNodeData(ANode : PVirtualNode; ANodeData : IInterface);
-    Function  GetNodeData(ANode : PVirtualNode; AId : TGUID; Var ANodeData) : Boolean; OverLoad;
-    Function  GetNodeData(ANode : PVirtualNode; AId : TGUID) : Boolean; OverLoad;
+    procedure tvPluginsInitNode(Sender: TBaseVirtualTree; ParentNode,
+      Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+    procedure tvPluginsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure tvPluginsFocusChanged(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; Column: TColumnIndex);
 
   public
     Property Plugins : ITSTOPlugins     Read GetPlugins Write SetPlugins;
@@ -71,19 +69,17 @@ Uses HsStreamEx;
 
 {$R *.dfm}
 
-Procedure TTSTOPluginManagerDlg.SetNodeData(ANode : PVirtualNode; ANodeData : IInterface);
-Var lNodeData : PPointer;
-Begin
-  lNodeData  := tvPlugins.GetNodeData(ANode);
-  lNodeData^ := Pointer(ANodeData);
-End;
+procedure TTSTOPluginManagerDlg.FormCreate(Sender: TObject);
+begin
+  FTvPlugin := TTSTOBaseTreeView.Create(Self);
+  FTvPlugin.Parent := PanTv;
+  FTvPlugin.Align  := alClient;
 
-Function TTSTOPluginManagerDlg.GetNodeData(ANode : PVirtualNode; AId : TGUID; Var ANodeData) : Boolean;
-Var lNodeData : PPointer;
-Begin
-  lNodeData := tvPlugins.GetNodeData(ANode);
-  Result := Assigned(lNodeData^) And Supports(IInterface(lNodeData^), AId, ANodeData);
-End;
+  FTvPlugin.OnInitNode     := tvPluginsInitNode;
+  FTvPlugin.OnGetText      := tvPluginsGetText;
+  FTvPlugin.OnFocusChanged := tvPluginsFocusChanged;
+  FTvPlugin.TreeOptions.PaintOptions := FTvPlugin.TreeOptions.PaintOptions - [toShowRoot, toShowTreeLines];
+end;
 
 procedure TTSTOPluginManagerDlg.FormKeyPress(Sender: TObject; var Key: Char);
 begin
@@ -94,12 +90,6 @@ begin
   End;
 end;
 
-Function TTSTOPluginManagerDlg.GetNodeData(ANode : PVirtualNode; AId : TGUID) : Boolean;
-Var lDummy : IInterface;
-Begin
-  Result := GetNodeData(ANode, AId, lDummy);
-End;
-
 procedure TTSTOPluginManagerDlg.tbSavePluginsClick(Sender: TObject);
 begin
   ModalResult := mrOk;
@@ -108,7 +98,7 @@ end;
 procedure TTSTOPluginManagerDlg.CmdPluginSettingClick(Sender: TObject);
 Var lNodeData : ITSTOPlugin;
 begin
-  If GetNodeData(tvPlugins.GetFirstSelected(), ITSTOPlugin, lNodeData) Then
+  If FTvPlugin.GetNodeData(FTvPlugin.GetFirstSelected(), ITSTOPlugin, lNodeData) Then
     If lNodeData.ShowSettings() Then
     Begin
       lNodeData.Finalize();
@@ -122,7 +112,7 @@ procedure TTSTOPluginManagerDlg.tvPluginsFocusChanged(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex);
 Var lNodeData : ITSTOPlugin;
 begin
-  If GetNodeData(Node, ITSTOPlugin, lNodeData) Then
+  If FTvPlugin.GetNodeData(Node, ITSTOPlugin, lNodeData) Then
   Begin
     EditName.Text        := lNodeData.Name;
     EditAuthor.Text      := lNodeData.Author;
@@ -139,14 +129,14 @@ procedure TTSTOPluginManagerDlg.tvPluginsGetText(Sender: TBaseVirtualTree;
   var CellText: WideString);
 Var lNodeData : ITSTOPlugin;
 begin
-  If GetNodeData(Node, ITSTOPlugin, lNodeData) Then
+  If FTvPlugin.GetNodeData(Node, ITSTOPlugin, lNodeData) Then
     CellText := lNodeData.Name;
 end;
 
 procedure TTSTOPluginManagerDlg.tvPluginsInitNode(Sender: TBaseVirtualTree;
   ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
-  SetNodeData(Node, FPlugins[Node.Index]);
+  FTvPlugin.SetNodeData(Node, FPlugins[Node.Index]);
 end;
 
 Function TTSTOPluginManagerDlg.GetPlugins() : ITSTOPlugins;
@@ -160,16 +150,16 @@ Begin
 
   If Assigned(FPlugins) Then
   Begin
-    tvPlugins.BeginUpdate();
+    FTvPlugin.BeginUpdate();
     Try
-      tvPlugins.RootNodeCount := FPlugins.Count;
+      FTvPlugin.RootNodeCount := FPlugins.Count;
 
       Finally
-        tvPlugins.EndUpdate();
+        FTvPlugin.EndUpdate();
     End;
   End
   Else
-    tvPlugins.RootNodeCount := 0;
+    FTvPlugin.RootNodeCount := 0;
 End;
 
 Procedure TTSTOPluginManagerDlg.SetMainApp(AMainApp : ITSTOApplication);
@@ -181,7 +171,7 @@ Begin
   Begin
     lMemStrm := TMemoryStreamEx.Create();
     Try
-      FMainApp.Icon.SaveToStream(TStream(lMemStrm.InterfaceObject));
+      FMainApp.Host.Icon.SaveToStream(TStream(lMemStrm.InterfaceObject));
       lMemStrm.Position := 0;
       Self.Icon.LoadFromStream(TStream(lMemStrm.InterfaceObject));
 

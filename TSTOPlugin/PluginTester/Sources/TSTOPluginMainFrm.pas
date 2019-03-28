@@ -37,6 +37,7 @@ type
     SpTBXExPanel1: TSpTBXExPanel;
     cmdLoadPlugins: TSpTBXButton;
     lbPlugins: TSpTBXListBox;
+    
     procedure SpTBXItem1Click(Sender: TObject);
     procedure SpTBXItem2Click(Sender: TObject);
     procedure cmdLoadPluginsClick(Sender: TObject);
@@ -64,6 +65,12 @@ type
     Function GetCurrentSkinName() : String;
     Function GetIcon() : TIcon;
     Function GetHost() : TApplication;
+
+    Function  GetOnBeforeApplyMod() : TBeforeApplyModEvent;
+    Procedure SetOnBeforeApplyMod(AOnBeforeApplyMod : TBeforeApplyModEvent);
+
+    Function  GetOnAfterApplyMod() : TNotifyEvent;
+    Procedure SetOnAfterApplyMod(AOnAfterApplyMod : TNotifyEvent);
 
     Procedure AddItem(AItemKind : TUIItemKind; Sender : TComponent; AItem : TTBCustomItem); OverLoad;
     Procedure AddItem(Sender : TComponent; ASrcItem, ATrgItem : TTBCustomItem); OverLoad;
@@ -130,6 +137,26 @@ End;
 Function TTSTOPluginManager.GetHost() : TApplication;
 Begin
   Result := Application;
+End;
+
+Function TTSTOPluginManager.GetOnBeforeApplyMod() : TBeforeApplyModEvent;
+Begin
+
+End;
+
+Procedure TTSTOPluginManager.SetOnBeforeApplyMod(AOnBeforeApplyMod : TBeforeApplyModEvent);
+Begin
+
+End;
+
+Function TTSTOPluginManager.GetOnAfterApplyMod() : TNotifyEvent;
+Begin
+
+End;
+
+Procedure TTSTOPluginManager.SetOnAfterApplyMod(AOnAfterApplyMod : TNotifyEvent);
+Begin
+
 End;
 
 procedure TTSTOPluginManager.cmdLoadPluginsClick(Sender: TObject);
