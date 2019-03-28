@@ -860,6 +860,8 @@ object FrmDckMain: TFrmDckMain
             ActiveTabIndex = 0
             TabPosition = ttpBottom
             OnActiveTabChange = tsScriptTemplateActiveTabChange
+            ExplicitLeft = -6
+            ExplicitTop = 315
             HiddenItems = <>
             object tsSTSource: TSpTBXTabItem
               Caption = 'Source'

@@ -116,6 +116,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.Title := 'TSTOModToolKit';
+  Application.HelpFile := 'C:\Projects\TSTOModToolKit\Bin\TSTOToolKit.chm';
   Application.CreateForm(TDataModuleImage, DataModuleImage);
   Application.CreateForm(TFrmDckMain, FrmDckMain);
   Application.Run;

@@ -271,7 +271,7 @@ Type
     Function AddChild(Const TagName : DOMString; Index : Integer = -1) : IXmlNodeEx; OverLoad; Virtual; Abstract;
     Function AddChild(Const TagName, NamespaceURI : DOMString;
       GenPrefix : Boolean = False; Index : Integer = -1) : IXmlNodeEx; OverLoad; Virtual; Abstract;
-    Function AddItem(Index: Integer) : IXMLNodeEx; OverLoad;
+    Function AddItem(Index: Integer) : IXMLNodeEx; ReIntroduce; OverLoad;
 
     Function  GetAsString() : String; Virtual; Abstract;
     Procedure SetAsString(Const AString : String); Virtual; Abstract;
