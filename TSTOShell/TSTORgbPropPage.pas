@@ -11,8 +11,10 @@ uses
     SxPropertySheetForm, Vcl.Controls, Vcl.StdCtrls;
 
 type
-  TSxShellPropSheetForm1 = class(TSxShellPropSheetForm)
+  TTSTORgbPropSheet = class(TSxShellPropSheetForm)
     Label1: TLabel;
+    Label2: TLabel;
+    procedure SxShellPropSheetFormResize(Sender: TObject);
   private
     { Private declarations }
   protected
@@ -26,8 +28,14 @@ implementation
 {$R *.DFM}
 
 
+procedure TTSTORgbPropSheet.SxShellPropSheetFormResize(Sender: TObject);
+begin
+  Label2.Caption := IntToStr(Width) + 'X' + IntToStr(Height);
+end;
+
 initialization
-    RegisterPropSheetForm(TSxShellPropSheetForm1);
+  RegisterPropSheetForm(TTSTORgbPropSheet);
+
 end.
 
 

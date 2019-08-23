@@ -8,7 +8,7 @@ object SxModule1: TSxModule1
     Description = 'TSTOContextMenu'
     ExtensionName = 'TSTOContextMenu'
     RefreshWhenRegistered = False
-    FileClasses = SxFileClasses
+    FileType = '*'
     RememberPrevExtension = False
     ContextMenu = SxPopupMenu
     Left = 32
@@ -22,36 +22,22 @@ object SxModule1: TSxModule1
     object N1: TMenuItem
       Caption = '-'
     end
-    object STOToolkit1: TMenuItem
+    object PopTSTOToolkit: TMenuItem
       Caption = 'TSTOToolkit'
       ImageIndex = 0
-      object ConvertToPng1: TMenuItem
+      object PopConvertToPng: TMenuItem
         Caption = 'Convert To Png'
       end
-      object ConvertToRGB4441: TMenuItem
+      object PopConvertToRGB444: TMenuItem
         Caption = 'Convert To RGB444'
+      end
+      object PopConvertToRGB888: TMenuItem
+        Caption = 'Convert To RGB888'
       end
     end
     object N2: TMenuItem
       Caption = '-'
     end
-  end
-  object SxFileClasses: TSxFileClasses
-    FileClasses = <
-      item
-        FileClassName = 'RgbImageFile'
-        ExtensionName = 'rgb'
-        Description = 'Rgb Image File'
-      end
-      item
-        FileClassName = 'PngImageFile'
-        ExtensionName = 'png'
-        Description = 'Png Image File'
-      end>
-    RegisterForAll = True
-    StrongRegistration = True
-    Left = 32
-    Top = 72
   end
   object ImageList: TImageList
     Left = 116
@@ -204,6 +190,10 @@ object SxModule1: TSxModule1
     FileType = '*'
     RememberPrevExtension = False
     ExtraPages = <>
+    ImageList = ImageList
+    OnAddPropSheet = SxShellPropSheetExtAddPropSheet
+    PropertySheets.Strings = (
+      'TTSTORgbPropSheet[0]=Rgb Detail,0')
     ActivateXPThemes = True
     Left = 112
     Top = 120

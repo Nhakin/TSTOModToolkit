@@ -17,15 +17,17 @@ type
   TSxModule1 = class(TSxModule)
     SxContextMenu: TSxContextMenu;
     SxPopupMenu: TSxPopupMenu;
-    STOToolkit1: TMenuItem;
-    ConvertToPng1: TMenuItem;
-    ConvertToRGB4441: TMenuItem;
-    SxFileClasses: TSxFileClasses;
+    PopTSTOToolkit: TMenuItem;
+    PopConvertToPng: TMenuItem;
+    PopConvertToRGB444: TMenuItem;
     ImageList: TImageList;
     N1: TMenuItem;
     N2: TMenuItem;
     SxShellPropSheetExt: TSxShellPropSheetExt;
+    PopConvertToRGB888: TMenuItem;
     procedure SxPopupMenuPopup(Sender: TObject);
+    procedure SxShellPropSheetExtAddPropSheet(Sender: TSxShellPropSheetExt;
+      PropSheetClass: TFormClass; var AllowInsert: Boolean);
   private
     { Private declarations }
   protected
@@ -43,8 +45,17 @@ uses Dialogs,
 
 procedure TSxModule1.SxPopupMenuPopup(Sender: TObject);
 begin
-  SxPopupMenu.Items[1].Visible := SameText(ExtractFileExt(SxContextMenu.FileName), '.png') Or
-                                  SameText(ExtractFileExt(SxContextMenu.FileName), '.rgb');
+  PopTSTOToolkit.Visible  := SameText(ExtractFileExt(SxContextMenu.FileName), '.png') Or
+                             SameText(ExtractFileExt(SxContextMenu.FileName), '.rgb');
+  PopConvertToPng.Enabled := Not SameText(ExtractFileExt(SxContextMenu.FileName), '.png');
+end;
+
+procedure TSxModule1.SxShellPropSheetExtAddPropSheet(
+  Sender: TSxShellPropSheetExt; PropSheetClass: TFormClass;
+  var AllowInsert: Boolean);
+begin
+  AllowInsert := (PropSheetClass = TTSTORgbPropSheet) And
+                 SameText(ExtractFileExt(Sender.FileName), '.rgb');
 end;
 
 initialization
