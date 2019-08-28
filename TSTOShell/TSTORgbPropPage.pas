@@ -8,13 +8,17 @@ uses
     SysUtils,
     Classes,
     Forms,
-    SxPropertySheetForm, Vcl.Controls, Vcl.StdCtrls;
+    SxPropertySheetForm, Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls;
 
 type
   TTSTORgbPropSheet = class(TSxShellPropSheetForm)
+    Panel1: TPanel;
+    ImgPreview: TImage;
     Label1: TLabel;
+    LblFileName: TLabel;
     Label2: TLabel;
-    procedure SxShellPropSheetFormResize(Sender: TObject);
+    lblImageSize: TLabel;
+    procedure SxShellPropSheetFormCreate(Sender: TObject);
   private
     { Private declarations }
   protected
@@ -27,10 +31,22 @@ implementation
 
 {$R *.DFM}
 
+Uses TSTORgb;
 
-procedure TTSTORgbPropSheet.SxShellPropSheetFormResize(Sender: TObject);
+procedure TTSTORgbPropSheet.SxShellPropSheetFormCreate(Sender: TObject);
+Var lRgb : ITSTORgbFile;
 begin
-  Label2.Caption := IntToStr(Width) + 'X' + IntToStr(Height);
+  lblFileName.Caption := ExtractFileName(PropSheetComponent.FileName);
+
+  lRgb := TTSTORgbFile.CreateRGBFile();
+  Try
+    lRgb.LoadRgbFromFile(PropSheetComponent.FileName);
+    lblImageSize.Caption := IntToStr(lRgb.Width) + ' X ' + IntToStr(lRgb.Height);
+    ImgPreview.Picture.Assign(lRgb.Picture);
+
+    Finally
+      lRgb := Nil;
+  End;
 end;
 
 initialization
