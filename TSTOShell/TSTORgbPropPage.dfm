@@ -17,31 +17,59 @@ object TSTORgbPropSheet: TTSTORgbPropSheet
   TextHeight = 13
   object Label1: TLabel
     Left = 8
-    Top = 8
+    Top = 4
     Width = 56
     Height = 13
     Caption = 'File Name : '
   end
   object LblFileName: TLabel
     Left = 70
-    Top = 8
+    Top = 4
     Width = 56
     Height = 13
     Caption = 'File Name : '
   end
   object Label2: TLabel
     Left = 8
-    Top = 24
+    Top = 20
     Width = 29
     Height = 13
     Caption = 'Size : '
   end
   object lblImageSize: TLabel
     Left = 70
-    Top = 24
+    Top = 20
     Width = 56
     Height = 13
     Caption = 'File Name : '
+  end
+  object Label3: TLabel
+    Left = 8
+    Top = 36
+    Width = 38
+    Height = 13
+    Caption = 'Height :'
+  end
+  object lblHeight: TLabel
+    Left = 70
+    Top = 36
+    Width = 56
+    Height = 13
+    Caption = 'File Name : '
+  end
+  object lblWidth: TLabel
+    Left = 70
+    Top = 51
+    Width = 56
+    Height = 13
+    Caption = 'File Name : '
+  end
+  object Label6: TLabel
+    Left = 8
+    Top = 51
+    Width = 35
+    Height = 13
+    Caption = 'Width :'
   end
   object Panel1: TPanel
     Left = 0
@@ -53,9 +81,8 @@ object TSTORgbPropSheet: TTSTORgbPropSheet
     ParentColor = True
     TabOrder = 0
     object ImgPreview: TImage
-      AlignWithMargins = True
       Left = 8
-      Top = 13
+      Top = 8
       Width = 105
       Height = 105
       AutoSize = True

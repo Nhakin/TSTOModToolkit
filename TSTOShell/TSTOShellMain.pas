@@ -44,7 +44,8 @@ type
 implementation
 
 uses Dialogs,
-  TSTORgb, ComServ;
+  ExtCtrls, TSTORgb,
+  ImagingClasses, ImagingComponents, ImagingRgb, Imaging, ImagingTypes, ImagingCanvases, ComServ;
 
 {$R *.DFM}
 
@@ -75,56 +76,67 @@ var i: Integer;
     q: ^TRGBQ;
     lRgb : ITSTORgbFile;
     lH, lW : Integer;
+    lRgb2 : TImageData;
+    lStrm : TMemoryStream;
+    lFName : String;
+    lImage : TImage;
+
+    lRgb3 : TSingleImage;
+    lCanvas : TImagingCanvas;
 begin
-  If SameText(ExtractFileExt(SxThumbnailProvider.FileName), '.rgb') Then
-  Begin
-{
-    lRgb := TTSTORgbFile.CreateRGBFile();
+  With TStringList.Create() Do
+  Try
+    if FileExists('00-Debug.log') then
+      LoadFromFile('00-Debug.log');
+    Add('SxThumbnailProviderGetThumbnail : ' + SxThumbnailProvider.FileName);
+    SaveToFile('00-Debug.log');
+
+    Finally
+      Free();
+  End;
+
+  lFName := SxThumbnailProvider.FileName;
+  If lFName = '' Then
+    lFName := 'C:\Projects\casinostore.rgb';
+
+  If FileExists(lFName) Then
+    If LoadImageFromFile(lFName, lRgb2) Then
     Try
       Image.Width  := CX;
       Image.Height := CX * 3 Div 4;
+      Image.PixelFormat := pf32bit;
+      Image.AlphaFormat := afDefined;
+      HasAlphaChannel := True;
 
-      lRgb.LoadRgbFromFile(SxThumbnailProvider.FileName);
-      Image.Assign(lRgb.Picture);
+      If lRgb2.Height > lRgb2.Width Then
+      Begin
+        lH := Image.Height;
+        lW := Round(lH / lRgb2.Height * lH);
+      End
+      Else If lRgb2.Width > lRgb2.Height Then
+      Begin
+        lW := Image.Width;
+        lH := Round(lW / lRgb2.Width * lW);
+      End
+      Else
+      Begin
+        lW := Image.Width;
+        lH := Image.Height;
+      End;
+
+      If lH > Image.Height Then
+        lH := Image.Height;
+      If lW > Image.Width Then
+        lW := Image.Width;
+
+      If (lW > 0) And (lH > 0) Then
+        ResizeImage(lRgb2, lW, lH, rfLanczos);
+
+      DisplayImageData(Image.Canvas, Rect(0, 0, lW, lH), lRgb2, Rect(0, 0, lW, lH));
 
       Finally
-        lRgb := Nil;
+        FreeImage(lRgb2);
     End;
-}
-//(*
-    HasAlphaChannel := False;
-
-    Image.width:=CX;
-    image.height:=Cx*3 div 4;
-    Image.PixelFormat := pf32bit;
-    Image.AlphaFormat := afDefined;
-    HasAlphaChannel := True;
-
-    C := Image.Canvas;
-
-    C.Font.Name:='Arial';
-    C.Font.Size:=9;
-
-
-    top := 0;
-    h := C.TextHeight('A');
-
-    // Out some text
-    for i := 0 to 3 do
-    begin
-      c.TextOut(0,TOP,'TSTORgb');
-      INC(TOP, H);
-    end;
-
-    // Add transparency gradient. Top is solid, bottom is transparent
-    for I := 0 to Image.Height-1 do
-    begin
-      q:= Image.ScanLine[i];
-      for H := 0 to Image.Width-1 do
-        q^[H].rgbReserved := 255 - (I * 255) div image.Height;
-    end;
-//*)
-  End;
 end;
 
 initialization

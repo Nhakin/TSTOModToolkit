@@ -13,11 +13,15 @@ uses
 type
   TTSTORgbPropSheet = class(TSxShellPropSheetForm)
     Panel1: TPanel;
-    ImgPreview: TImage;
     Label1: TLabel;
     LblFileName: TLabel;
     Label2: TLabel;
     lblImageSize: TLabel;
+    Label3: TLabel;
+    lblHeight: TLabel;
+    lblWidth: TLabel;
+    Label6: TLabel;
+    ImgPreview: TImage;
     procedure SxShellPropSheetFormCreate(Sender: TObject);
   private
     { Private declarations }
@@ -36,13 +40,14 @@ Uses TSTORgb;
 procedure TTSTORgbPropSheet.SxShellPropSheetFormCreate(Sender: TObject);
 Var lRgb : ITSTORgbFile;
 begin
-  lblFileName.Caption := ExtractFileName(PropSheetComponent.FileName);
-
   lRgb := TTSTORgbFile.CreateRGBFile();
   Try
     lRgb.LoadRgbFromFile(PropSheetComponent.FileName);
-    lblImageSize.Caption := IntToStr(lRgb.Width) + ' X ' + IntToStr(lRgb.Height);
     ImgPreview.Picture.Assign(lRgb.Picture);
+
+    lblImageSize.Caption := IntToStr(lRgb.Width) + ' X ' + IntToStr(lRgb.Height);
+    lblHeight.Caption    := IntToStr(lRgb.Height);
+    lblWidth.Caption     := IntToStr(lRgb.Width);
 
     Finally
       lRgb := Nil;

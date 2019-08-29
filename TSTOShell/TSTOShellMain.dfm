@@ -210,7 +210,7 @@ object SxModule1: TSxModule1
     Top = 72
   end
   object SxThumbnailProvider: TSxThumbnailProvider
-    CLSID = '{85F94B8F-E03E-4F75-9F3D-5D9324B12484}'
+    CLSID = '{EC26060F-7F14-4AFE-AB64-B1DF045C7C7F}'
     Description = 'SxThumbnailProvider'
     ExtensionName = 'SxThumbnailProvider'
     RefreshWhenRegistered = False
