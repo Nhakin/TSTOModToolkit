@@ -12,7 +12,7 @@ uses
     SxComObj,
     SxDataModule, Vcl.Menus, SxPopupMenu, SxCustShlObj, SxContextMenu,
     SxFileClasses, System.ImageList, Vcl.ImgList, Vcl.Controls, SxPropertySheetExt,
-    TSTORgbPropPage, SxThumbnailProvider, SxExtractImage;
+    TSTORgbPropPage, SxThumbnailProvider, SxExtractImage, SxConst;
 
 type
   TSxModule1 = class(TSxModule)
@@ -27,12 +27,12 @@ type
     SxShellPropSheetExt: TSxShellPropSheetExt;
     PopConvertToRGB888: TMenuItem;
     SxFileClasses: TSxFileClasses;
-    SxThumbnailProvider: TSxThumbnailProvider;
+    SxExtractImage: TSxExtractImage;
     procedure SxPopupMenuPopup(Sender: TObject);
     procedure SxShellPropSheetExtAddPropSheet(Sender: TSxShellPropSheetExt;
       PropSheetClass: TFormClass; var AllowInsert: Boolean);
-    procedure SxThumbnailProviderGetThumbnail(Sender: TSxThumbnailProvider;
-      CX: Integer; Image: TBitmap; var HasAlphaChannel: Boolean);
+    procedure SxExtractImageExtractImage(Sender: TSxExtractImage;
+      Image: TBitmap; Size: TSxSize);
   private
     { Private declarations }
   protected
@@ -44,10 +44,73 @@ type
 implementation
 
 uses Dialogs,
-  ExtCtrls, TSTORgb,
+  ExtCtrls,
   ImagingClasses, ImagingComponents, ImagingRgb, Imaging, ImagingTypes, ImagingCanvases, ComServ;
 
 {$R *.DFM}
+
+procedure TSxModule1.SxExtractImageExtractImage(Sender: TSxExtractImage;
+  Image: TBitmap; Size: TSxSize);
+var lH, lW : Integer;
+    lRgb : TImageData;
+    lFName : String;
+begin
+  With TStringList.Create() Do
+  Try
+    if FileExists('00-Debug.log') then
+      LoadFromFile('00-Debug.log');
+    Add('SxExtractImageExtractImage : ' + Sender.FileName);
+    SaveToFile('00-Debug.log');
+
+    Finally
+      Free();
+  End;
+
+//  lFName := Sender.FileName;
+//  If lFName = '' Then
+    lFName := 'C:\Projects\casinostore.rgb';
+
+  If FileExists(lFName) Then
+    If LoadImageFromFile(lFName, lRgb) Then
+    Try
+      Image.Width  := Size.cX;
+      Image.Height := Size.cY;
+      Image.PixelFormat := pf32bit;
+      Image.AlphaFormat := afDefined;
+
+      If (Image.Width < lRgb.Width) And (Image.Height < lRgb.Height) Then
+      Begin
+        If lRgb.Height > lRgb.Width Then
+        Begin
+          lH := Image.Height;
+          lW := Round(lH / lRgb.Height * lH);
+        End
+        Else If lRgb.Width > lRgb.Height Then
+        Begin
+          lW := Image.Width;
+          lH := Round(lW / lRgb.Width * lW);
+        End
+        Else
+        Begin
+          lW := Image.Width;
+          lH := Image.Height;
+        End;
+
+        If lH > Image.Height Then
+          lH := Image.Height;
+        If lW > Image.Width Then
+          lW := Image.Width;
+
+        If (lW > 0) And (lH > 0) Then
+          ResizeImage(lRgb, lW, lH, rfLanczos);
+      End;
+
+      ConvertDataToBitmap(lRgb, Image);
+
+      Finally
+        FreeImage(lRgb);
+    End;
+end;
 
 procedure TSxModule1.SxPopupMenuPopup(Sender: TObject);
 begin
@@ -62,81 +125,6 @@ procedure TSxModule1.SxShellPropSheetExtAddPropSheet(
 begin
   AllowInsert := (PropSheetClass = TTSTORgbPropSheet) And
                  SameText(ExtractFileExt(Sender.FileName), '.rgb');
-end;
-
-procedure TSxModule1.SxThumbnailProviderGetThumbnail(
-  Sender: TSxThumbnailProvider; CX: Integer; Image: TBitmap;
-  var HasAlphaChannel: Boolean);
-type
-  TRGBQ = array  [word] of TRGBQuad;
-var i: Integer;
-    h: Integer;
-    top: Integer;
-    c: TCanvas;
-    q: ^TRGBQ;
-    lRgb : ITSTORgbFile;
-    lH, lW : Integer;
-    lRgb2 : TImageData;
-    lStrm : TMemoryStream;
-    lFName : String;
-    lImage : TImage;
-
-    lRgb3 : TSingleImage;
-    lCanvas : TImagingCanvas;
-begin
-  With TStringList.Create() Do
-  Try
-    if FileExists('00-Debug.log') then
-      LoadFromFile('00-Debug.log');
-    Add('SxThumbnailProviderGetThumbnail : ' + SxThumbnailProvider.FileName);
-    SaveToFile('00-Debug.log');
-
-    Finally
-      Free();
-  End;
-
-  lFName := SxThumbnailProvider.FileName;
-  If lFName = '' Then
-    lFName := 'C:\Projects\casinostore.rgb';
-
-  If FileExists(lFName) Then
-    If LoadImageFromFile(lFName, lRgb2) Then
-    Try
-      Image.Width  := CX;
-      Image.Height := CX * 3 Div 4;
-      Image.PixelFormat := pf32bit;
-      Image.AlphaFormat := afDefined;
-      HasAlphaChannel := True;
-
-      If lRgb2.Height > lRgb2.Width Then
-      Begin
-        lH := Image.Height;
-        lW := Round(lH / lRgb2.Height * lH);
-      End
-      Else If lRgb2.Width > lRgb2.Height Then
-      Begin
-        lW := Image.Width;
-        lH := Round(lW / lRgb2.Width * lW);
-      End
-      Else
-      Begin
-        lW := Image.Width;
-        lH := Image.Height;
-      End;
-
-      If lH > Image.Height Then
-        lH := Image.Height;
-      If lW > Image.Width Then
-        lW := Image.Width;
-
-      If (lW > 0) And (lH > 0) Then
-        ResizeImage(lRgb2, lW, lH, rfLanczos);
-
-      DisplayImageData(Image.Canvas, Rect(0, 0, lW, lH), lRgb2, Rect(0, 0, lW, lH));
-
-      Finally
-        FreeImage(lRgb2);
-    End;
 end;
 
 initialization

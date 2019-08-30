@@ -209,14 +209,13 @@ object SxModule1: TSxModule1
     Left = 32
     Top = 72
   end
-  object SxThumbnailProvider: TSxThumbnailProvider
-    CLSID = '{EC26060F-7F14-4AFE-AB64-B1DF045C7C7F}'
-    Description = 'SxThumbnailProvider'
-    ExtensionName = 'SxThumbnailProvider'
+  object SxExtractImage: TSxExtractImage
+    CLSID = '{A8EC78AF-5A31-4B58-BB9D-2C2AD1282E42}'
+    Description = 'SxExtractImage'
+    ExtensionName = 'SxExtractImage'
     RefreshWhenRegistered = False
-    FileType = '*'
-    RememberPrevExtension = False
-    OnGetThumbnail = SxThumbnailProviderGetThumbnail
+    FileType = 'txtfile'
+    OnExtractImage = SxExtractImageExtractImage
     Left = 32
     Top = 128
   end

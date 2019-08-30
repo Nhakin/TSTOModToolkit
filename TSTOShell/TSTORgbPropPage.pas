@@ -35,22 +35,32 @@ implementation
 
 {$R *.DFM}
 
-Uses TSTORgb;
+Uses Math, Graphics,
+  Imaging, ImagingTypes, ImagingComponents;
 
 procedure TTSTORgbPropSheet.SxShellPropSheetFormCreate(Sender: TObject);
-Var lRgb : ITSTORgbFile;
+Var lImg : TImageData;
+    lGraphic : TBitMap;
 begin
-  lRgb := TTSTORgbFile.CreateRGBFile();
+  If LoadImageFromFile(PropSheetComponent.FileName, lImg) Then
   Try
-    lRgb.LoadRgbFromFile(PropSheetComponent.FileName);
-    ImgPreview.Picture.Assign(lRgb.Picture);
+    lblFileName.Caption  := ExtractFilePath(PropSheetComponent.FileName);
+    lblImageSize.Caption := IntToStr(lImg.Width) + ' X ' + IntToStr(lImg.Height);
+    lblHeight.Caption    := IntToStr(lImg.Height);
+    lblWidth.Caption     := IntToStr(lImg.Width);
 
-    lblImageSize.Caption := IntToStr(lRgb.Width) + ' X ' + IntToStr(lRgb.Height);
-    lblHeight.Caption    := IntToStr(lRgb.Height);
-    lblWidth.Caption     := IntToStr(lRgb.Width);
+    lGraphic := TBitMap.Create();
+    Try
+      ConvertDataToBitmap(lImg, lGraphic);
+
+      ImgPreview.Picture.Assign(lGraphic);
+      ImgPreview.Refresh();
+      Finally
+        lGraphic.Free();
+    End;
 
     Finally
-      lRgb := Nil;
+      FreeImage(lImg);
   End;
 end;
 
