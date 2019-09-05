@@ -83,12 +83,12 @@ begin
         If lRgb.Height > lRgb.Width Then
         Begin
           lH := Image.Height;
-          lW := Round(lH / lRgb.Height * lH);
+          lW := Round(lH / lRgb.Height * Image.Width);
         End
         Else If lRgb.Width > lRgb.Height Then
         Begin
           lW := Image.Width;
-          lH := Round(lW / lRgb.Width * lW);
+          lH := Round(lW / lRgb.Width * Image.Height);
         End
         Else
         Begin

@@ -89,14 +89,17 @@ Begin
 
     lReadCount := lIO.Read(Handle, @lHeader, SizeOf(lHeader));
     lIO.Seek(Handle, -lReadCount, smFromCurrent);
-    Result := ((lHeader.FileSig = $20000000) Or (lHeader.FileSig = $60000000)) And
-              (GetInputSize(lIO, Handle) - SizeOf(lHeader) = lHeader.Width * lHeader.Height * 2);
+    Result := (((lHeader.FileSig = $20000000) Or (lHeader.FileSig = $60000000)) And
+               (GetInputSize(lIO, Handle) - SizeOf(lHeader) = lHeader.Width * lHeader.Height * 2)) Or
+              ((lHeader.FileSig = $00000000) And
+              (GetInputSize(lIO, Handle) - SizeOf(lHeader) = lHeader.Width * lHeader.Height * 4));
   End;
 End;
 
 Function TRgbFileFormat.LoadData(Handle : TImagingHandle; Var Images : TDynImageDataArray;
   OnlyFirstLevel : Boolean) : Boolean;
 Var lWord    : Word;
+    lDWord   : DWord;
     lPixel32 : PColor32RecArray;
     lIdx     : Integer;
     lHeader  : TRgbHeader;
@@ -116,19 +119,34 @@ Begin
       Begin
         lPixel32 := Bits;
 
-        For lIdx := 0 To (Size Div 4) - 1 Do
-        Begin
-          //RGBA4444->ARGB8888
-          Read(Handle, @lWord, SizeOf(lWord));
-          With lPixel32^[lIdx] Do
+        If lHeader.FileSig = $00000000 Then
+          For lIdx := 0 To (Size Div 4) - 1 Do
           Begin
-            A := lWord And $F;
-            R := RgbPreMult[lWord And $F000 Shr $C, A];
-            G := RgbPreMult[lWord And $0F00 Shr $8, A];
-            B := RgbPreMult[lWord And $00F0 Shr $4, A];
-            A := RgbMap[A];
+            //RGBA4444->ARGB8888
+            Read(Handle, @lDWord, SizeOf(lDWord));
+
+            With lPixel32^[lIdx] Do
+            Begin
+              A := lDWord And $FF000000 Shr $18;
+              R := lDWord And $000000FF;
+              G := lDWord And $0000FF00 Shr $08;
+              B := lDWord And $00FF0000 Shr $10;
+            End;
+          End
+        Else
+          For lIdx := 0 To (Size Div 4) - 1 Do
+          Begin
+            //RGBA4444->ARGB8888
+            Read(Handle, @lWord, SizeOf(lWord));
+            With lPixel32^[lIdx] Do
+            Begin
+              A := lWord And $F;
+              R := RgbPreMult[lWord And $F000 Shr $C, A];
+              G := RgbPreMult[lWord And $0F00 Shr $8, A];
+              B := RgbPreMult[lWord And $00F0 Shr $4, A];
+              A := RgbMap[A];
+            End;
           End;
-        End;
       End;
 
       Result := True;

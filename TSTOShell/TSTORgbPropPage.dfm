@@ -22,12 +22,11 @@ object TSTORgbPropSheet: TTSTORgbPropSheet
     Height = 13
     Caption = 'File Name : '
   end
-  object LblFileName: TLabel
+  object lblFileName: TLabel
     Left = 70
     Top = 4
-    Width = 56
+    Width = 15
     Height = 13
-    Caption = 'File Name : '
   end
   object Label2: TLabel
     Left = 8
@@ -39,9 +38,8 @@ object TSTORgbPropSheet: TTSTORgbPropSheet
   object lblImageSize: TLabel
     Left = 70
     Top = 20
-    Width = 56
+    Width = 15
     Height = 13
-    Caption = 'File Name : '
   end
   object Label3: TLabel
     Left = 8
@@ -53,16 +51,14 @@ object TSTORgbPropSheet: TTSTORgbPropSheet
   object lblHeight: TLabel
     Left = 70
     Top = 36
-    Width = 56
+    Width = 15
     Height = 13
-    Caption = 'File Name : '
   end
   object lblWidth: TLabel
     Left = 70
     Top = 51
-    Width = 56
+    Width = 15
     Height = 13
-    Caption = 'File Name : '
   end
   object Label6: TLabel
     Left = 8
@@ -71,20 +67,31 @@ object TSTORgbPropSheet: TTSTORgbPropSheet
     Height = 13
     Caption = 'Width :'
   end
-  object Panel1: TPanel
-    Left = 0
+  object lblFormat: TLabel
+    Left = 374
+    Top = 4
+    Width = 44
+    Height = 13
+    Caption = 'Unknown'
+  end
+  object Label5: TLabel
+    Left = 328
+    Top = 4
+    Width = 44
+    Height = 13
+    Caption = 'Format : '
+  end
+  object sbPreview: TScrollBox
+    Left = 8
     Top = 70
-    Width = 450
-    Height = 305
-    BevelOuter = bvNone
-    BorderWidth = 8
-    ParentColor = True
+    Width = 434
+    Height = 297
     TabOrder = 0
     object ImgPreview: TImage
-      Left = 8
-      Top = 8
-      Width = 105
-      Height = 105
+      Left = 3
+      Top = 3
+      Width = 424
+      Height = 287
       AutoSize = True
     end
   end
