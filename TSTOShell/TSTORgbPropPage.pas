@@ -38,74 +38,53 @@ implementation
 {$R *.DFM}
 
 Uses Math, Graphics,
-  Imaging, ImagingTypes, ImagingComponents;
+  Imaging, ImagingTypes, ImagingComponents, RgbTools;
 
 procedure TTSTORgbPropSheet.SxShellPropSheetFormCreate(Sender: TObject);
 Var lImg : TImageData;
     lGraphic : TBitMap;
-
-    lRgbHeader : Packed Record
-      FileSig : DWord;
-      Width   : Word;
-      Height  : Word;
-    End;
-    lStrm : TMemoryStream;
     lH, lW : Integer;
 begin
-  lStrm := TMemoryStream.Create();
+  If LoadImageFromFile(PropSheetComponent.FileName, lImg) Then
   Try
-    lStrm.LoadFromFile(PropSheetComponent.FileName);
-    lStrm.ReadBuffer(lRgbHeader, SizeOf(lRgbHeader));
-    lStrm.Position := 0;
+    lblFileName.Caption  := ExtractFileName(PropSheetComponent.FileName);
+    lblFormat.Caption    := ImageTypeStr[GetImageType(PropSheetComponent.FileName)];
+    lblImageSize.Caption := IntToStr(lImg.Width) + ' X ' + IntToStr(lImg.Height);
+    lblHeight.Caption    := IntToStr(lImg.Height);
+    lblWidth.Caption     := IntToStr(lImg.Width);
 
-    If LoadImageFromStream(lStrm, lImg) Then
+    lGraphic := TBitMap.Create();
     Try
-      lblFileName.Caption  := ExtractFileName(PropSheetComponent.FileName);
-      If lRgbHeader.FileSig = 0 Then
-        lblFormat.Caption := 'RGBA8888'
-      Else If (lRgbHeader.FileSig = $20000000) Or (lRgbHeader.FileSig = $60000000) Then
-        lblFormat.Caption := 'RGBA4444';
-
-      lblImageSize.Caption := IntToStr(lImg.Width) + ' X ' + IntToStr(lImg.Height);
-      lblHeight.Caption    := IntToStr(lImg.Height);
-      lblWidth.Caption     := IntToStr(lImg.Width);
-
-      lGraphic := TBitMap.Create();
-      Try
-        If (lImg.Height > ImgPreview.Height) Or (lImg.Width > ImgPreview.Width) Then
+      If (lImg.Height > ImgPreview.Height) Or (lImg.Width > ImgPreview.Width) Then
+      Begin
+        If (lImg.Height > ImgPreview.Height) Then
         Begin
-          If (lImg.Height > ImgPreview.Height) Then
-          Begin
-            lH := ImgPreview.Height;
-            lW := Round((lH / lImg.Height) * ImgPreview.Width);
-          End
-          Else
-          Begin
-            lW := ImgPreview.Width;
-            lH := Round((lW / lImg.Width) * ImgPreview.Height);
-          End;
-
-          ResizeImage(lImg, lW, lH, rfLanczos);
-
-          lblImageSize.Caption := lblImageSize.Caption + ' (Resized at ' + IntToStr(lW) + ' X ' + IntToStr(lH) + ')';
+          lH := ImgPreview.Height;
+          lW := Round((lH / lImg.Height) * ImgPreview.Width);
+        End
+        Else
+        Begin
+          lW := ImgPreview.Width;
+          lH := Round((lW / lImg.Width) * ImgPreview.Height);
         End;
 
-        ConvertDataToBitmap(lImg, lGraphic);
+        ResizeImage(lImg, lW, lH, rfLanczos);
 
-        ImgPreview.Picture.Assign(lGraphic);
-        ImgPreview.Top  := (sbPreview.Height - ImgPreview.Height) Div 2;
-        ImgPreview.Left := (sbPreview.Width - ImgPreview.Width) Div 2;
-
-        Finally
-          lGraphic.Free();
+        lblImageSize.Caption := lblImageSize.Caption + ' (Resized at ' + IntToStr(lW) + ' X ' + IntToStr(lH) + ')';
       End;
 
+      ConvertDataToBitmap(lImg, lGraphic);
+
+      ImgPreview.Picture.Assign(lGraphic);
+      ImgPreview.Top  := (sbPreview.Height - ImgPreview.Height) Div 2;
+      ImgPreview.Left := (sbPreview.Width - ImgPreview.Width) Div 2;
+
       Finally
-        FreeImage(lImg);
+        lGraphic.Free();
     End;
 
     Finally
-      lStrm.Free();
+      FreeImage(lImg);
   End;
 end;
 

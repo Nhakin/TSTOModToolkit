@@ -209,14 +209,4 @@ object SxModule1: TSxModule1
     Left = 32
     Top = 72
   end
-  object SxExtractImage: TSxExtractImage
-    CLSID = '{A8EC78AF-5A31-4B58-BB9D-2C2AD1282E42}'
-    Description = 'SxExtractImage'
-    ExtensionName = 'SxExtractImage'
-    RefreshWhenRegistered = False
-    FileType = 'txtfile'
-    OnExtractImage = SxExtractImageExtractImage
-    Left = 32
-    Top = 128
-  end
 end

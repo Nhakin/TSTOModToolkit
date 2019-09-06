@@ -27,7 +27,6 @@ type
     SxShellPropSheetExt: TSxShellPropSheetExt;
     PopConvertToRGB888: TMenuItem;
     SxFileClasses: TSxFileClasses;
-    SxExtractImage: TSxExtractImage;
     procedure SxPopupMenuPopup(Sender: TObject);
     procedure SxShellPropSheetExtAddPropSheet(Sender: TSxShellPropSheetExt;
       PropSheetClass: TFormClass; var AllowInsert: Boolean);
@@ -45,7 +44,8 @@ implementation
 
 uses Dialogs,
   ExtCtrls,
-  ImagingClasses, ImagingComponents, ImagingRgb, Imaging, ImagingTypes, ImagingCanvases, ComServ;
+  ImagingClasses, ImagingComponents, ImagingRgb, Imaging,
+  ImagingTypes, ImagingCanvases, RgbTools, ComServ;
 
 {$R *.DFM}
 
@@ -113,10 +113,14 @@ begin
 end;
 
 procedure TSxModule1.SxPopupMenuPopup(Sender: TObject);
+Var lFileType : TImageType;
 begin
-  PopTSTOToolkit.Visible  := SameText(ExtractFileExt(SxContextMenu.FileName), '.png') Or
-                             SameText(ExtractFileExt(SxContextMenu.FileName), '.rgb');
-  PopConvertToPng.Enabled := Not SameText(ExtractFileExt(SxContextMenu.FileName), '.png');
+  lFileType := GetImageType(SxContextMenu.FileName);
+
+  PopTSTOToolkit.Visible     := lFileType <> itUnknown;
+  PopConvertToPng.Enabled    := lFileType <> itPng;
+  PopConvertToRGB444.Enabled := lFileType <> itRGBA4444;
+  PopConvertToRGB888.Enabled := lFileType <> itRGBA8888;
 end;
 
 procedure TSxModule1.SxShellPropSheetExtAddPropSheet(
