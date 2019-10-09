@@ -37,7 +37,18 @@ Type
 
   TTSTOBGenCD = Class(TObject)
   Public
-    Class Function CreateBGenCD() : ITSTOBGenCD;
+    Class Function CreateBGenCD() : ITSTOBGenCD; OverLoad;
+    Class Function CreateBGenCD(Const AXmlString : String) : ITSTOBGenCD; OverLoad;
+    Class Function CreateBGenCD(AStream : IBytesStreamEx) : ITSTOBGenCD; OverLoad;
+    Class Function CreateBGenCD(ABGenCDContent : TBytes) : ITSTOBGenCD; OverLoad;
+
+    Class Function XmlToBGenCD(Const AXmlString : String) : TBytes; OverLoad;
+    Class Function XmlToBGenCD(Const AXmlString : String; AStream : IBytesStreamEx) : Boolean; OverLoad;
+    Class Function XmlToBGenCD(AStream : IBytesStreamEx) : Boolean; OverLoad;
+
+    Class Function BGenCDToXml(Const ABGenCDContent : TBytes) : AnsiString; OverLoad;
+    Class Function BGenCDToXml(Const ABGenCDContent : TBytes; AStream : IBytesStreamEx) : Boolean; OverLoad;
+    Class Function BGenCDToXml(AStream : IBytesStreamEx) : Boolean; OverLoad;
 
   End;
 
@@ -46,7 +57,17 @@ implementation
 Uses Classes, Dialogs;
 
 Type
-  TTSTOBGenCDImpl = Class(TStringStreamEx, ITSTOBGenCD)
+  ITSTOBGenCDEx = Interface(ITSTOBGenCD)
+    ['{4B61686E-29A0-2112-B7FF-4C0A6E03490E}']
+    Function  GetFileHdr() : String;
+
+    Procedure BGenCD(AContent : IBytesStreamEx);
+
+    Property FileHdr : String Read GetFileHdr;
+
+  End;
+
+  TTSTOBGenCDImpl = Class(TStringStreamEx, ITSTOBGenCD, ITSTOBGenCDEx)
   Private Const
     FileHdr = 'BGENCD>>';
     Secret = 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2Fy' +
@@ -93,11 +114,14 @@ Type
     Function GetStrmImpl() : IStreamEx;
 
     Procedure BGenCD(AContent : IBytesStreamEx);
-    Function  GetAsByte(AContent : IBytesStreamEx) : TBytes;
+    Function  GetAsBytes(AContent : IBytesStreamEx) : TBytes;
 
   Protected
-    Property Impl : TStreamImplementor Read GetImpl Implements ITSTOBGenCD;
+    Property Impl     : TStreamImplementor Read GetImpl Implements ITSTOBGenCD;
+    Property ImplEx   : TStreamImplementor Read GetImpl Implements ITSTOBGenCDEx;
     Property StrmImpl : IStreamEx Read GetStrmImpl;
+
+    Function  GetFileHdr() : String;
 
     Function  GetAsXml() : AnsiString;
     Procedure SetAsXml(Const AXmlString : AnsiString);
@@ -116,6 +140,11 @@ Type
     Procedure ITSTOBGenCD.LoadFromFile = MyLoadFromFile;
     Procedure ITSTOBGenCD.SaveToFile = MySaveToFile;
 
+    Procedure ITSTOBGenCDEx.LoadFromStream = MyLoadFromStream;
+    Procedure ITSTOBGenCDEx.SaveToStream = MySaveToStream;
+    Procedure ITSTOBGenCDEx.LoadFromFile = MyLoadFromFile;
+    Procedure ITSTOBGenCDEx.SaveToFile = MySaveToFile;
+
   End;
 
 Class Function TTSTOBGenCD.CreateBGenCD() : ITSTOBGenCD;
@@ -123,10 +152,121 @@ Begin
   Result := TTSTOBGenCDImpl.Create();
 End;
 
+Class Function TTSTOBGenCD.CreateBGenCD(Const AXmlString : String) : ITSTOBGenCD;
+Begin
+  Result := TTSTOBGenCDImpl.Create(AXmlString);
+End;
+
+Class Function TTSTOBGenCD.CreateBGenCD(AStream : IBytesStreamEx) : ITSTOBGenCD;
+Begin
+  Result := TTSTOBGenCDImpl.Create();
+  Result.LoadFromStream(AStream);
+End;
+
+Class Function TTSTOBGenCD.CreateBGenCD(ABGenCDContent : TBytes) : ITSTOBGenCD;
+Var lByteStrm : IBytesStreamEx;
+Begin
+  lByteStrm := TBytesStreamEx.Create(ABGenCDContent);
+  Try
+    Result := CreateBGenCD(lByteStrm);
+
+    Finally
+      lByteStrm := Nil;
+  End;
+End;
+
+Class Function TTSTOBGenCD.XmlToBGenCD(Const AXmlString : String) : TBytes;
+Var lBGenCD : ITSTOBGenCD;
+Begin
+  lBGenCD := CreateBGenCD(AXmlString);
+  With lBGenCD Do
+  Try
+    Result := lBGenCD.AsBGenCD;
+
+    Finally
+      lBGenCD := Nil;
+  End;
+End;
+
+Class Function TTSTOBGenCD.XmlToBGenCD(Const AXmlString : String; AStream : IBytesStreamEx) : Boolean;
+Var lBGenCD : ITSTOBGenCD;
+Begin
+  lBGenCD := CreateBGenCD(AXmlString);
+  With lBGenCD Do
+  Try
+    lBGenCD.SaveToStream(AStream, xftBGenCD);
+    Result := AStream.Size > 8;
+
+    Finally
+      lBGenCD := Nil;
+  End;
+End;
+
+Class Function TTSTOBGenCD.XmlToBGenCD(AStream : IBytesStreamEx) : Boolean;
+Var lBGenCD  : ITSTOBGenCD;
+Begin
+  lBGenCD := CreateBGenCD(AStream.Bytes);
+  Try
+    AStream.Clear();
+    lBGenCD.SaveToStream(AStream, xftBGenCD);
+    Result := AStream.Size > 8;
+
+    Finally
+      lBGenCD := Nil;
+  End;
+End;
+
+Class Function TTSTOBGenCD.BGenCDToXml(Const ABGenCDContent : TBytes) : AnsiString;
+Var lBGenCD : ITSTOBGenCD;
+Begin
+  lBGenCD := CreateBGenCD(ABGenCDContent);
+  Try
+    Result := lBGenCD.AsXml;
+
+    Finally
+      lBGenCD := Nil;
+  End;
+End;
+
+Class Function TTSTOBGenCD.BGenCDToXml(Const ABGenCDContent : TBytes; AStream : IBytesStreamEx) : Boolean;
+Var lBGenCD : ITSTOBGenCD;
+Begin
+  lBGenCD := CreateBGenCD(ABGenCDContent);
+  Try
+    lBGenCD.SaveToStream(AStream, xftXml);
+    Result := AStream.Size > 8;
+
+    Finally
+      lBGenCD := Nil;
+  End;
+End;
+
+Class Function TTSTOBGenCD.BGenCDToXml(AStream : IBytesStreamEx) : Boolean;
+Var lBGenCD : ITSTOBGenCD;
+Begin
+  lBGenCD := CreateBGenCD(AStream.Bytes);
+  Try
+    Result := AStream.Size > 8;
+    If Result Then
+    Begin
+      AStream.Clear();
+      lBGenCD.SaveToStream(AStream, xftXml);
+    End;
+
+    Finally
+      lBGenCD := Nil;
+  End;
+End;
+
 Function TTSTOBGenCDImpl.GetStrmImpl() : IStreamEx;
 Begin
   If Not Supports(Self, IStreamEx, Result) Then
     Result := Nil;
+End;
+
+Function TTSTOBGenCDImpl.GetFileHdr() : String;
+Begin
+  Result := FileHdr;
 End;
 
 Function TTSTOBGenCDImpl.GetAsXml() : AnsiString;
@@ -150,8 +290,7 @@ Begin
     lByteStrm.CopyFrom(Self, 0);
     lByteStrm.Seek(Length(FileHdr), soFromBeginning);
     BGenCD(lByteStrm);
-    SetLength(Result, lByteStrm.Size);
-    Move(lByteStrm.Bytes[0], Result[0], Length(Result));
+    Result := GetAsBytes(lByteStrm);
 
     Finally
       lByteStrm := Nil;
@@ -162,7 +301,7 @@ Procedure TTSTOBGenCDImpl.SetAsBGenCD(Const ABGenContent : TBytes);
 Var lByteStrm : IBytesStreamEx;
 Begin
   lByteStrm := TBytesStreamEx.Create(ABGenContent);
-  If lByteStrm.ReadAnsiString(8) = FileHdr Then
+  If lByteStrm.ReadAnsiString(Length(FileHdr)) = FileHdr Then
   Try
     BGenCD(lByteStrm);
     Clear();
@@ -192,7 +331,7 @@ Begin
   End;
 End;
 
-Function TTSTOBGenCDImpl.GetAsByte(AContent : IBytesStreamEx) : TBytes;
+Function TTSTOBGenCDImpl.GetAsBytes(AContent : IBytesStreamEx) : TBytes;
 Begin
   SetLength(Result, AContent.Size);
   Move(AContent.Bytes[0], Result[0], Length(Result));
@@ -203,8 +342,8 @@ Var lBytes : TBytes;
 Begin
   Clear();
 
-  If AStream.ReadAnsiString(8) = FileHdr Then
-    SetAsBGenCD(GetAsByte(AStream))
+  If AStream.ReadAnsiString(Length(FileHdr)) = FileHdr Then
+    SetAsBGenCD(GetAsBytes(AStream))
   Else
     StrmImpl.CopyFrom(AStream, 0);
 End;
@@ -215,7 +354,7 @@ Begin
   If AFileType = xftBGenCD Then
     lBytes := GetAsBGenCD()
   Else
-    lBytes := GetAsByte(Self);
+    lBytes := GetAsBytes(Self);
 
   AStream.WriteBuffer(lBytes[0], Length(lBytes));
 End;
@@ -225,7 +364,7 @@ Var lByteStrm : IBytesStreamEx;
 Begin
   If FileExists(AFileName) Then
   Begin
-    lByteStrm := TBytesStreamEx.Create(Bytes);
+    lByteStrm := TBytesStreamEx.Create();
     Try
       lByteStrm.LoadFromFile(AFileName);
       MyLoadFromStream(lByteStrm);
