@@ -103,7 +103,8 @@ uses
   VTEditors in 'VirtualTree\VTEditors.pas',
   TSTOPluginIntf in 'TSTOPlugin\TSTOSdk\TSTOPluginIntf.pas',
   TSTOPluginManagerIntf in 'TSTOPlugin\PluginManager.dpk\Source\TSTOPluginManagerIntf.pas',
-  AboutFrm in 'AboutFrm.pas' {FrmAbout};
+  AboutFrm in 'AboutFrm.pas' {FrmAbout},
+  TSTOBGenCD in 'TSTOBGenCD.pas';
 
 {$R *.res}
 {$R Images.res}

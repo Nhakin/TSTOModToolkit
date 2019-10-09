@@ -14,7 +14,7 @@ uses
   SciScintillaMemo, SciScintilla, SciScintillaNPP, SciActions, TB2Item, TB2Dock,
   TB2Toolbar, SpTBXItem, SpTBXSkins, SpTBXAdditionalSkins, SpTBXControls,
   SpTBXEditors, Mask, System.Actions, SpTBXExPanel, SpTBXDkPanels, SpTBXTabs,
-  ImagingRgb, JvPlugin;
+  ImagingRgb;
 
 Type
   TTSTOCurrentDataType = (dtUnknown, dtXml, dtZeroIndex, dtText, dtRbg, dtBCell, dtBsv3);
@@ -365,6 +365,9 @@ Type
     FIntfImpl : TInterfaceExImplementor;
     FPluginM  : ITSTOPluginManager;
 
+    FOnBeforeApplyMod : TBeforeApplyModEvent;
+    FOnAfterApplyMod  : TNotifyEvent;
+
     Function GetIntfImpl() : TInterfaceExImplementor;
 
     Function  UniqueComponentName(AComponentName : String) : String;
@@ -373,6 +376,12 @@ Type
 
   Protected
     Property IntfImpl: TInterfaceExImplementor Read GetIntfImpl Implements ITSTOApplication;
+
+    Function  GetOnBeforeApplyMod() : TBeforeApplyModEvent;
+    Procedure SetOnBeforeApplyMod(AOnBeforeApplyMod : TBeforeApplyModEvent);
+
+    Function  GetOnAfterApplyMod() : TNotifyEvent;
+    Procedure SetOnAfterApplyMod(AOnAfterApplyMod : TNotifyEvent);
 
     Function GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
     Function GetCurrentProject() : ITSTOWorkSpaceProjectIO;
@@ -388,6 +397,7 @@ Type
     Function CreateScriptTemplates() : ITSTOScriptTemplateHacksIO;
     Function CreateHackMasterList() : ITSTOHackMasterListIO;
     Function CreateRgbProgress() : IRgbProgress;
+
   {$EndRegion}
 
   end;
@@ -406,6 +416,7 @@ Uses RTTI, RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
   TSTOCustomPatches.IO, TSTOHackMasterList.Xml, TSTOBsv.IO,
   TSTOZero.Bin, TSTOSbtp.IO, TSTOProjectWorkSpaceIntf,
   TSTOProjectWorkSpace.Xml, TSTOProjectWorkSpace.Types,
+  TSTOBGenCD,
   RemoveFileFromProjectFrm, ProjectSettingFrm,
   ProjectGroupSettingFrm, HackMasterListFrm, AboutFrm;
 
@@ -1929,6 +1940,8 @@ Var lPkg     : ITSTOPackageNode;
     lImg  : ITSTORgbFile;
     lXmlStr : String;
     lBsvAnimation : IBsvAnimationIO;
+    lBGen : ITSTOBGenCD;
+    lByteStrm : IBytesStreamEx;
 Begin
   tbPackMod.Enabled     := False;
   tbUnpackMod.Enabled   := False;
@@ -1997,10 +2010,28 @@ Begin
             End
             Else If SameText(lFile.FileExtension, 'xml') Then
             Begin
-              lXmlStr := (lMem As IStringStreamEx).DataString;
-              If Copy(lXmlStr, 1, 3) = #$EF#$BB#$BF Then
-                lXmlStr := Copy(lXmlStr, 4, Length(lXmlStr));
-              CreateXmlTab(FormatXmlData(lXmlStr), lFile.FileName1);
+              lByteStrm := TBytesStreamEx.Create();
+              Try
+                lByteStrm.CopyFrom(lMem, 0);
+                lByteStrm.Seek(0, soFromBeginning);
+                lBGen := TTSTOBGenCD.CreateBGenCD(lByteStrm);
+                lXmlStr := lBGen.AsXml;
+
+                If Copy(lXmlStr, 1, 3) = #$EF#$BB#$BF Then
+                  lXmlStr := Copy(lXmlStr, 4, Length(lXmlStr));
+
+                Try
+                  lXmlStr := FormatXmlData(lXmlStr);
+                  Except
+                End;
+
+                CreateXmlTab(lXmlStr, lFile.FileName1);
+
+                Finally
+                  lByteStrm := Nil;
+                  lBGen     := Nil;
+              End;
+
   (*
               lXmlStr := (lMem As IStringStreamEx).DataString;
               If Copy(lXmlStr, 1, 3) = #$EF#$BB#$BF Then
@@ -2851,8 +2882,9 @@ End;
 
 Procedure TFrmDckMain.DoTvWorkSpaceDblClick(Sender: TObject);
 Var lSrcFolder : ITSTOWorkSpaceProjectSrcFolder;
-    lStrStream : IStringStreamEx;
+    lByteStrm  : IBytesStreamEx;
     lXmlStr    : String;
+    lBGen      : ITSTOBGenCD;
 Begin
   With FTvWorkSpace Do
     If Assigned(FocusedNode) And
@@ -2862,17 +2894,31 @@ Begin
       Begin
         If SameText(ExtractFileExt(lSrcFolder[FocusedNode.Index].FileName), '.xml') Then
         Begin
-          lStrStream := TStringStreamEx.Create();
+          lByteStrm := TBytesStreamEx.Create();
           Try
-            lStrStream.LoadFromFile(IncludeTrailingBackSlash(lSrcFolder.SrcPath) + lSrcFolder[FocusedNode.Index].FileName);
-            lXmlStr := lStrStream.DataString;
+            lByteStrm.LoadFromFile(IncludeTrailingBackSlash(lSrcFolder.SrcPath) + lSrcFolder[FocusedNode.Index].FileName);
+
+            lBGen := TTSTOBGenCD.CreateBGenCD(lByteStrm);
+            Try
+              lXmlStr := lBGen.AsXml;
+
+              Finally
+                lBGen := Nil;
+            End;
+
             If Copy(lXmlStr, 1, 3) = #$EF#$BB#$BF Then
               lXmlStr := Copy(lXmlStr, 4, Length(lXmlStr));
 
-            CreateXmlTab(FormatXmlData(lXmlStr), lSrcFolder[FocusedNode.Index].FileName);
+            Try
+              lXmlStr := FormatXmlData(lXmlStr);
+              Except
+                On e:Exception Do
+                  ShowMessage(e.Message);
+            End;
+            CreateXmlTab(lXmlStr, lSrcFolder[FocusedNode.Index].FileName);
 
             Finally
-              lStrStream := Nil;
+              lByteStrm := Nil;
           End;
         End;
       End;
@@ -3038,6 +3084,26 @@ Begin
   If Not Assigned(FIntfImpl) Then
     FIntfImpl := TInterfaceExImplementor.Create(Self, False);
   Result := FIntfImpl;
+End;
+
+Function TFrmDckMain.GetOnBeforeApplyMod() : TBeforeApplyModEvent;
+Begin
+  Result := FOnBeforeApplyMod;
+End;
+
+Procedure TFrmDckMain.SetOnBeforeApplyMod(AOnBeforeApplyMod : TBeforeApplyModEvent);
+Begin
+  FOnBeforeApplyMod := AOnBeforeApplyMod;
+End;
+
+Function TFrmDckMain.GetOnAfterApplyMod() : TNotifyEvent;
+Begin
+  Result := FOnAfterApplyMod;
+End;
+
+Procedure TFrmDckMain.SetOnAfterApplyMod(AOnAfterApplyMod : TNotifyEvent);
+Begin
+  FOnAfterApplyMod := AOnAfterApplyMod;
 End;
 
 Function TFrmDckMain.GetWorkSpace() : ITSTOWorkSpaceProjectGroupIO;
