@@ -122,15 +122,14 @@ Begin
         If lHeader.FileSig = $00000000 Then
           For lIdx := 0 To (Size Div 4) - 1 Do
           Begin
-            //RGBA4444->ARGB8888
             Read(Handle, @lDWord, SizeOf(lDWord));
 
             With lPixel32^[lIdx] Do
             Begin
-              A := lDWord And $FF000000 Shr $18;
               R := lDWord And $000000FF;
               G := lDWord And $0000FF00 Shr $08;
               B := lDWord And $00FF0000 Shr $10;
+              A := lDWord And $FF000000 Shr $18;
             End;
           End
         Else

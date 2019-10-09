@@ -1,7 +1,7 @@
 object SxModule1: TSxModule1
   OldCreateOrder = False
   ThreadFree = False
-  Height = 255
+  Height = 197
   Width = 272
   object SxContextMenu: TSxContextMenu
     CLSID = '{EEED453D-8F67-44EE-962F-BE50353923F9}'
@@ -11,13 +11,13 @@ object SxModule1: TSxModule1
     FileType = '*'
     RememberPrevExtension = False
     ContextMenu = SxPopupMenu
-    Left = 32
+    Left = 62
     Top = 16
   end
   object SxPopupMenu: TSxPopupMenu
     Images = ImageList
     OnPopup = SxPopupMenuPopup
-    Left = 136
+    Left = 166
     Top = 16
     object N1: TMenuItem
       Caption = '-'
@@ -40,7 +40,7 @@ object SxModule1: TSxModule1
     end
   end
   object ImageList: TImageList
-    Left = 132
+    Left = 166
     Top = 70
     Bitmap = {
       494C010101000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
@@ -195,7 +195,7 @@ object SxModule1: TSxModule1
     PropertySheets.Strings = (
       'TTSTORgbPropSheet[0]=Rgb Detail,0')
     ActivateXPThemes = True
-    Left = 136
+    Left = 166
     Top = 128
   end
   object SxFileClasses: TSxFileClasses
@@ -206,7 +206,18 @@ object SxModule1: TSxModule1
         Description = 'Rgb File'
       end>
     RegisterForAll = True
-    Left = 32
+    Left = 62
     Top = 72
+  end
+  object SxThumbnailProvider: TSxThumbnailProvider
+    CLSID = '{69B30CC0-C9E9-4735-B74F-236F34F0229A}'
+    Description = 'SxThumbnailProvider'
+    ExtensionName = 'SxThumbnailProvider'
+    RefreshWhenRegistered = False
+    FileType = '*'
+    RememberPrevExtension = False
+    OnGetThumbnail = SxThumbnailProviderGetThumbnail
+    Left = 62
+    Top = 128
   end
 end

@@ -12,7 +12,7 @@ uses
     SxComObj,
     SxDataModule, Vcl.Menus, SxPopupMenu, SxCustShlObj, SxContextMenu,
     SxFileClasses, System.ImageList, Vcl.ImgList, Vcl.Controls, SxPropertySheetExt,
-    TSTORgbPropPage, SxThumbnailProvider, SxExtractImage, SxConst;
+    TSTORgbPropPage, SxThumbnailProvider, SxExtractImage, SxConst, SxExtractIcon;
 
 type
   TSxModule1 = class(TSxModule)
@@ -27,17 +27,23 @@ type
     SxShellPropSheetExt: TSxShellPropSheetExt;
     PopConvertToRGB888: TMenuItem;
     SxFileClasses: TSxFileClasses;
+    SxThumbnailProvider: TSxThumbnailProvider;
+
     procedure SxPopupMenuPopup(Sender: TObject);
     procedure SxShellPropSheetExtAddPropSheet(Sender: TSxShellPropSheetExt;
       PropSheetClass: TFormClass; var AllowInsert: Boolean);
     procedure SxExtractImageExtractImage(Sender: TSxExtractImage;
       Image: TBitmap; Size: TSxSize);
+    procedure SxThumbnailProviderGetThumbnail(Sender: TSxThumbnailProvider;
+      CX: Integer; Image: TBitmap; var HasAlphaChannel: Boolean);
+
   private
-    { Private declarations }
+    Function GetPictureRatio(ASrcWidth, ASrcHeight, ATrgWidth, ATrgHeight : Integer) : TPoint;
+
   protected
-    { Protected declarations }
+
   public
-    { Public declarations }
+
   end;
 
 implementation
@@ -129,6 +135,81 @@ procedure TSxModule1.SxShellPropSheetExtAddPropSheet(
 begin
   AllowInsert := (PropSheetClass = TTSTORgbPropSheet) And
                  SameText(ExtractFileExt(Sender.FileName), '.rgb');
+end;
+
+Function TSxModule1.GetPictureRatio(ASrcWidth, ASrcHeight, ATrgWidth, ATrgHeight : Integer) : TPoint;
+Begin
+(*
+      If (lImg.Height > ImgPreview.Height) Or (lImg.Width > ImgPreview.Width) Then
+      Begin
+        If (lImg.Height > ImgPreview.Height) Then
+        Begin
+          lH := ImgPreview.Height;
+          lW := Round((lH / lImg.Height) * ImgPreview.Width);
+        End
+        Else
+        Begin
+          lW := ImgPreview.Width;
+          lH := Round((lW / lImg.Width) * ImgPreview.Height);
+        End;
+
+        ResizeImage(lImg, lW, lH, rfLanczos);
+
+        lblImageSize.Caption := lblImageSize.Caption + ' (Resized at ' + IntToStr(lW) + ' X ' + IntToStr(lH) + ')';
+      End;
+*)
+  Result.X := ASrcWidth;
+  Result.Y := ASrcHeight;
+
+  If (ASrcWidth > ATrgWidth) Or (ASrcHeight > ATrgHeight) Then
+  Begin
+    If ASrcHeight > ATrgHeight Then
+    Begin
+      Result.Y := ATrgHeight;
+      Result.X := Round((Result.Y / ASrcHeight) * ATrgWidth);
+    End
+    Else If ASrcWidth > ATrgWidth Then
+    Begin
+      Result.X := ATrgWidth;
+      Result.Y := Round((Result.X / ASrcWidth) * ATrgHeight)
+    End;
+  End;
+End;
+
+procedure TSxModule1.SxThumbnailProviderGetThumbnail(
+  Sender: TSxThumbnailProvider; CX: Integer; Image: TBitmap;
+  var HasAlphaChannel: Boolean);
+Var lTrgWidth  ,
+    lTrgHeight ,
+    lSrcWidth  ,
+    lSrcHeight : Integer;
+    lFName : String;
+    lImg : TImageData;
+begin
+  lTrgWidth  := CX;
+  lTrgHeight := CX * 3 Div 4;
+  HasAlphaChannel := True;
+
+//  lFName := Sender.FileName;
+//  If lFName = '' Then
+    lFName := 'C:\Projects\casinostore.rgb';
+
+  If FileExists(lFName) Then
+    If LoadImageFromFile(lFName, lImg) Then
+    Try
+      lSrcWidth  := lImg.Width;
+      lSrcHeight := lImg.Height;
+
+      With GetPictureRatio(lSrcWidth, lSrcHeight, lTrgWidth, lTrgHeight) Do
+      Begin
+        If (X > 0) And (Y > 0) Then
+          ResizeImage(lImg, X, Y, rfLanczos);
+      End;
+      ConvertDataToBitmap(lImg, Image);
+
+      Finally
+        FreeImage(lImg);
+    End;
 end;
 
 initialization

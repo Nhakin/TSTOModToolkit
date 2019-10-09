@@ -5,8 +5,8 @@ uses
   TSTOShell_TLB in 'TSTOShell_TLB.pas',
   TSTOShellMain in 'TSTOShellMain.pas' {SxModule1: TSxModule},
   TSTORgbPropPage in 'TSTORgbPropPage.pas' {TSTORgbPropSheet: TSxShellPropSheetForm},
-  TSTORgb in 'TSTORgb.pas',
-  ImagingRgb in 'ImagingRgb.pas';
+  ImagingRgb in 'ImagingRgb.pas',
+  RgbTools in 'RgbTools.pas';
 
 exports
   DllGetClassObject,
