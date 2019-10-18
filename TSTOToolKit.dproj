@@ -3,7 +3,7 @@
         <ProjectGuid>{A62B0428-5926-41EA-9B9A-D6AF996A1E0B}</ProjectGuid>
         <MainSource>TSTOToolKit.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
@@ -103,6 +103,7 @@
         <DCC_IMPLICIT_STRING_CAST_LOSS>false</DCC_IMPLICIT_STRING_CAST_LOSS>
         <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
         <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
+        <DCC_ExeOutput>Z:\Temp\TSTO\Bin</DCC_ExeOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;DONT_LINK_TARGA;DONT_LINK_DDS;DONT_LINK_GIF;DONT_LINK_MNG;DONT_LINK_JNG;DONT_LINK_PNM;DONT_LINK_RADHDR;DONT_LINK_EXTRAS;VT60;MainApp;$(DCC_Define)</DCC_Define>

@@ -221,6 +221,7 @@ Type
     mnuAbout: TSpTBXItem;
     mnuHelp: TSpTBXItem;
     SpTBXSeparatorItem15: TSpTBXSeparatorItem;
+    SpTBXStatusBar1: TSpTBXStatusBar;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);

@@ -819,7 +819,7 @@ Begin
           ForceDirectories(ExtractFilePath(lTemplate[X].Settings.OutputFileName));
       End;
 
-    lTemplate.GenerateScripts(GetHackSettings().HackMasterList);
+    lTemplate.GenerateScripts(GetHackSettings().HackMasterList, AProject.EncryptScript);
 
     For X := 0 To lTemplate.Count - 1 Do
       If lTemplate[X].Enabled Then

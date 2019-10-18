@@ -216,6 +216,9 @@ Type
     Function  GetISrcFolders() : ITSTOWorkSpaceProjectSrcFolders;
     Function  ITSTOWorkSpaceProject.GetSrcFolders = GetISrcFolders;
 
+    Function  GetEncryptScript() : Boolean;
+    Procedure SetEncryptScript(Const AEncryptScript : Boolean);
+
     Function  GetOnChanged() : TNotifyEvent;
     Procedure SetOnChanged(AOnChanged : TNotifyEvent);
     
@@ -328,6 +331,7 @@ Begin
     ATarget.ProjectType      := ASource.ProjectType;
     ATarget.ZeroCrc32        := ASource.ZeroCrc32;
     ATarget.PackOutput       := ASource.PackOutput;
+    ATarget.EncryptScript    := ASource.EncryptScript;
     ATarget.OutputPath       := ASource.OutputPath;
     ATarget.CustomScriptPath := ASource.CustomScriptPath;
     ATarget.CustomModPath    := ASource.CustomModPath;
@@ -435,6 +439,19 @@ Begin
 
   If Not IsImplementorOf(WSProjectImpl) Then
     WSProjectImpl.PackOutput := APackOutput;
+End;
+
+Function TXmlTSTOWorkSpaceProject.GetEncryptScript() : Boolean;
+Begin
+  Result := ChildNodes['EncryptScript'].AsBoolean;
+End;
+
+Procedure TXmlTSTOWorkSpaceProject.SetEncryptScript(Const AEncryptScript : Boolean);
+Begin
+  ChildNodes['EncryptScript'].AsBoolean := AEncryptScript;
+
+  If Not IsImplementorOf(WSProjectImpl) Then
+    WSProjectImpl.EncryptScript := AEncryptScript;
 End;
 
 Function TXmlTSTOWorkSpaceProject.GetOutputPath() : AnsiString;

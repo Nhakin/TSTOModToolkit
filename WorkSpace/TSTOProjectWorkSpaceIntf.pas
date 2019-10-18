@@ -96,6 +96,9 @@ Type
 
     Function  GetSrcFolders() : ITSTOWorkSpaceProjectSrcFolders;
 
+    Function  GetEncryptScript() : Boolean;
+    Procedure SetEncryptScript(Const AEncryptScript : Boolean);
+
     Procedure Assign(ASource : IInterface);
 
     Property ProjectName      : AnsiString                      Read GetProjectName      Write SetProjectName;
@@ -107,6 +110,7 @@ Type
     Property CustomScriptPath : AnsiString                      Read GetCustomScriptPath Write SetCustomScriptPath;
     Property CustomModPath    : AnsiString                      Read GetCustomModPath    Write SetCustomModPath;
     Property SrcFolders       : ITSTOWorkSpaceProjectSrcFolders Read GetSrcFolders;
+    Property EncryptScript    : Boolean                         Read GetEncryptScript    Write SetEncryptScript;
 
   End;
 
