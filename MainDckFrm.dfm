@@ -179,7 +179,7 @@ object FrmDckMain: TFrmDckMain
     Left = 0
     Top = 51
     Width = 719
-    Height = 662
+    Height = 636
     Manager = dckMgr
     Align = alClient
     TabOrder = 1
@@ -194,9 +194,9 @@ object FrmDckMain: TFrmDckMain
       6473697A653D22302E353433383834383932303836333331223E0D0A09090909
       3C7A6F6E65206B696E643D2250414E454C222069643D2250616E46696C65496E
       666F222076697369626C653D2231222073697A653D2231323022206473697A65
-      3D22302E313836333335343033373236373038222F3E0D0A090909093C7A6F6E
+      3D22302E313934313734373537323831353533222F3E0D0A090909093C7A6F6E
       65206B696E643D225441425322206163746976657461623D2234222073697A65
-      3D2235323422206473697A653D22302E38313336363435393632373332393222
+      3D2234393822206473697A653D22302E38303538323532343237313834343722
       20697373706163653D2231223E0D0A09090909093C7A6F6E65206B696E643D22
       50414E454C222069643D2250616E496E666F222076697369626C653D2231222F
       3E0D0A09090909093C7A6F6E65206B696E643D2250414E454C222069643D2250
@@ -210,13 +210,13 @@ object FrmDckMain: TFrmDckMain
       093C7A6F6E65206B696E643D2256455254222073697A653D2231363722206473
       697A653D22302E323430323837373639373834313733223E0D0A090909093C7A
       6F6E65206B696E643D225441425322206163746976657461623D223022207369
-      7A653D2233323522206473697A653D22302E3530343635383338353039333136
+      7A653D2233313222206473697A653D22302E3530343635383338353039333136
       38223E0D0A09090909093C7A6F6E65206B696E643D2250414E454C222069643D
       2250616E50726F6A656374222076697369626C653D2231222F3E0D0A09090909
       093C7A6F6E65206B696E643D2250414E454C222069643D2250616E5265736F75
       72636573222076697369626C653D2231222F3E0D0A090909093C2F7A6F6E653E
       0D0A090909093C7A6F6E65206B696E643D225441425322206163746976657461
-      623D2230222073697A653D2233313922206473697A653D22302E343935333431
+      623D2230222073697A653D2233303622206473697A653D22302E343935333431
       363134393036383332223E0D0A09090909093C7A6F6E65206B696E643D225041
       4E454C222069643D2250616E4D6F644F7074696F6E73222076697369626C653D
       2231222F3E0D0A09090909093C7A6F6E65206B696E643D2250414E454C222069
@@ -225,9 +225,9 @@ object FrmDckMain: TFrmDckMain
       653E0D0A093C2F736974653E0D0A3C2F736974656C6973743E}
     object PanCustomMod: TLMDDockPanel
       Left = 546
-      Top = 337
+      Top = 324
       Width = 167
-      Height = 299
+      Height = 286
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 13
@@ -383,7 +383,7 @@ object FrmDckMain: TFrmDckMain
       Left = 162
       Top = 153
       Width = 378
-      Height = 503
+      Height = 477
       ParentBackground = False
       TabOrder = 10
       Caption = 'Script Template'
@@ -391,7 +391,7 @@ object FrmDckMain: TFrmDckMain
         Left = 0
         Top = 0
         Width = 378
-        Height = 503
+        Height = 477
         Manager = dckMgr
         Align = alClient
         TabOrder = 0
@@ -400,7 +400,7 @@ object FrmDckMain: TFrmDckMain
           227574662D38223F3E0D0A3C736974656C6973743E0D0A093C73697465206964
           3D2253454C465F53495445223E0D0A09093C7A6F6E65206B696E643D22564552
           54223E0D0A0909093C7A6F6E65206B696E643D22484F525A222073697A653D22
-          31323722206473697A653D22302E323631383535363730313033303933223E0D
+          31323722206473697A653D22302E323736363838343533313539303431223E0D
           0A090909093C7A6F6E65206B696E643D2250414E454C222069643D2250616E54
           764861636B54656D706C617465222076697369626C653D2231222073697A653D
           2231373522206473697A653D22302E343836363331303136303432373831222F
@@ -412,8 +412,8 @@ object FrmDckMain: TFrmDckMain
           2069643D2250616E535453657474696E6773222076697369626C653D2231222F
           3E0D0A090909093C2F7A6F6E653E0D0A0909093C2F7A6F6E653E0D0A0909093C
           7A6F6E65206B696E643D225441425322206163746976657461623D2230222073
-          697A653D2233353822206473697A653D22302E37333831343433323938393639
-          30372220697373706163653D2231223E0D0A090909093C7A6F6E65206B696E64
+          697A653D2233333222206473697A653D22302E37323333313135343638343039
+          35392220697373706163653D2231223E0D0A090909093C7A6F6E65206B696E64
           3D2250414E454C222069643D2250616E4861636B54656D706C61746522207669
           7369626C653D2231222F3E0D0A0909093C2F7A6F6E653E0D0A09093C2F7A6F6E
           653E0D0A093C2F736974653E0D0A3C2F736974656C6973743E}
@@ -421,7 +421,7 @@ object FrmDckMain: TFrmDckMain
           Left = 6
           Top = 160
           Width = 366
-          Height = 337
+          Height = 311
           ParentBackground = False
           TabOrder = 7
           Caption = 'Template Source'
@@ -429,7 +429,7 @@ object FrmDckMain: TFrmDckMain
             Left = 0
             Top = 0
             Width = 366
-            Height = 309
+            Height = 283
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
             Font.Height = -13
@@ -853,15 +853,13 @@ object FrmDckMain: TFrmDckMain
           end
           object tsScriptTemplate: TSpTBXTabSet
             Left = 0
-            Top = 309
+            Top = 283
             Width = 366
             Height = 28
             Align = alBottom
             ActiveTabIndex = 0
             TabPosition = ttpBottom
             OnActiveTabChange = tsScriptTemplateActiveTabChange
-            ExplicitLeft = -6
-            ExplicitTop = 315
             HiddenItems = <>
             object tsSTSource: TSpTBXTabItem
               Caption = 'Source'
@@ -906,7 +904,7 @@ object FrmDckMain: TFrmDckMain
       Left = 162
       Top = 153
       Width = 378
-      Height = 503
+      Height = 477
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 11
@@ -917,7 +915,7 @@ object FrmDckMain: TFrmDckMain
         Left = 3
         Top = 3
         Width = 372
-        Height = 497
+        Height = 471
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -932,7 +930,7 @@ object FrmDckMain: TFrmDckMain
       Left = 162
       Top = 153
       Width = 378
-      Height = 503
+      Height = 477
       ParentBackground = False
       TabOrder = 12
       Caption = 'Image'
@@ -974,7 +972,7 @@ object FrmDckMain: TFrmDckMain
         Left = 3
         Top = 39
         Width = 372
-        Height = 461
+        Height = 435
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
@@ -995,7 +993,7 @@ object FrmDckMain: TFrmDckMain
       Left = 162
       Top = 153
       Width = 378
-      Height = 503
+      Height = 477
       Buttons = [pbMenu, pbPin, pbMaximize]
       ParentBackground = False
       TabOrder = 9
@@ -1004,7 +1002,7 @@ object FrmDckMain: TFrmDckMain
         Left = 0
         Top = 0
         Width = 378
-        Height = 503
+        Height = 477
         Manager = dckMgr
         Align = alClient
         TabOrder = 0
@@ -1032,9 +1030,9 @@ object FrmDckMain: TFrmDckMain
     end
     object PanModOptions: TLMDDockPanel
       Left = 546
-      Top = 337
+      Top = 324
       Width = 167
-      Height = 299
+      Height = 286
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 14
@@ -1104,7 +1102,7 @@ object FrmDckMain: TFrmDckMain
       Left = 546
       Top = 6
       Width = 167
-      Height = 305
+      Height = 292
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 7
@@ -1114,7 +1112,7 @@ object FrmDckMain: TFrmDckMain
       Left = 546
       Top = 6
       Width = 167
-      Height = 305
+      Height = 292
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 6
@@ -1133,7 +1131,7 @@ object FrmDckMain: TFrmDckMain
       Left = 162
       Top = 153
       Width = 378
-      Height = 503
+      Height = 477
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 8
@@ -1143,7 +1141,7 @@ object FrmDckMain: TFrmDckMain
       Left = 6
       Top = 6
       Width = 150
-      Height = 650
+      Height = 624
       Buttons = [pbPin, pbMaximize, pbClose]
       ParentBackground = False
       TabOrder = 4
@@ -1158,6 +1156,12 @@ object FrmDckMain: TFrmDckMain
         TabOrder = 0
       end
     end
+  end
+  object SpTBXStatusBar1: TSpTBXStatusBar
+    Left = 0
+    Top = 687
+    Width = 719
+    Height = 26
   end
   object dckMgr: TLMDDockManager
     StyleName = 'VS2012Dark'
@@ -1811,6 +1815,12 @@ object FrmDckMain: TFrmDckMain
       end
     end
     object popTvRessourceItems: TSpTBXSubmenuItem
+      object popResOpenInWindowsExplorer: TSpTBXItem
+        Caption = 'Open In Windows Explorer'
+        OnClick = popResOpenInWindowsExplorerClick
+      end
+      object SpTBXSeparatorItem16: TSpTBXSeparatorItem
+      end
       object popExpandResources: TSpTBXItem
         Caption = 'Expand All'
         OnClick = popExpandResourcesClick
@@ -1931,6 +1941,10 @@ object FrmDckMain: TFrmDckMain
       object popAddFile: TSpTBXItem
         Caption = 'Add...'
         OnClick = popAddFileClick
+      end
+      object popWSOpenInWindowsExplorer: TSpTBXItem
+        Caption = 'Open In Windows Explorer'
+        OnClick = popWSOpenInWindowsExplorerClick
       end
       object SpTBXSeparatorItem7: TSpTBXSeparatorItem
       end

@@ -96,7 +96,7 @@ Type
     Procedure SaveToStream(AStream : IStreamEx);
     Procedure SaveToFile(Const AFileName : String);
 
-    Procedure GenerateScripts(AHackMasterList : ITSTOHackMasterListIO);
+    Procedure GenerateScripts(AHackMasterList : ITSTOHackMasterListIO; AEncrypt : Boolean);
 
     Property Items[Index : Integer] : ITSTOScriptTemplateHackIO Read Get Write Put; Default;
 
@@ -118,7 +118,7 @@ Type
 implementation
 
 Uses Forms, Dialogs,
-  SysUtils, HsXmlDocEx, HsInterfaceEx, HsStringListEx,
+  SysUtils, HsXmlDocEx, HsInterfaceEx, HsStringListEx, TSTOBGenCd,
   TSTOScriptTemplateImpl, TSTOScriptTemplate.Xml, TSTOScriptTemplate.Bin;
 
 Type
@@ -254,7 +254,7 @@ Type
     Procedure SaveToStream(AStream : IStreamEx);
     Procedure SaveToFile(Const AFileName : String);
 
-    Procedure GenerateScripts(AHackMasterList : ITSTOHackMasterListIO);
+    Procedure GenerateScripts(AHackMasterList : ITSTOHackMasterListIO; AEncrypt : Boolean);
 
   Public
     Procedure AfterConstruction(); OverRide;
@@ -755,12 +755,14 @@ Begin
   End;
 End;
 
-Procedure TTSTOScriptTemplateHacksIOImpl.GenerateScripts(AHackMasterList : ITSTOHackMasterListIO);
+Procedure TTSTOScriptTemplateHacksIOImpl.GenerateScripts(AHackMasterList : ITSTOHackMasterListIO; AEncrypt : Boolean);
 Var X : Integer;
     lLst : IHsStringListEx;
     lItem : ITSTOScriptTemplateHackIO;
     lNbScripts : Integer;
     lProgress : IRgbProgress;
+    lStrStrm : IStringStreamEx;
+    lBGen : ITSTOBGenCD;
 Begin
   lNbScripts := 0;
   For X := 0 To Count - 1 Do
@@ -783,8 +785,21 @@ Begin
           lProgress.CurOperation := lItem.Name;
           Application.ProcessMessages();
 
-          lLst.Text := lItem.GenenrateScript(AHackMasterList, lProgress);
-          lLst.SaveToFile(lItem.Settings.OutputFileName);
+          lStrStrm := TStringStreamEx.Create(lItem.GenenrateScript(AHackMasterList, lProgress));
+          Try
+            If AEncrypt Then
+            Begin
+              lBGen := TTSTOBGenCD.CreateBGenCD(lStrStrm);
+              lStrStrm.Clear();
+              lBGen.SaveToStream(lStrStrm, xftBGenCD);
+            End;
+            lStrStrm.SaveToFile(lItem.Settings.OutputFileName);
+
+            Finally
+              lStrStrm := Nil;
+          End;
+//          lLst.Text := lItem.GenenrateScript(AHackMasterList, lProgress);
+//          lLst.SaveToFile(lItem.Settings.OutputFileName);
 
           lProgress.ItemProgress := Round((X + 1) / lNbScripts * 100);
           Application.ProcessMessages();

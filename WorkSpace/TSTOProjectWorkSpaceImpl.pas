@@ -95,6 +95,7 @@ Type
     FCustomScriptPath : AnsiString;
     FCustomModPath    : AnsiString;
     FSrcFolders       : ITSTOWorkSpaceProjectSrcFolders;
+    FEncryptScript    : Boolean;
 
   Protected
     Function  GetWorkSpaceProjectSrcFoldersClass() : TTSTOWorkSpaceProjectSrcFoldersClass; Virtual;
@@ -125,6 +126,9 @@ Type
 
     Function  GetSrcFolders() : ITSTOWorkSpaceProjectSrcFolders;
 
+    Function  GetEncryptScript() : Boolean; Virtual;
+    Procedure SetEncryptScript(Const AEncryptScript : Boolean); Virtual;
+
     Procedure Clear();
 
     Procedure Assign(ASource : IInterface);
@@ -138,6 +142,7 @@ Type
     Property CustomScriptPath : AnsiString                      Read GetCustomScriptPath Write SetCustomScriptPath;
     Property CustomModPath    : AnsiString                      Read GetCustomModPath    Write SetCustomModPath;
     Property SrcFolders       : ITSTOWorkSpaceProjectSrcFolders Read GetSrcFolders;
+    Property EncryptScript    : Boolean                         Read GetEncryptScript    Write SetEncryptScript;
 
   Public
     Procedure AfterConstruction(); OverRide;
@@ -399,6 +404,7 @@ Begin
     FProjectType      := lSrc.ProjectType;
     FZeroCrc32        := lSrc.ZeroCrc32;
     FPackOutput       := lSrc.PackOutput;
+    FEncryptScript    := lSrc.EncryptScript;
     FOutputPath       := lSrc.OutputPath;
     FCustomScriptPath := lSrc.CustomScriptPath;
     FCustomModPath    := lSrc.CustomModPath;
@@ -504,6 +510,16 @@ End;
 Function TTSTOWorkSpaceProject.GetSrcFolders() : ITSTOWorkSpaceProjectSrcFolders;
 Begin
   Result := FSrcFolders;
+End;
+
+Function TTSTOWorkSpaceProject.GetEncryptScript() : Boolean;
+Begin
+  Result := FEncryptScript;
+End;
+
+Procedure TTSTOWorkSpaceProject.SetEncryptScript(Const AEncryptScript : Boolean);
+Begin
+  FEncryptScript := AEncryptScript;
 End;
 
 Procedure TTSTOWorkSpaceProjectGroup.Assign(ASource : IInterface);

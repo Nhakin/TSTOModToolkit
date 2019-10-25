@@ -195,6 +195,7 @@ Type
     Procedure SetOutputPath(Const AOutputPath : AnsiString); OverRide;
     Procedure SetCustomScriptPath(Const ACustomScriptPath : AnsiString); OverRide;
     Procedure SetCustomModPath(Const ACustomModPath : AnsiString); OverRide;
+    Procedure SetEncryptScript(Const AEncryptScript : Boolean); OverRide;
 
   Public
     Constructor Create(AWorkSpace : ITSTOWorkSpaceProjectGroupIO); ReIntroduce;
@@ -463,6 +464,17 @@ Begin
   If GetCustomModPath() <> ACustomModPath Then
   Begin
     InHerited SetCustomModPath(ACustomModPath);
+
+    If Assigned(FOnChange) Then
+      FOnChange(Self);
+  End;
+End;
+
+Procedure TTSTOWorkSpaceProjectIO.SetEncryptScript(Const AEncryptScript : Boolean);
+Begin
+  If GetEncryptScript() <>  AEncryptScript Then
+  Begin
+    InHerited SetEncryptScript(AEncryptScript);
 
     If Assigned(FOnChange) Then
       FOnChange(Self);
@@ -819,7 +831,7 @@ Begin
           ForceDirectories(ExtractFilePath(lTemplate[X].Settings.OutputFileName));
       End;
 
-    lTemplate.GenerateScripts(GetHackSettings().HackMasterList);
+    lTemplate.GenerateScripts(GetHackSettings().HackMasterList, AProject.EncryptScript);
 
     For X := 0 To lTemplate.Count - 1 Do
       If lTemplate[X].Enabled Then

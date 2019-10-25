@@ -28,6 +28,8 @@ type
     EditCustomScriptPath: TSpTBXButtonEdit;
     EditCustomModPath: TSpTBXButtonEdit;
     SpTBXLabel2: TSpTBXLabel;
+    LblEncryptScripts: TSpTBXLabel;
+    chkEncryptScripts: TSpTBXCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure EditOutputPathSubEditButton0Click(Sender: TObject);
     procedure SpTbxSaveClick(Sender: TObject);
@@ -165,6 +167,8 @@ End;
 procedure TFrmProjectSettings.rgProjectTypeClick(Sender: TObject);
 begin
   EditCustomScriptPath.Enabled := rgProjectType.ItemIndex = 0;
+  chkEncryptScripts.Enabled    := rgProjectType.ItemIndex = 0;
+  LblEncryptScripts.Enabled    := rgProjectType.ItemIndex = 0;
 end;
 
 Procedure TFrmProjectSettings.SetWorkSpaceProject(AWorkSpaceProject : ITSTOWorkSpaceProject);
@@ -177,6 +181,7 @@ Begin
   rgProjectKind.ItemIndex   := Ord(FWorkSpaceProject.ProjectKind);
   rgProjectType.ItemIndex   := Ord(FWorkSpaceProject.ProjectType);
   chkPackOutput.Checked     := FWorkSpaceProject.PackOutput;
+  chkEncryptScripts.Checked := FWorkSpaceProject.EncryptScript;
   EditOutputPath.Text       := FWorkSpaceProject.OutputPath;
   EditCustomScriptPath.Text := FWorkSpaceProject.CustomScriptPath;
   EditCustomModPath.Text    := FWorkSpaceProject.CustomModPath;
@@ -213,6 +218,7 @@ begin
   FWorkSpaceProject.ProjectKind      := TWorkSpaceProjectKind(rgProjectKind.ItemIndex);
   FWorkSpaceProject.ProjectType      := TWorkSpaceProjectType(rgProjectType.ItemIndex);
   FWorkSpaceProject.PackOutput       := chkPackOutput.Checked;
+  FWorkSpaceProject.EncryptScript    := chkEncryptScripts.Checked;
   FWorkSpaceProject.OutputPath       := EditOutputPath.Text;
   FWorkSpaceProject.CustomScriptPath := EditCustomScriptPath.Text;
   FWorkSpaceProject.CustomModPath    := EditCustomModPath.Text;

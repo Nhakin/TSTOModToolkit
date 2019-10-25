@@ -33,6 +33,28 @@ object FrmProjectSettings: TFrmProjectSettings
     DesignSize = (
       364
       209)
+    object LblEncryptScripts: TSpTBXLabel
+      Left = 136
+      Top = 105
+      Width = 85
+      Height = 19
+      Caption = 'Encrypt Scripts :'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+    end
+    object chkEncryptScripts: TSpTBXCheckBox
+      Left = 219
+      Top = 100
+      Width = 20
+      Height = 28
+      BiDiMode = bdLeftToRight
+      ParentBiDiMode = False
+      TabOrder = 13
+    end
     object SpTBXLabel1: TSpTBXLabel
       Left = 16
       Top = 17

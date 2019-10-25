@@ -153,7 +153,7 @@ Type
 
 implementation
 
-Uses SysUtils, XmlDom, HsStreamEx, HsZipUtils, TSTOSbtpTypes;
+Uses SysUtils, XmlDom, HsStreamEx, HsZipUtils, TSTOSbtpTypes, TSTOBGenCD;
 
 Type
   TTSTOXmlStoreCategories = Class(TInterfaceList, ITSTOXmlStoreCategories)
@@ -298,6 +298,7 @@ Var X, Y : Integer;
     lNodeList : IXmlNodeListEx;
     lStrStream : IStringStreamEx;
     lIdx : Integer;
+    lBGen : ITSTOBGenCD;
 Begin
   lPatchIdx  := 0;
   lNbPatches := AWorkSpaceProject.GlobalSettings.CustomPatches.ActivePatchCount;
@@ -353,6 +354,17 @@ Begin
     Begin
       lStrStream := TStringStreamEx.Create(FormatXmlData(AXmlList[X].Xml.Text));
       Try
+        If AWorkSpaceProject.EncryptScript Then
+        Begin
+          lBGen := TTSTOBGenCD.CreateBGenCD(lStrStream);
+          Try
+            lStrStream.Clear();
+            lBGen.SaveToStream(lStrStream, xftBGenCD);
+
+            Finally
+              lBGen := Nil;
+          End;
+        End;
         lStrStream.SaveToFile(IncludeTrailingBackSlash(AWorkSpaceProject.CustomModPath) + ExtractFileName(AXmlList[X].FileName));
 
         Finally
