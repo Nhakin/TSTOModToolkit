@@ -126,8 +126,8 @@ Type
 
     Function  GetSrcFolders() : ITSTOWorkSpaceProjectSrcFolders;
 
-    Function  GetEncryptScript() : Boolean;
-    Procedure SetEncryptScript(Const AEncryptScript : Boolean);
+    Function  GetEncryptScript() : Boolean; Virtual;
+    Procedure SetEncryptScript(Const AEncryptScript : Boolean); Virtual;
 
     Procedure Clear();
 
