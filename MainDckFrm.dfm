@@ -183,7 +183,6 @@ object FrmDckMain: TFrmDckMain
     Manager = dckMgr
     Align = alClient
     TabOrder = 1
-    ExplicitHeight = 662
     Layout = {
       EFBBBF3C3F786D6C2076657273696F6E3D22312E302220656E636F64696E673D
       227574662D38223F3E0D0A3C736974656C6973743E0D0A093C73697465206964
@@ -396,7 +395,6 @@ object FrmDckMain: TFrmDckMain
         Manager = dckMgr
         Align = alClient
         TabOrder = 0
-        ExplicitHeight = 503
         Layout = {
           EFBBBF3C3F786D6C2076657273696F6E3D22312E302220656E636F64696E673D
           227574662D38223F3E0D0A3C736974656C6973743E0D0A093C73697465206964
@@ -862,7 +860,6 @@ object FrmDckMain: TFrmDckMain
             ActiveTabIndex = 0
             TabPosition = ttpBottom
             OnActiveTabChange = tsScriptTemplateActiveTabChange
-            ExplicitTop = 309
             HiddenItems = <>
             object tsSTSource: TSpTBXTabItem
               Caption = 'Source'
@@ -927,7 +924,6 @@ object FrmDckMain: TFrmDckMain
         Font.Pitch = fpFixed
         Font.Style = [fsBold]
         TabOrder = 0
-        ExplicitHeight = 497
       end
     end
     object PanImage: TLMDDockPanel
@@ -984,7 +980,6 @@ object FrmDckMain: TFrmDckMain
         BorderStyle = bsNone
         TabOrder = 1
         OnEnter = PanImageOldEnter
-        ExplicitHeight = 461
         object ImgResource: TImage
           Left = 0
           Top = 0
@@ -1011,7 +1006,6 @@ object FrmDckMain: TFrmDckMain
         Manager = dckMgr
         Align = alClient
         TabOrder = 0
-        ExplicitHeight = 503
         Layout = {
           EFBBBF3C3F786D6C2076657273696F6E3D22312E302220656E636F64696E673D
           227574662D38223F3E0D0A3C736974656C6973743E0D0A093C73697465206964
@@ -1168,9 +1162,6 @@ object FrmDckMain: TFrmDckMain
     Top = 687
     Width = 719
     Height = 26
-    ExplicitLeft = 64
-    ExplicitTop = 600
-    ExplicitWidth = 0
   end
   object dckMgr: TLMDDockManager
     StyleName = 'VS2012Dark'
@@ -1824,6 +1815,12 @@ object FrmDckMain: TFrmDckMain
       end
     end
     object popTvRessourceItems: TSpTBXSubmenuItem
+      object popResOpenInWindowsExplorer: TSpTBXItem
+        Caption = 'Open In Windows Explorer'
+        OnClick = popResOpenInWindowsExplorerClick
+      end
+      object SpTBXSeparatorItem16: TSpTBXSeparatorItem
+      end
       object popExpandResources: TSpTBXItem
         Caption = 'Expand All'
         OnClick = popExpandResourcesClick
@@ -1944,6 +1941,10 @@ object FrmDckMain: TFrmDckMain
       object popAddFile: TSpTBXItem
         Caption = 'Add...'
         OnClick = popAddFileClick
+      end
+      object popWSOpenInWindowsExplorer: TSpTBXItem
+        Caption = 'Open In Windows Explorer'
+        OnClick = popWSOpenInWindowsExplorerClick
       end
       object SpTBXSeparatorItem7: TSpTBXSeparatorItem
       end

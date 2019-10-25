@@ -14,7 +14,7 @@ uses
   SciScintillaMemo, SciScintilla, SciScintillaNPP, SciActions, TB2Item, TB2Dock,
   TB2Toolbar, SpTBXItem, SpTBXSkins, SpTBXAdditionalSkins, SpTBXControls,
   SpTBXEditors, Mask, System.Actions, SpTBXExPanel, SpTBXDkPanels, SpTBXTabs,
-  ImagingRgb;
+  ImagingRgb, SpTBXExControls;
 
 Type
   TTSTOCurrentDataType = (dtUnknown, dtXml, dtZeroIndex, dtText, dtRbg, dtBCell, dtBsv3);
@@ -222,6 +222,9 @@ Type
     mnuHelp: TSpTBXItem;
     SpTBXSeparatorItem15: TSpTBXSeparatorItem;
     SpTBXStatusBar1: TSpTBXStatusBar;
+    popWSOpenInWindowsExplorer: TSpTBXItem;
+    popResOpenInWindowsExplorer: TSpTBXItem;
+    SpTBXSeparatorItem16: TSpTBXSeparatorItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -295,6 +298,8 @@ Type
     procedure FormActivate(Sender: TObject);
     procedure mnuHackMasterListClick(Sender: TObject);
     procedure mnuAboutClick(Sender: TObject);
+    procedure popWSOpenInWindowsExplorerClick(Sender: TObject);
+    procedure popResOpenInWindowsExplorerClick(Sender: TObject);
 
   private
     FEditFilter    : THsVTButtonEdit;
@@ -361,6 +366,8 @@ Type
     Procedure ValidateHackMasterList(AWorkSpaceProject : ITSTOWorkSpaceProjectIO);
     Procedure LoadPlugins();
 
+    Procedure OpenFileInWindowsExplorer(Const AFileName : String);
+
   {$Region ' ITSTOApplication '}
   Private
     FIntfImpl : TInterfaceExImplementor;
@@ -409,7 +416,7 @@ var
 implementation
 
 Uses RTTI, RtlConsts, uSelectDirectoryEx, System.UITypes, XmlIntf,
-  Imaging, HtmlHelpViewer, ImagingTypes, HsBase64Ex,
+  Imaging, HtmlHelpViewer, ShellApi, ImagingTypes, HsBase64Ex,
   HsJSonFormatterEx, HsXmlDocEx, HsZipUtils, HsFunctionsEx,
   HsCheckSumEx, HsStringListEx, SciSupport, System.Character,
   SettingsFrm, CustomPatchFrm, SptbFrm, ImagingClasses,
@@ -1721,7 +1728,10 @@ begin
       Else If GetNodeData(lNode, ITSTOWorkSpaceProjectSrcFolder) Then
         SetVisibility(popTvWSProjectSrcFolderItems, True)
       Else If GetNodeData(lNode, ITSTOWorkSpaceProjectSrcFile) Then
+      Begin
         popRemoveFile.Visible := True;
+        popWSOpenInWindowsExplorer.Visible := True;
+      End;
     End
     Else
       Abort;
@@ -1795,6 +1805,35 @@ end;
 procedure TFrmDckMain.popTvWSRenameProjectClick(Sender: TObject);
 begin
   Raise Exception.Create('ToDo');
+end;
+
+Procedure TFrmDckMain.OpenFileInWindowsExplorer(Const AFileName : String);
+Var lRetVal : Integer;
+Begin
+  lRetVal := ShellExecute(Application.Handle, 'open', PWideChar('explorer.exe'), PChar('/select, "' + AFileName + '"'), nil, SW_SHOWNORMAL);
+  if lRetVal < 32 then
+     raise Exception.CreateFmt('An error occurred while locating the document.'#13#10#13#10'File: "%s".'#13#10'Code: %d.', [AFileName, lRetVal]);
+End;
+
+procedure TFrmDckMain.popWSOpenInWindowsExplorerClick(Sender: TObject);
+Var lItem : ITSTOWorkSpaceProjectSrcFile;
+    lSrcFolder : ITSTOWorkSpaceProjectSrcFolder;
+begin
+  With FTvWorkSpace Do
+    If Assigned(FocusedNode) And Assigned(FocusedNode.Parent) And
+       GetNodeData(FocusedNode, ITSTOWorkSpaceProjectSrcFile, lItem) And
+       GetNodeData(FocusedNode.Parent, ITSTOWorkSpaceProjectSrcFolder, lSrcFolder) Then
+      OpenFileInWindowsExplorer(lSrcFolder.SrcPath + lItem.FileName);
+end;
+
+procedure TFrmDckMain.popResOpenInWindowsExplorerClick(Sender: TObject);
+Var lRes : ITSTOResourcePath;
+begin
+  With FTvResources Do
+    If Assigned(FocusedNode) And Assigned(FocusedNode.Parent) And
+       GetNodeData(FocusedNode.Parent, ITSTOResourcePath, lRes) Then
+      OpenFileInWindowsExplorer( IncludeTrailingBackslash(FPrj.Settings.ResourcePath) +
+                                 lRes.ResourcePath + '\' + lRes.ResourceFiles[FocusedNode.Index].FileName);
 end;
 
 Procedure TFrmDckMain.DoFilterNode(Sender : TBaseVirtualTree; Node : PVirtualNode; Data : Pointer; Var Abort : Boolean);
