@@ -1385,6 +1385,7 @@ Begin
   {$Else}
   Result := InHerited Bytes;
   {$IfEnd}
+  SetLength(Result, Size);
 End;
 
 {$IfDef UseClassHelper}
