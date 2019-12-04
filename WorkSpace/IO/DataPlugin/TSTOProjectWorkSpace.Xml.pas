@@ -219,6 +219,9 @@ Type
     Function  GetEncryptScript() : Boolean;
     Procedure SetEncryptScript(Const AEncryptScript : Boolean);
 
+    Function  GetUseADS() : Boolean;
+    Procedure SetUseADS(Const AUseADS : Boolean);
+
     Function  GetOnChanged() : TNotifyEvent;
     Procedure SetOnChanged(AOnChanged : TNotifyEvent);
     
@@ -332,6 +335,7 @@ Begin
     ATarget.ZeroCrc32        := ASource.ZeroCrc32;
     ATarget.PackOutput       := ASource.PackOutput;
     ATarget.EncryptScript    := ASource.EncryptScript;
+    ATarget.UseADS           := ASource.UseADS;
     ATarget.OutputPath       := ASource.OutputPath;
     ATarget.CustomScriptPath := ASource.CustomScriptPath;
     ATarget.CustomModPath    := ASource.CustomModPath;
@@ -452,6 +456,19 @@ Begin
 
   If Not IsImplementorOf(WSProjectImpl) Then
     WSProjectImpl.EncryptScript := AEncryptScript;
+End;
+
+Function TXmlTSTOWorkSpaceProject.GetUseADS() : Boolean;
+Begin
+  Result := ChildNodes['UseADS'].AsBoolean;
+End;
+
+Procedure TXmlTSTOWorkSpaceProject.SetUseADS(Const AUseADS : Boolean);
+Begin
+  ChildNodes['UseADS'].AsBoolean := AUseADS;
+
+  If Not IsImplementorOf(WSProjectImpl) Then
+    WSProjectImpl.UseADS := AUseADS;
 End;
 
 Function TXmlTSTOWorkSpaceProject.GetOutputPath() : AnsiString;

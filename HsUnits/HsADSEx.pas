@@ -5,25 +5,25 @@ interface
 Uses Windows, Classes;
 
 Type
-  TStreamId  = ( siInvalid, siStandard, siExtendedAttribute, siSecurity, siAlternate,
+  TStreamType  = ( siInvalid, siStandard, siExtendedAttribute, siSecurity, siAlternate,
                  siHardLink, siProperty, siObjectIdentifier, siReparsePoints, siSparseFile);
-  TStreamIds = Set Of TStreamId;
+  TStreamTypes = Set Of TStreamType;
 
   TInternalFindStreamData = Record
     FileHandle : THandle;
     Context    : Pointer;
-    StreamIds  : TStreamIds;
+    StreamIds  : TStreamTypes;
   End;
 
   TFindStreamData = Record
     Internal   : TInternalFindStreamData;
     Attributes : DWord;
-    StreamID   : TStreamId;
+    StreamID   : TStreamType;
     Name       : WideString;
     Size       : Int64;
   End;
   
-Function HsFindFirstStreamEx(Const FileName : String; StreamIds : TStreamIds; Var Data : TFindStreamData) : Boolean;
+Function HsFindFirstStreamEx(Const FileName : String; StreamIds : TStreamTypes; Var Data : TFindStreamData) : Boolean;
 Function HsFindNextStreamEx(Var Data : TFindStreamData) : Boolean;
 Function HsFindStreamCloseEx(Var Data : TFindStreamData) : Boolean;
 
@@ -33,15 +33,15 @@ Function  HsFindSreamEx(AStartPoint : String; AList : TStrings; Const ARecursive
 implementation
 
 Uses Dialogs,
-  SysUtils, PerlRegEx;
+  SysUtils, HsPerlRegEx;
 
 type
   TBackupSeek = function (hFile: THandle; dwLowBytesToSeek, dwHighBytesToSeek: DWORD;
     out lpdwLowByteSeeked, lpdwHighByteSeeked: DWORD;
     var lpContext: Pointer): BOOL; stdcall;
 
-var
-  _BackupSeek: TBackupSeek = nil;
+Var
+  _BackupSeek : TBackupSeek = Nil;
 
 Function FindStream(Var Data : TFindStreamData) : Boolean;
   Procedure GetProcedureAddress(Var P : Pointer; Const ModuleName, ProcName : String);
@@ -99,7 +99,7 @@ Begin
     // Read stream header
     BytesToRead := DWord(Cardinal(@Header.cStreamName[0]) - Cardinal(@Header.dwStreamId));
     BytesRead   := 0;
-    If Not BackupRead(Data.Internal.FileHandle, (@Header), BytesToRead, BytesRead, False, True, Data.Internal.Context) Then
+    If Not BackupRead(Data.Internal.FileHandle, @Header, BytesToRead, BytesRead, False, True, Data.Internal.Context) Then
     Begin
       SetLastError(ERROR_READ_FAULT);
       Exit;
@@ -142,13 +142,13 @@ Begin
 
         // Did we find any of the specified streams ([] means any stream)?
         If (Data.Internal.StreamIds = []) Or
-          (TStreamId(Header.dwStreamId) In Data.Internal.StreamIds) Then
+          (TStreamType(Header.dwStreamId) In Data.Internal.StreamIds) Then
         Begin
           FoundStream     := True;
           Data.Size       := Header.Size;
           Data.Name       := StreamName;
           Data.Attributes := Header.dwStreamAttributes;
-          Data.StreamId   := TStreamId(Header.dwStreamId);
+          Data.StreamId   := TStreamType(Header.dwStreamId);
         End;
 
         // Release stream name memory if necessary
@@ -171,7 +171,7 @@ Begin
   Result := True;
 End;
 
-Function HsFindFirstStreamEx(Const FileName : String; StreamIds : TStreamIds; Var Data : TFindStreamData) : Boolean;
+Function HsFindFirstStreamEx(Const FileName : String; StreamIds : TStreamTypes; Var Data : TFindStreamData) : Boolean;
 Begin
   Result := False;
   // Open file for reading, note that the FILE_FLAG_BACKUP_SEMANTICS requires
@@ -255,7 +255,7 @@ Var lSr : TSearchRec;
 Begin
   If DirectoryExists(AStartPoint) Then
     AStartPoint := IncludeTrailingBackSlash(AStartPoint);
-    
+
   If FileExists(AStartPoint) Then
     InternalListStream(AStartPoint)
   Else If FindFirst(AStartPoint + '*.*', faAnyFile, lSr) = 0 Then
@@ -266,7 +266,7 @@ Begin
         If lSr.Name = '.' Then
           InternalListStream(AStartPoint)
         Else If (lSr.Name <> '..') And ARecursive Then
-          HsListStreamEx(AStartPoint + lSr.Name + '\', AList);
+          HsListStreamEx(AStartPoint + lSr.Name {+ '\'}, AList);
       End
       Else
         InternalListStream(AStartPoint + lSr.Name);
@@ -279,33 +279,40 @@ End;
 
 Function HsFindSreamEx(AStartPoint : String; AList : TStrings; Const ARecursive : Boolean = True) : Boolean;
 Var lLst    : TStringList;
+    lRegExp : IHsPerlRegEx;
     lRegStr : String;
-    lRegExp : TPerlRegEx;
 Begin
   lLst := TStringList.Create();
-  lRegExp := TPerlRegEx.Create();
+  lRegExp := THsPerlRegEx.CreateHsPerlRegEx();
   Try
     HsListStreamEx(ExtractFilePath(AStartPoint), lLst, ARecursive);
-{
-  *.txt -> ^.*\.txt$
-}
-    lRegStr := '^' + StringReplace(ExcludeTrailingBackSlash(ExtractFilePath(AStartPoint)), '\', '\\', [rfReplaceAll, rfIgnoreCase]) + '.*' +
-               StringReplace(StringReplace(ExtractFileName(AStartPoint), '.', '\.', [rfReplaceAll, rfIgnoreCase]), '*', '.*', [rfReplaceAll, rfIgnoreCase]) + '$';
+
+    lRegStr := '^' +
+               StringReplace(
+                 StringReplace(
+                   lRegExp.EscapeRegExChars(
+                     StringReplace(
+                       ExcludeTrailingBackSlash(ExtractFilePath(AStartPoint)) + #$90 + ExtractFileName(AStartPoint)
+                     , '*', #$90, [rfReplaceAll]))
+                 , #$90, '.*', [rfReplaceAll])
+               , '.*.*', '.*', [rfReplaceAll]) + '$';
+//ShowMessage(lRegStr);Exit;
+
     lRegExp.RegEx := lRegStr;
     lRegExp.Subject := lLst.Text;
-    lRegExp.Options := [preMultiLine];
+    lRegExp.Options := [preCaseLess, preMultiLine];
 
-    If lRegExp.Match Then
-    Begin
+    If lRegExp.Match() Then
       Repeat
         AList.Add(lRegExp.MatchedText);
-      Until Not lRegExp.MatchAgain;
-    End;
+      Until Not lRegExp.MatchAgain();
 
     Finally
       lLst.Free();
-      lRegExp.Free();
+      lRegExp := Nil;
   End;
+
+  Result := AList.Count > 0;
 End;
 
 end.

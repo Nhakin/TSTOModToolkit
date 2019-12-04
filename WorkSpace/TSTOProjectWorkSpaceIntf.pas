@@ -99,6 +99,9 @@ Type
     Function  GetEncryptScript() : Boolean;
     Procedure SetEncryptScript(Const AEncryptScript : Boolean);
 
+    Function  GetUseADS() : Boolean;
+    Procedure SetUseADS(Const AUseADS : Boolean);
+
     Procedure Assign(ASource : IInterface);
 
     Property ProjectName      : AnsiString                      Read GetProjectName      Write SetProjectName;
@@ -111,6 +114,7 @@ Type
     Property CustomModPath    : AnsiString                      Read GetCustomModPath    Write SetCustomModPath;
     Property SrcFolders       : ITSTOWorkSpaceProjectSrcFolders Read GetSrcFolders;
     Property EncryptScript    : Boolean                         Read GetEncryptScript    Write SetEncryptScript;
+    Property UseADS           : Boolean                         Read GetUseADS           Write SetUseADS;
 
   End;
 

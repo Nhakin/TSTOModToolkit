@@ -90,6 +90,7 @@ Type
     Procedure LoadFromStreamV001(ASource : IStreamEx);
     Procedure LoadFromStreamV002(ASource : IStreamEx);
     Procedure LoadFromStreamV003(ASource : IStreamEx);
+    Procedure LoadFromStreamV004(ASource : IStreamEx);
 
   Protected
     Function GetWorkSpaceProjectSrcFoldersClass() : TTSTOWorkSpaceProjectSrcFoldersClass; OverRide;
@@ -268,12 +269,39 @@ Begin
   End;
 End;
 
+Procedure TBinTSTOWorkSpaceProject.LoadFromStreamV004(ASource : IStreamEx);
+Var lNbPath : Byte;
+    lSrcFolders : IBinTSTOWorkSpaceProjectSrcFolders;
+Begin
+  ProjectName   := ASource.ReadAnsiString();
+  ProjectKind   := TWorkSpaceProjectKind(ASource.ReadByte());
+  ProjectType   := TWorkSpaceProjectType(ASource.ReadByte());
+  ZeroCrc32     := ASource.ReadDWord();
+  PackOutput    := ASource.ReadByte() <> 0;
+  EncryptScript := ASource.ReadByte() <> 0;
+  UseADS        := ASource.ReadByte() <> 0;
+
+  OutputPath  := ASource.ReadAnsiString();
+  If ProjectType = sptScript Then
+    CustomScriptPath := ASource.ReadAnsiString();
+  CustomModPath := ASource.ReadAnsiString();
+
+  lNbPath := ASource.ReadByte();
+  lSrcFolders := GetSrcFolders();
+  While lNbPath > 0 Do
+  Begin
+    lSrcFolders.Add().LoadFromStream(ASource);
+    Dec(lNbPath);
+  End;
+End;
+
 Procedure TBinTSTOWorkSpaceProject.LoadFromStream(ASource : IStreamEx);
 Begin
   Case ASource.ReadByte() Of
     1 : LoadFromStreamV001(ASource);
     2 : LoadFromStreamV002(ASource);
     3 : LoadFromStreamV003(ASource);
+    4 : LoadFromStreamV004(ASource);
 
     Else
       Raise Exception.Create('Invalid workspace file');
@@ -282,7 +310,7 @@ End;
 
 Procedure TBinTSTOWorkSpaceProject.SaveToStream(ATarget : IStreamEx);
 Const
-  cStreamVersion = 3;
+  cStreamVersion = 4;
 
 Var X : Integer;
     lSrcFolders : IBinTSTOWorkSpaceProjectSrcFolders;
@@ -303,6 +331,10 @@ Begin
   Else
     ATarget.WriteByte(0);
 
+  If UseADS Then
+    ATarget.WriteByte(1)
+  Else
+    ATarget.WriteByte(0);
 
   ATarget.WriteAnsiString(OutputPath);
   If ProjectType = sptScript Then

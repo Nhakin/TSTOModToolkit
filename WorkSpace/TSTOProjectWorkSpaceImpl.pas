@@ -96,6 +96,7 @@ Type
     FCustomModPath    : AnsiString;
     FSrcFolders       : ITSTOWorkSpaceProjectSrcFolders;
     FEncryptScript    : Boolean;
+    FUseADS           : Boolean;
 
   Protected
     Function  GetWorkSpaceProjectSrcFoldersClass() : TTSTOWorkSpaceProjectSrcFoldersClass; Virtual;
@@ -129,6 +130,9 @@ Type
     Function  GetEncryptScript() : Boolean; Virtual;
     Procedure SetEncryptScript(Const AEncryptScript : Boolean); Virtual;
 
+    Function  GetUseADS() : Boolean;
+    Procedure SetUseADS(Const AUseADS : Boolean);
+
     Procedure Clear();
 
     Procedure Assign(ASource : IInterface);
@@ -143,6 +147,7 @@ Type
     Property CustomModPath    : AnsiString                      Read GetCustomModPath    Write SetCustomModPath;
     Property SrcFolders       : ITSTOWorkSpaceProjectSrcFolders Read GetSrcFolders;
     Property EncryptScript    : Boolean                         Read GetEncryptScript    Write SetEncryptScript;
+    Property UseADS           : Boolean                         Read GetUseADS           Write SetUseADS;
 
   Public
     Procedure AfterConstruction(); OverRide;
@@ -408,6 +413,7 @@ Begin
     FOutputPath       := lSrc.OutputPath;
     FCustomScriptPath := lSrc.CustomScriptPath;
     FCustomModPath    := lSrc.CustomModPath;
+    FUseADS           := lSrc.UseADS;
 
     FSrcFolders.Assign(lSrc.SrcFolders);
   End
@@ -520,6 +526,16 @@ End;
 Procedure TTSTOWorkSpaceProject.SetEncryptScript(Const AEncryptScript : Boolean);
 Begin
   FEncryptScript := AEncryptScript;
+End;
+
+Function TTSTOWorkSpaceProject.GetUseADS() : Boolean;
+Begin
+  Result := FUseADS;
+End;
+
+Procedure TTSTOWorkSpaceProject.SetUseADS(Const AUseADS : Boolean);
+Begin
+  FUseADS := AUseADS;
 End;
 
 Procedure TTSTOWorkSpaceProjectGroup.Assign(ASource : IInterface);
