@@ -593,7 +593,11 @@ End;
 
 Procedure TInterfacedObjectEx.SetController(AController : IInterfaceEx);
 Begin
-  FController := Pointer(AController);
+  If Assigned(AController) Then
+  Begin
+    FController := Pointer(AController);
+    FHaveRefCount := False;
+  End;
 End;
 
 Function TInterfacedObjectEx.GetIsContained() : Boolean;
@@ -693,7 +697,7 @@ End;
 Procedure TInterfaceListEx.Created();
 Begin
   InHerited Created();
-  
+
   FList := TThreadList.Create();
 End;
 
@@ -806,6 +810,7 @@ End;
 Function TInterfaceListEx.Add() : IInterfaceEx;
 Begin
   Result := GetItemClass().Create(True);
+
   Add(Result);
   Notify(Pointer(Result), lnAdded);
 End;

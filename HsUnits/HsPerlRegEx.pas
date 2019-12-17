@@ -3,7 +3,7 @@ unit HsPerlRegEx;
 interface
 
 Uses
-  Windows, Classes, HsInterfaceEx, pcre;
+  Windows, Classes, pcre, HsInterfaceEx;
 
 Type
   TPerlRegExOptions = Set Of (
@@ -123,9 +123,9 @@ Type
     Procedure Insert(Index : Integer; Const Item : IHsPerlRegEx);
     Function  Remove(Const Item : IHsPerlRegEx) : Integer;
     Function  Extract(Const Item : IHsPerlRegEx) : IHsPerlRegEx;
-    Function  IndexOf(Const Item : IHsPerlRegEx) : Integer; 
+    Function  IndexOf(Const Item : IHsPerlRegEx) : Integer;
 
-    Function  GetEnumerator() : IHsPerlRegExListEnumerator; 
+    Function  GetEnumerator() : IHsPerlRegExListEnumerator;
 
     Function  GetSubject() : PCREString;
     Procedure SetSubject(Const ASuject : PCREString);
@@ -165,105 +165,105 @@ implementation
 Uses SysUtils;
 
 Type
-  THsPerlRegExImpl =  Class(TInterfacedObjectEx, IHsPerlRegEx)
-  Strict Private   
-    FCompiled    ,
-    FStudied     : Boolean;
-    FOptions     : TPerlRegExOptions;
-    FState       : TPerlRegExState;
-    FRegEx       ,
-    FReplacement ,
-    FSubject     : PCREString;
-    FStart       ,
-    FStop        : Integer;
-    FOnMatch     : TNotifyEvent;
-    FOnReplace   : TPerlRegExReplaceEvent;
-
-  Protected
-    Function  GetMatchedText() : PCREString;
-    Function  GetMatchedLength() : Integer;
-    Function  GetMatchedOffset() : Integer;
-
-    Function  GetOptions() : TPerlRegExOptions;
-    Procedure SetOptions(Value : TPerlRegExOptions);
-
-    Function  GetRegEx() : PCREString;
-    Procedure SetRegEx(Const Value : PCREString);
-
-    Function  GetGroupCount() : Integer;
-    Function  GetGroups(Index : Integer) : PCREString;
-    Function  GetGroupLengths(Index : Integer) : Integer;
-    Function  GetGroupOffsets(Index : Integer) : Integer;
-
-    Function  GetSubject() : PCREString;
-    Procedure SetSubject(Const Value : PCREString);
-
-    Function  GetStart() : Integer;
-    Procedure SetStart(Const Value : Integer);
-
-    Function  GetStop() : Integer;
-    Procedure SetStop(Const Value : Integer);
-
-    Function  GetFoundMatch() : Boolean;
-
-    Function  GetCompiled() : Boolean;
-    Function  GetStudied() : Boolean;
-
-    Function  GetState() : TPerlRegExState;
-    Procedure SetState(Const AState : TPerlRegExState);
-
-    Function  GetReplacement() : PCREString;
-    Procedure SetReplacement(Const AReplacement : PCREString);
-
-    Function  GetOnMatch() : TNotifyEvent;
-    Procedure SetOnMatch(Const AOnMatch : TNotifyEvent);
-
-    Function  GetOnReplace() : TPerlRegExReplaceEvent;
-    Procedure SetOnReplace(Const AOnReplace : TPerlRegExReplaceEvent);
-
-  Strict Private
-    FOffsets         : Array[0..(MAX_SUBEXPRESSIONS + 1) * 3] Of Integer;
-    FOffsetCount     : Integer;
-    FpcreOptions     : Integer;
-    FPattern         ,
-    FHints           ,
-    FCharTable       : Pointer;
-    FSubjectPChar    : PAnsiChar;
-    FHasStoredGroups : Boolean;
-    FStoredGroups    : Array Of PCREString;
-
-  Protected
-    Function GetSubjectLeft() : PCREString;
-    Function GetSubjectRight() : PCREString;
-
-    Procedure CleanUp();
-    Procedure ClearStoredGroups();
-
-    Procedure Compile();
-    Procedure Study();
-    Function  Match() : Boolean;
-    Function  MatchAgain() : Boolean;
-    Function  Replace() : PCREString;
-    Function  ReplaceAll() : Boolean;
-    Function  ComputeReplacement() : PCREString;
-    Procedure StoreGroups();
-    Function  NamedGroup(Const Name : PCREString) : Integer;
-    Procedure Split(Strings : TStrings; Limit : Integer);
-    Procedure SplitCapture(Strings : TStrings; Limit : Integer); Overload;
-    Procedure SplitCapture(Strings : TStrings; Limit : Integer; Offset : Integer); Overload;
-    Function  EscapeRegExChars(Const S : String) : String;
-
-  Public
-    Procedure AfterConstruction(); OverRide;
-    Procedure BeforeDestruction(); OverRide;
-
-  End;
-
   THsPerlRegExList = Class(TInterfaceListEx, IHsPerlRegExList)
   Strict Private Type
     THsPerlRegExListEnumerator = Class(TInterfaceExEnumerator, IHsPerlRegExListEnumerator)
     Protected
       Function GetCurrent() : IHsPerlRegEx; OverLoad;
+
+    End;
+
+    THsPerlRegExItem =  Class(TInterfacedObjectEx, IHsPerlRegEx)
+    Strict Private
+      FCompiled    ,
+      FStudied     : Boolean;
+      FOptions     : TPerlRegExOptions;
+      FState       : TPerlRegExState;
+      FRegEx       ,
+      FReplacement ,
+      FSubject     : PCREString;
+      FStart       ,
+      FStop        : Integer;
+      FOnMatch     : TNotifyEvent;
+      FOnReplace   : TPerlRegExReplaceEvent;
+
+    Protected
+      Function  GetMatchedText() : PCREString;
+      Function  GetMatchedLength() : Integer;
+      Function  GetMatchedOffset() : Integer;
+
+      Function  GetOptions() : TPerlRegExOptions;
+      Procedure SetOptions(Value : TPerlRegExOptions);
+
+      Function  GetRegEx() : PCREString;
+      Procedure SetRegEx(Const Value : PCREString);
+
+      Function  GetGroupCount() : Integer;
+      Function  GetGroups(Index : Integer) : PCREString;
+      Function  GetGroupLengths(Index : Integer) : Integer;
+      Function  GetGroupOffsets(Index : Integer) : Integer;
+
+      Function  GetSubject() : PCREString;
+      Procedure SetSubject(Const Value : PCREString);
+
+      Function  GetStart() : Integer;
+      Procedure SetStart(Const Value : Integer);
+
+      Function  GetStop() : Integer;
+      Procedure SetStop(Const Value : Integer);
+
+      Function  GetFoundMatch() : Boolean;
+
+      Function  GetCompiled() : Boolean;
+      Function  GetStudied() : Boolean;
+
+      Function  GetState() : TPerlRegExState;
+      Procedure SetState(Const AState : TPerlRegExState);
+
+      Function  GetReplacement() : PCREString;
+      Procedure SetReplacement(Const AReplacement : PCREString);
+
+      Function  GetOnMatch() : TNotifyEvent;
+      Procedure SetOnMatch(Const AOnMatch : TNotifyEvent);
+
+      Function  GetOnReplace() : TPerlRegExReplaceEvent;
+      Procedure SetOnReplace(Const AOnReplace : TPerlRegExReplaceEvent);
+
+    Strict Private
+      FOffsets         : Array[0..(MAX_SUBEXPRESSIONS + 1) * 3] Of Integer;
+      FOffsetCount     : Integer;
+      FpcreOptions     : Integer;
+      FPattern         ,
+      FHints           ,
+      FCharTable       : Pointer;
+      FSubjectPChar    : PAnsiChar;
+      FHasStoredGroups : Boolean;
+      FStoredGroups    : Array Of PCREString;
+
+    Protected
+      Function GetSubjectLeft() : PCREString;
+      Function GetSubjectRight() : PCREString;
+
+      Procedure CleanUp();
+      Procedure ClearStoredGroups();
+
+      Procedure Compile();
+      Procedure Study();
+      Function  Match() : Boolean;
+      Function  MatchAgain() : Boolean;
+      Function  Replace() : PCREString;
+      Function  ReplaceAll() : Boolean;
+      Function  ComputeReplacement() : PCREString;
+      Procedure StoreGroups();
+      Function  NamedGroup(Const Name : PCREString) : Integer;
+      Procedure Split(Strings : TStrings; Limit : Integer);
+      Procedure SplitCapture(Strings : TStrings; Limit : Integer); Overload;
+      Procedure SplitCapture(Strings : TStrings; Limit : Integer; Offset : Integer); Overload;
+      Function  EscapeRegExChars(Const S : String) : String;
+
+    Public
+      Procedure AfterConstruction(); OverRide;
+      Procedure BeforeDestruction(); OverRide;
 
     End;
     
@@ -276,21 +276,23 @@ Type
     Procedure InitRegEx(ARegEx : IHsPerlRegEx);
 
   Protected
+    //IInterfaceListEx
     Function GetItemClass() : TInterfacedObjectExClass; OverRide;
+    Function GetEnumeratorClass() : TInterfaceExEnumeratorClass; OverRide;
+    Function GetEnumerator() : IHsPerlRegExListEnumerator; OverLoad;
 
-    Function  Get(Index : Integer) : IHsPerlRegEx; OverLoad;
-    Procedure Put(Index : Integer; Const Item : IHsPerlRegEx); OverLoad;
+    Function  Get(Index : Integer) : IHsPerlRegEx; ReIntroduce; OverLoad;
+    Procedure Put(Index : Integer; Const Item : IHsPerlRegEx); ReIntroduce; OverLoad;
 
     Function Add() : IHsPerlRegEx; ReIntroduce; OverLoad;
-    Function Add(Const AItem : IHsPerlRegEx) : Integer; OverLoad;
+    Function Add(Const AItem : IHsPerlRegEx) : Integer; ReIntroduce; OverLoad;
 
-    Procedure Insert(Index : Integer; Const Item : IHsPerlRegEx); OverLoad;
+    Procedure Insert(Index : Integer; Const Item : IHsPerlRegEx); ReIntroduce; OverLoad;
     Function  Remove(Const Item : IHsPerlRegEx) : Integer; ReIntroduce; OverLoad;
-    Function  Extract(Const Item : IHsPerlRegEx) : IHsPerlRegEx; OverLoad;
+    Function  Extract(Const Item : IHsPerlRegEx) : IHsPerlRegEx; ReIntroduce; OverLoad;
     Function  IndexOf(Const Item : IHsPerlRegEx) : Integer; ReIntroduce; OverLoad;
 
-    Function  GetEnumerator() : IHsPerlRegExListEnumerator; OverLoad;
-
+    //IHsPerlRegExList
     Function  GetSubject() : PCREString;
     Procedure SetSubject(Const ASuject : PCREString);
 
@@ -305,11 +307,14 @@ Type
     Function Match() : Boolean;
     Function MatchAgain() : Boolean;
 
-  End;
+  Public
+    Class Function CreateHsPerlRegEx() : IHsPerlRegEx;
     
+  End;
+
 Class Function THsPerlRegEx.CreateHsPerlRegEx() : IHsPerlRegEx;
 Begin
-  Result := THsPerlRegExImpl.Create();
+  Result := THsPerlRegExList.CreateHsPerlRegEx();
 End;
 
 Class Function THsPerlRegEx.CreateHsPerlRegExList() : IHsPerlRegExList;
@@ -318,30 +323,8 @@ Begin
 End;
 
 (******************************************************************************)
-(*
-Procedure THsPerlRegExImpl.AfterConstruction();
-Begin
-  InHerited AfterConstruction();
 
-  FRegExImpl := Nil;
-End;
-
-Procedure THsPerlRegExImpl.BeforeDestruction();
-Begin
-  If Assigned(FRegExImpl) Then
-    FreeAndNil(FRegExImpl);
-
-  InHerited BeforeDestruction();
-End;
-
-Function THsPerlRegExImpl.GetRegExImpl() : TPerlRegEx;
-Begin
-  If Not Assigned(FRegExImpl) Then
-    FRegExImpl := TPerlRegEx.Create();
-  Result := FRegExImpl;
-End;
-*)
-Procedure THsPerlRegExImpl.AfterConstruction();
+Procedure THsPerlRegExList.THsPerlRegExItem.AfterConstruction();
 Begin
   InHerited AfterConstruction();
 
@@ -354,14 +337,14 @@ Begin
 {$ENDIF}
 End;
 
-Procedure THsPerlRegExImpl.BeforeDestruction();
+Procedure THsPerlRegExList.THsPerlRegExItem.BeforeDestruction();
 Begin
   pcre_dispose(FPattern, FHints, FCharTable);
 
   InHerited BeforeDestruction();
 End;
 
-Function THsPerlRegExImpl.EscapeRegExChars(Const S : String) : String;
+Function THsPerlRegExList.THsPerlRegExItem.EscapeRegExChars(Const S : String) : String;
 Var I : Integer;
 Begin
   Result := S;
@@ -370,61 +353,61 @@ Begin
   Begin
     Case Result[I] Of
       '.', '[', ']', '(', ')', '?', '*', '+', '{', '}', '^', '$', '|', '\':
-        Insert('\', Result, I);
+        System.Insert('\', Result, I);
       #0:
       Begin
         Result[I] := '0';
-        Insert('\', Result, I);
+        System.Insert('\', Result, I);
       End;
     End;
     Dec(I);
   End;
 End;
 
-Function THsPerlRegExImpl.GetFoundMatch() : Boolean;
+Function THsPerlRegExList.THsPerlRegExItem.GetFoundMatch() : Boolean;
 Begin
   Result := FOffsetCount > 0;
 End;
 
-Function THsPerlRegExImpl.GetMatchedText() : PCREString;
+Function THsPerlRegExList.THsPerlRegExItem.GetMatchedText() : PCREString;
 Begin
   Assert(GetFoundMatch(), 'REQUIRE: There must be a successful match first');
   Result := GetGroups(0);
 End;
 
-Function THsPerlRegExImpl.GetMatchedLength() : Integer;
+Function THsPerlRegExList.THsPerlRegExItem.GetMatchedLength() : Integer;
 Begin
   Assert(GetFoundMatch(), 'REQUIRE: There must be a successful match first');
   Result := GetGroupLengths(0);
 End;
 
-Function THsPerlRegExImpl.GetMatchedOffset() : Integer;
+Function THsPerlRegExList.THsPerlRegExItem.GetMatchedOffset() : Integer;
 Begin
   Assert(GetFoundMatch(), 'REQUIRE: There must be a successful match first');
   Result := GetGroupOffsets(0);
 End;
 
-Function THsPerlRegExImpl.GetGroupCount() : Integer;
+Function THsPerlRegExList.THsPerlRegExItem.GetGroupCount() : Integer;
 Begin
   Assert(GetFoundMatch(), 'REQUIRE: There must be a successful match first');
   Result := FOffsetCount - 1;
 End;
 
-Function THsPerlRegExImpl.GetGroupLengths(Index : Integer) : Integer;
+Function THsPerlRegExList.THsPerlRegExItem.GetGroupLengths(Index : Integer) : Integer;
 Begin
   Assert(GetFoundMatch(), 'REQUIRE: There must be a successful match first');
   Assert((Index >= 0) And (Index <= GetGroupCount()), 'REQUIRE: Index <= GroupCount');
   Result := FOffsets[Index * 2 + 1] - FOffsets[Index * 2];
 End;
 
-Function THsPerlRegExImpl.GetGroupOffsets(Index : Integer) : Integer;
+Function THsPerlRegExList.THsPerlRegExItem.GetGroupOffsets(Index : Integer) : Integer;
 Begin
   Assert(GetFoundMatch(), 'REQUIRE: There must be a successful match first');
   Assert((Index >= 0) And (Index <= GetGroupCount()), 'REQUIRE: Index <= GroupCount');
   Result := FOffsets[Index * 2];
 End;
 
-Function THsPerlRegExImpl.GetGroups(Index : Integer) : PCREString;
+Function THsPerlRegExList.THsPerlRegExItem.GetGroups(Index : Integer) : PCREString;
 Begin
   Assert(GetFoundMatch(), 'REQUIRE: There must be a successful match first');
   If Index > GetGroupCount() Then
@@ -435,92 +418,92 @@ Begin
     Result := Copy(FSubject, FOffsets[Index * 2], FOffsets[Index * 2 + 1] - FOffsets[Index * 2]);
 End;
 
-Function THsPerlRegExImpl.GetCompiled() : Boolean;
+Function THsPerlRegExList.THsPerlRegExItem.GetCompiled() : Boolean;
 Begin
   Result := FCompiled;
 End;
 
-Function THsPerlRegExImpl.GetStudied() : Boolean;
+Function THsPerlRegExList.THsPerlRegExItem.GetStudied() : Boolean;
 Begin
   Result := FStudied;
 End;
 
-Function THsPerlRegExImpl.GetStart() : Integer;
+Function THsPerlRegExList.THsPerlRegExItem.GetStart() : Integer;
 Begin
   Result := FStart;
 End;
 
-Function THsPerlRegExImpl.GetStop() : Integer;
+Function THsPerlRegExList.THsPerlRegExItem.GetStop() : Integer;
 Begin
   Result := FStop;
 End;
 
-Function THsPerlRegExImpl.GetState() : TPerlRegExState;
+Function THsPerlRegExList.THsPerlRegExItem.GetState() : TPerlRegExState;
 Begin
   Result := FState;
 End;
 
-Procedure THsPerlRegExImpl.SetState(Const AState : TPerlRegExState);
+Procedure THsPerlRegExList.THsPerlRegExItem.SetState(Const AState : TPerlRegExState);
 Begin
   FState := AState;
 End;
 
-Function THsPerlRegExImpl.GetSubject() : PCREString;
+Function THsPerlRegExList.THsPerlRegExItem.GetSubject() : PCREString;
 Begin
   Result := FSubject;
 End;
 
-Function THsPerlRegExImpl.GetOptions() : TPerlRegExOptions;
+Function THsPerlRegExList.THsPerlRegExItem.GetOptions() : TPerlRegExOptions;
 Begin
   Result := FOptions;
 End;
 
-Function THsPerlRegExImpl.GetRegEx() : PCREString;
+Function THsPerlRegExList.THsPerlRegExItem.GetRegEx() : PCREString;
 Begin
   Result := FRegEx;
 End;
 
-Function THsPerlRegExImpl.GetReplacement() : PCREString;
+Function THsPerlRegExList.THsPerlRegExItem.GetReplacement() : PCREString;
 Begin
   Result := FReplacement;
 End;
 
-Procedure THsPerlRegExImpl.SetReplacement(Const AReplacement : PCREString);
+Procedure THsPerlRegExList.THsPerlRegExItem.SetReplacement(Const AReplacement : PCREString);
 Begin
   FReplacement := AReplacement;
 End;
 
-Function THsPerlRegExImpl.GetOnMatch() : TNotifyEvent;
+Function THsPerlRegExList.THsPerlRegExItem.GetOnMatch() : TNotifyEvent;
 Begin
   Result := FOnMatch;
 End;
 
-Procedure THsPerlRegExImpl.SetOnMatch(Const AOnMatch : TNotifyEvent);
+Procedure THsPerlRegExList.THsPerlRegExItem.SetOnMatch(Const AOnMatch : TNotifyEvent);
 Begin
   FOnMatch := AOnMatch;
 End;
 
-Function THsPerlRegExImpl.GetOnReplace() : TPerlRegExReplaceEvent;
+Function THsPerlRegExList.THsPerlRegExItem.GetOnReplace() : TPerlRegExReplaceEvent;
 Begin
   Result := FOnReplace;
 End;
 
-Procedure THsPerlRegExImpl.SetOnReplace(Const AOnReplace : TPerlRegExReplaceEvent);
+Procedure THsPerlRegExList.THsPerlRegExItem.SetOnReplace(Const AOnReplace : TPerlRegExReplaceEvent);
 Begin
   FOnReplace := AOnReplace
 End;
 
-Function THsPerlRegExImpl.GetSubjectLeft() : PCREString;
+Function THsPerlRegExList.THsPerlRegExItem.GetSubjectLeft() : PCREString;
 Begin
   Result := Copy(GetSubject(), 1, FOffsets[0] - 1);
 End;
 
-Function THsPerlRegExImpl.GetSubjectRight() : PCREString;
+Function THsPerlRegExList.THsPerlRegExItem.GetSubjectRight() : PCREString;
 Begin
   Result := Copy(FSubject, FOffsets[1], MaxInt);
 End;
 
-Procedure THsPerlRegExImpl.CleanUp();
+Procedure THsPerlRegExList.THsPerlRegExItem.CleanUp();
 Begin
   FCompiled := False;
   FStudied  := False;
@@ -531,13 +514,13 @@ Begin
   FOffsetCount := 0;
 End;
 
-Procedure THsPerlRegExImpl.ClearStoredGroups();
+Procedure THsPerlRegExList.THsPerlRegExItem.ClearStoredGroups();
 Begin
   FHasStoredGroups := False;
   FStoredGroups    := Nil;
 End;
 
-Function THsPerlRegExImpl.Match() : Boolean;
+Function THsPerlRegExList.THsPerlRegExItem.Match() : Boolean;
 Var I, Opts : Integer;
 Begin
   ClearStoredGroups();
@@ -571,7 +554,7 @@ Begin
   End;
 End;
 
-Function THsPerlRegExImpl.MatchAgain() : Boolean;
+Function THsPerlRegExList.THsPerlRegExItem.MatchAgain() : Boolean;
 Var
   I, Opts : Integer;
 Begin
@@ -613,12 +596,12 @@ Begin
   End;
 End;
 
-Function THsPerlRegExImpl.NamedGroup(Const Name : PCREString) : Integer;
+Function THsPerlRegExList.THsPerlRegExItem.NamedGroup(Const Name : PCREString) : Integer;
 Begin
   Result := pcre_get_stringnumber(FPattern, PAnsiChar(Name));
 End;
 
-Function THsPerlRegExImpl.Replace() : PCREString;
+Function THsPerlRegExList.THsPerlRegExItem.Replace() : PCREString;
 Begin
   Assert(GetFoundMatch(), 'REQUIRE: There must be a successful match first');
   // Substitute backreferences
@@ -627,9 +610,9 @@ Begin
   If Assigned(FOnReplace) Then
     FOnReplace(Self, Result);
   // Perform substitution
-  Delete(FSubject, GetMatchedOffset(), GetMatchedLength());
+  System.Delete(FSubject, GetMatchedOffset(), GetMatchedLength());
   If Result <> '' Then
-    Insert(Result, FSubject, GetMatchedOffset());
+    System.Insert(Result, FSubject, GetMatchedOffset());
   FSubjectPChar := PAnsiChar(FSubject);
   // Position to continue search
   FStart := FStart - GetMatchedLength() + Length(Result);
@@ -639,7 +622,7 @@ Begin
   FOffsetCount := 0;
 End;
 
-Function THsPerlRegExImpl.ReplaceAll() : Boolean;
+Function THsPerlRegExList.THsPerlRegExItem.ReplaceAll() : Boolean;
 Begin
   If Match() Then
   Begin
@@ -652,7 +635,7 @@ Begin
     Result := False;
 End;
 
-Function THsPerlRegExImpl.ComputeReplacement() : PCREString;
+Function THsPerlRegExList.THsPerlRegExItem.ComputeReplacement() : PCREString;
 Var
   Mode    : AnsiChar;
   S       : PCREString;
@@ -735,7 +718,7 @@ Var
   Var
     Backreference : PCREString;
   Begin
-    Delete(S, I, J - I);
+    System.Delete(S, I, J - I);
     If Number <= GetGroupCount() Then
     Begin
       Backreference := GetGroups(Number);
@@ -751,7 +734,7 @@ Var
         
         If S <> '' Then
         Begin
-          Insert(Backreference, S, I);
+          System.Insert(Backreference, S, I);
           I := I + Length(Backreference);
         End
         Else
@@ -824,8 +807,8 @@ Var
       Else If Dollar And (S[J] = '_') Then
       Begin
         // $_ (whole subject)
-        Delete(S, I, J + 1 - I);
-        Insert(FSubject, S, I);
+        System.Delete(S, I, J + 1 - I);
+        System.Insert(FSubject, S, I);
         I := I + Length(FSubject);
         Exit;
       End
@@ -848,8 +831,8 @@ Var
           '`':
           Begin
             // \` or $` (backtick; subject to the left of the match)
-            Delete(S, I, J + 1 - I);
-            Insert(GetSubjectLeft(), S, I);
+            System.Delete(S, I, J + 1 - I);
+            System.Insert(GetSubjectLeft(), S, I);
             I := I + FOffsets[0] - 1;
             Exit;
           End;
@@ -857,8 +840,8 @@ Var
           '''':
           Begin
             // \' or $' (straight quote; subject to the right of the match)
-            Delete(S, I, J + 1 - I);
-            Insert(GetSubjectRight(), S, I);
+            System.Delete(S, I, J + 1 - I);
+            System.Insert(GetSubjectRight(), S, I);
             I := I + Length(FSubject) - FOffsets[1];
             Exit;
           End
@@ -884,9 +867,10 @@ Begin
         Case S[J] Of
           '$', '\':
           Begin
-            Delete(S, I, 1);
+            System.Delete(S, I, 1);
             Inc(I);
           End;
+          
           'g':
           Begin
             If (J < Length(S) - 1) And (S[J + 1] = '<') And (S[J + 2] In ['A'..'Z', 'a'..'z', '_']) Then
@@ -903,7 +887,7 @@ Begin
                 If N > 0 Then
                   ReplaceBackreference(N)
                 Else
-                  Delete(S, I, J - I);
+                  System.Delete(S, I, J - I);
               End
               Else
                 I := J;
@@ -930,7 +914,7 @@ Begin
         Assert(J <= Length(S), 'CHECK: We let I stop one character before the end, so J cannot point beyond the end of the PCREString here');
         If S[J] = '$' Then
         Begin
-          Delete(S, J, 1);
+          System.Delete(S, J, 1);
           Inc(I);
         End
         Else
@@ -946,7 +930,7 @@ Begin
   Result := S;
 End;
 
-Procedure THsPerlRegExImpl.SetOptions(Value : TPerlRegExOptions);
+Procedure THsPerlRegExList.THsPerlRegExItem.SetOptions(Value : TPerlRegExOptions);
 Begin
   If (FOptions <> Value) Then
   Begin
@@ -975,7 +959,7 @@ Begin
   End;
 End;
 
-Procedure THsPerlRegExImpl.SetRegEx(Const Value : PCREString);
+Procedure THsPerlRegExList.THsPerlRegExItem.SetRegEx(Const Value : PCREString);
 Begin
   If FRegEx <> Value Then
   Begin
@@ -984,7 +968,7 @@ Begin
   End;
 End;
 
-Procedure THsPerlRegExImpl.SetStart(Const Value : Integer);
+Procedure THsPerlRegExList.THsPerlRegExItem.SetStart(Const Value : Integer);
 Begin
   If Value < 1 Then
     FStart := 1
@@ -993,7 +977,7 @@ Begin
   // If FStart > Length(Subject), MatchAgain() will simply return False
 End;
 
-Procedure THsPerlRegExImpl.SetStop(Const Value : Integer);
+Procedure THsPerlRegExList.THsPerlRegExItem.SetStop(Const Value : Integer);
 Begin
   If Value > Length(FSubject) Then
     FStop := Length(FSubject)
@@ -1001,7 +985,7 @@ Begin
     FStop := Value;
 End;
 
-Procedure THsPerlRegExImpl.SetSubject(Const Value : PCREString);
+Procedure THsPerlRegExList.THsPerlRegExItem.SetSubject(Const Value : PCREString);
 Begin
   FSubject := Value;
   FSubjectPChar := PAnsiChar(Value);
@@ -1011,7 +995,7 @@ Begin
     FOffsetCount := 0;
 End;
 
-Procedure THsPerlRegExImpl.Split(Strings : TStrings; Limit : Integer);
+Procedure THsPerlRegExList.THsPerlRegExItem.Split(Strings : TStrings; Limit : Integer);
 Var Offset ,
     Count  : Integer;
 Begin
@@ -1031,7 +1015,7 @@ Begin
   End;
 End;
 
-Procedure THsPerlRegExImpl.SplitCapture(Strings : TStrings; Limit, Offset : Integer);
+Procedure THsPerlRegExList.THsPerlRegExItem.SplitCapture(Strings : TStrings; Limit, Offset : Integer);
 Var Count      : Integer;
     bUseOffset : Boolean;
     iOffset    : Integer;
@@ -1070,12 +1054,12 @@ Begin
   End;
 End;
 
-Procedure THsPerlRegExImpl.SplitCapture(Strings : TStrings; Limit : Integer);
+Procedure THsPerlRegExList.THsPerlRegExItem.SplitCapture(Strings : TStrings; Limit : Integer);
 Begin
   SplitCapture(Strings, Limit, 1);
 End;
 
-Procedure THsPerlRegExImpl.StoreGroups;
+Procedure THsPerlRegExList.THsPerlRegExItem.StoreGroups;
 Var
   I : Integer;
 Begin
@@ -1089,7 +1073,7 @@ Begin
   End;
 End;
 
-Procedure THsPerlRegExImpl.Compile();
+Procedure THsPerlRegExList.THsPerlRegExItem.Compile();
 Var
   Error : PAnsiChar;
   ErrorOffset : Integer;
@@ -1103,7 +1087,7 @@ Begin
   FCompiled := True;
 End;
 
-Procedure THsPerlRegExImpl.Study();
+Procedure THsPerlRegExList.THsPerlRegExItem.Study();
 Var
   Error : PAnsiChar;
 Begin
@@ -1111,7 +1095,7 @@ Begin
     Compile();
   FHints := pcre_study(FPattern, 0, @Error);
   If Error <> Nil Then
-    Raise Exception.Create('TPerlRegEx.Study() - Error studying the regex: ' + Ansistring(Error));
+    Raise Exception.Create('TPerlRegEx.Study() - Error studying the regex : ' + Ansistring(Error));
   FStudied := True;
 End;
 
@@ -1120,9 +1104,14 @@ Begin
   Result := InHerited Current As IHsPerlRegEx;
 End;
 
+Class Function THsPerlRegExList.CreateHsPerlRegEx() : IHsPerlRegEx;
+Begin
+  Result := THsPerlRegExItem.Create();
+End;
+
 Function THsPerlRegExList.GetItemClass() : TInterfacedObjectExClass;
 Begin
-  Result := THsPerlRegExImpl;
+  Result := THsPerlRegExItem;
 End;
 
 Function THsPerlRegExList.Get(Index : Integer) : IHsPerlRegEx;
@@ -1175,9 +1164,14 @@ Begin
   Result := InHerited IndexOf(IInterfaceEx(Item));
 End;
 
+Function THsPerlRegExList.GetEnumeratorClass() : TInterfaceExEnumeratorClass;
+Begin
+  Result := THsPerlRegExListEnumerator;
+End;
+
 Function THsPerlRegExList.GetEnumerator() : IHsPerlRegExListEnumerator;
 Begin
-  Result := THsPerlRegExListEnumerator.Create(Self);
+  Result := InHerited GetEnumerator() As IHsPerlRegExListEnumerator;
 End;
 
 Function THsPerlRegExList.GetSubject() : PCREString;
